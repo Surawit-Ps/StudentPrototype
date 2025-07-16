@@ -42,7 +42,7 @@ func main() {
 
 		router.POST("/work", controller.CreateWork)
 		router.GET("/work", controller.GetAllWork)
-		router.GET("/work/:id", controller.GetAllWork)
+		router.GET("/work/:id", controller.GetWork)
 		router.PATCH("/work/:id", controller.UpdateWork)
 		router.DELETE("/work/:id", controller.DeleteWork)
 		
