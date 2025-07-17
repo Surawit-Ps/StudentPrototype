@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Layout, Menu, Dropdown, Avatar } from "antd";
+import { Layout, Menu, Dropdown, Avatar, Tooltip } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import logo from "../../assets/logojob.png";
 import { GetUserById } from "../../services/https";
@@ -12,6 +12,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(localStorage.getItem("page") || "home");
   const [user, setUser] = useState<UsersInterface | null>(null);
+  const [isHover, setIsHover] = useState(false);
 
   const handleMenuClick = (key: string) => {
     setCurrentPage(key);
@@ -59,14 +60,14 @@ const Navbar: React.FC = () => {
     <Header
       style={{
         backgroundColor: "#F9F7F7",
-        height: 64,
-        padding: "0 24px",
+        height: 20,
+        padding: 0,
         boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
       }}
     >
       <div
         style={{
-          maxWidth: "100%",
+          maxWidth: "60%",
           margin: "0 auto",
           height: "100%",
           display: "flex",
@@ -79,8 +80,9 @@ const Navbar: React.FC = () => {
           <img src={logo} alt="Logo" style={{ height: 40 }} />
         </div>
 
-        {/* Main navigation items */}
-        <div style={{ display: "flex", gap: 40 }}>
+        {/* Menu + Avatar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 40 }}>
+          {/* Navigation Links */}
           {navItems.map((item) => {
             const isActive = currentPage === item.key;
             return (
@@ -97,10 +99,10 @@ const Navbar: React.FC = () => {
                   borderBottom: isActive ? "2px solid #3F72AF" : "none",
                   transition: "all 0.3s ease",
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   e.currentTarget.style.borderBottom = "2px solid #3F72AF";
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
                   if (!isActive) {
                     e.currentTarget.style.borderBottom = "none";
                   }
@@ -110,19 +112,46 @@ const Navbar: React.FC = () => {
               </Link>
             );
           })}
-        </div>
 
-        {/* Dropdown Menu with Avatar */}
-        <Dropdown overlay={dropdownMenu} trigger={["click"]}>
-          <Avatar
-            src={user?.Profile} // แสดงรูปถ้ามี
-            icon={!user?.Profile ? <UserOutlined /> : undefined}
-            style={{
-              backgroundColor: "#3F72AF",
-              cursor: "pointer",
-            }}
-          />
-        </Dropdown>
+          {/* Avatar + First Name */}
+          <Dropdown overlay={dropdownMenu} trigger={["hover", "click"]}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                cursor: "pointer",
+              }}
+              onMouseEnter={() => setIsHover(true)}
+              onMouseLeave={() => setIsHover(false)}
+            >
+              <Tooltip title="เปิดเมนูโปรไฟล์" placement="bottom">
+                <div
+                  style={{
+                    transform: isHover ? "scale(1.1)" : "scale(1)",
+                    transition: "transform 0.2s ease",
+                  }}
+                >
+                  <Avatar
+                    src={user?.Profile}
+                    icon={!user?.Profile ? <UserOutlined /> : undefined}
+                    style={{ backgroundColor: "#3F72AF" }}
+                  />
+                </div>
+              </Tooltip>
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  color: "#3F72AF",
+                  textTransform: "uppercase",
+                }}
+              >
+                {user?.FirstName}
+              </span>
+            </div>
+          </Dropdown>
+        </div>
       </div>
     </Header>
   );

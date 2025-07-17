@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"time"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/tanapon395/sa-67-example/config"
@@ -102,4 +103,87 @@ func DeleteWork(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Work deleted successfully"})
+}
+
+type RegisterPayload struct {
+	UserID uint `json:"user_id"`
+}
+
+func RegisterWork(c *gin.Context) {
+	id := c.Param("id") // รับ work id จาก URL
+	db := config.DB()
+
+	var work entity.Work
+	if err := db.First(&work, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Work not found"})
+		return
+	}
+
+	var payload RegisterPayload
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing or invalid user_id"})
+		return
+	}
+
+	// ✅ ตรวจสอบว่าผู้ใช้เคยลงทะเบียนแล้วหรือยัง
+	var user entity.User
+	if err := db.First(&user, payload.UserID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+	if user.Status == 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User already registered for a job"})
+		return
+	}
+
+	// ตรวจสอบว่าจำนวนคนเต็มหรือยัง
+	if work.WorkUse >= work.WorkCount {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Work is full, cannot register"})
+		return
+	}
+
+	// ตรวจสอบเวลา
+	now := time.Now()
+	if now.After(work.WorkTime) || now.Equal(work.WorkTime) {
+		work.WorkStatusID = 2
+		db.Save(&work)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Work is already started or passed"})
+		return
+	}
+
+	// เพิ่มจำนวนผู้ใช้
+	work.WorkUse += 1
+	if err := db.Save(&work).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update work usage"})
+		return
+	}
+
+	// เตรียม WorkHistory
+	workHistory := entity.WorkHistory{
+		UserID: payload.UserID,
+		WorkID: work.ID,
+	}
+	if work.WorkTypeID == 1 && work.Paid != nil {
+		workHistory.PaidAmount = work.Paid
+	}
+	if work.WorkTypeID == 2 && work.Volunteer != nil {
+		workHistory.VolunteerHour = work.Volunteer
+	}
+	if err := db.Create(&workHistory).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record work history"})
+		return
+	}
+
+	// ✅ อัปเดตสถานะผู้ใช้เป็น 1
+	user.Status = 1
+	if err := db.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":     "Registered successfully",
+		"workuse":     work.WorkUse,
+		"workhistory": workHistory,
+	})
 }

@@ -45,6 +45,7 @@ func main() {
 		router.GET("/work/:id", controller.GetWork)
 		router.PATCH("/work/:id", controller.UpdateWork)
 		router.DELETE("/work/:id", controller.DeleteWork)
+		router.POST("/work/register/:id", controller.RegisterWork)
 		
 		router.POST("/dashboard", controller.CreateDashboard)
 		router.GET("/dashboard", controller.GetAllDashboard)

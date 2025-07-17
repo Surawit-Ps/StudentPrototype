@@ -126,6 +126,15 @@ async function DeleteWorkByID(id: Number | undefined) {
   return res.ok;
 }
 
+async function RegisterWork(workId: number, userId: number) {
+  const res = await fetch(
+    `${apiUrl}/work/register/${workId}`,
+    authRequestOptions("POST", { user_id: userId })
+  );
+
+  return res.ok ? res.json() : false;
+}
+
 // -------------------- DASHBOARD --------------------
 async function CreateDashboard(data: DashboardInterface) {
   const res = await fetch(`${apiUrl}/dashboard`, authRequestOptions("POST", data));
@@ -166,6 +175,7 @@ export {
   GetWorkById,
   UpdateWork,
   DeleteWorkByID,
+  RegisterWork,
   // dashboard
   CreateDashboard,
   GetDashboard,
