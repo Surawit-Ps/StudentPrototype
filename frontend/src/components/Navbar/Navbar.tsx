@@ -63,6 +63,7 @@ const Navbar: React.FC = () => {
         height: 20,
         padding: 0,
         boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+        
       }}
     >
       <div
@@ -87,29 +88,21 @@ const Navbar: React.FC = () => {
             const isActive = currentPage === item.key;
             return (
               <Link
-                key={item.key}
-                to={item.to}
-                onClick={() => handleMenuClick(item.key)}
-                style={{
-                  color: isActive ? "#3F72AF" : "#112D4E",
-                  fontWeight: isActive ? "bold" : "normal",
-                  fontSize: 17,
-                  textDecoration: "none",
-                  padding: "12px 0",
-                  borderBottom: isActive ? "2px solid #3F72AF" : "none",
-                  transition: "all 0.3s ease",
-                }}
-                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                  e.currentTarget.style.borderBottom = "2px solid #3F72AF";
-                }}
-                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                  if (!isActive) {
-                    e.currentTarget.style.borderBottom = "none";
-                  }
-                }}
-              >
-                {item.label}
-              </Link>
+  key={item.key}
+  to={item.to}
+  onClick={() => handleMenuClick(item.key)}
+  style={{
+    color: isActive ? "#3F72AF" : "#112D4E",
+    fontWeight: isActive ? "bold" : "normal",
+    fontSize: 17,
+    textDecoration: "none",
+    padding: "12px 0",
+    borderBottom: "none", // << ไม่มีเส้นใต้
+    transition: "all 0.3s ease",
+  }}
+>
+  {item.label}
+</Link>
             );
           })}
 

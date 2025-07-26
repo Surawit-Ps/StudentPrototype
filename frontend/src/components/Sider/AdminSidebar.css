@@ -50,13 +50,24 @@
   display: flex;
   align-items: center;
   padding-left: 20px;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   color: #DBE2EF;
 }
 
 .admin .menu-item:hover {
-  background-color: #3F72AF !important;
-  color: #ffffff !important;
+  font-size: 17px !important;
+  color: #3F72AF !important;
+  background-color: #f0f4ff !important;
+}
+
+.menu-item:hover .icon-style {
+  color: #3F72AF !important;
+}
+
+/* ป้องกันตัวเลือกที่ถูกเลือกไว้ให้ไม่โดนกลบ */
+.ant-menu-item-selected {
+  font-weight: bold;
+  color: #112D4E !important;
 }
 
 .admin .menu-item.ant-menu-item-selected {

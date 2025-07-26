@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Layout } from "antd";
 import "leaflet/dist/leaflet.css";
 
-import Home from "./pages/home";
+// import Home from "./pages/home";
 import Work from "./pages/work";
 import WorkCreate from "./pages/work/create";
 import WorkEdit from "./pages/work/edit";
+import WorkInfo from "./pages/work/info";
 import WorkView from "./pages/work/view";
 
 import Dashboard from "./pages/dashboard";
@@ -35,12 +36,13 @@ const App: React.FC = () => {
           }}
         >
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* <Route path="/" element={<Home />} /> */}
             <Route path="/work" element={<Work />} />
             <Route path="/work/create" element={<WorkCreate />} />
             <Route path="/work/edit/:id" element={<WorkEdit />} />
+            <Route path="/work/info/:id" element={<WorkInfo />} />
             <Route path="/work/view" element={<WorkView />} />
-            
+
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/create" element={<DashboardCreate />} />
             <Route path="/dashboard/edit/:id" element={<DashboardEdit />} />
@@ -53,7 +55,12 @@ const App: React.FC = () => {
           </Routes>
         </Content>
 
-        <Footer style={{ textAlign: "center" }}>STUDENT JOB HUB</Footer>
+        <Footer style={{ textAlign: "center", color: "#888", background: "#f0f2f5", lineHeight: "1.6" }}>
+          STUDENT JOB HUB © {new Date().getFullYear()}<br />
+          มหาวิทยาลัยเทคโนโลยีสุรนารี (SUT)<br />
+          ติดต่อ: projectstudentjobhub@gmail.com
+        </Footer>
+
       </Layout>
     </Router>
   );

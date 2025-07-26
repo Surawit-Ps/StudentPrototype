@@ -292,7 +292,7 @@ const WorkEdit = () => {
                 <Col xs={24} md={10}>
                   <div style={{ marginBottom: 8, fontWeight: 600 }}>เลือกพิกัดจากแผนที่</div>
                   {position && (
-                    <MapContainer center={position} zoom={15} style={{ height: "430px", width: "100%", borderRadius: 8 }}>
+                    <MapContainer center={position} zoom={14} style={{ height: "430px", width: "100%", borderRadius: 8 }}>
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                       <Marker position={position} />
                       <LocationPicker onSelect={(lat, lng) => setPosition([lat, lng])} />
