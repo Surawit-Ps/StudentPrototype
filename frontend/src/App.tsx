@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Layout } from "antd";
 import "leaflet/dist/leaflet.css";
 
-// import Home from "./pages/home";
+import Home from "./pages/home";
 import Work from "./pages/work";
 import WorkCreate from "./pages/work/create";
 import WorkEdit from "./pages/work/edit";
@@ -20,8 +20,8 @@ import AccountrCreate from "./pages/account/create";
 import AccountEdit from "./pages/account/edit";
 
 import Login from "./pages/login/login";
-
-const { Content, Footer } = Layout;
+import EnhancedFooter from "./components/Footer/EnhancedFooter";
+const { Content } = Layout;
 
 const App: React.FC = () => {
   return (
@@ -29,14 +29,14 @@ const App: React.FC = () => {
       <Layout style={{ minHeight: "100vh" }}>
         <Content
           style={{
-            margin: "0 16px",
-            padding: 24,
+            // margin: "0 16px",
+            // padding: 24,
             minHeight: "calc(100vh - 134px)", // เผื่อ Footer
             background: "#F9F7F7",
           }}
         >
           <Routes>
-            {/* <Route path="/" element={<Home />} /> */}
+            <Route path="/" element={<Home />} />
             <Route path="/work" element={<Work />} />
             <Route path="/work/create" element={<WorkCreate />} />
             <Route path="/work/edit/:id" element={<WorkEdit />} />
@@ -55,11 +55,7 @@ const App: React.FC = () => {
           </Routes>
         </Content>
 
-        <Footer style={{ textAlign: "center", color: "#888", background: "#f0f2f5", lineHeight: "1.6" }}>
-          STUDENT JOB HUB © {new Date().getFullYear()}<br />
-          มหาวิทยาลัยเทคโนโลยีสุรนารี (SUT)<br />
-          ติดต่อ: projectstudentjobhub@gmail.com
-        </Footer>
+        <EnhancedFooter />
 
       </Layout>
     </Router>

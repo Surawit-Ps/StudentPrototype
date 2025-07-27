@@ -59,23 +59,30 @@ const Navbar: React.FC = () => {
   return (
     <Header
       style={{
-        backgroundColor: "#F9F7F7",
-        height: 20,
-        padding: 0,
+        position: "sticky",
+        top: 0,
+        left: 0,
+        width: "100%",
+        zIndex: 1000,
+        padding: "0 24px", // ✅ เพิ่ม padding ซ้าย-ขวาเหมือน Footer
+        backgroundColor: "#fcfcfcff",
         boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-        
       }}
     >
       <div
         style={{
-          maxWidth: "60%",
+          width: "100%",
+          maxWidth: 1400,
           margin: "0 auto",
-          height: "100%",
+          padding: "0 12px", // ✅ เพิ่ม padding ซ้ายขวาภายใน div
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          height: 64,
         }}
       >
+
+
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <img src={logo} alt="Logo" style={{ height: 40 }} />
@@ -88,21 +95,21 @@ const Navbar: React.FC = () => {
             const isActive = currentPage === item.key;
             return (
               <Link
-  key={item.key}
-  to={item.to}
-  onClick={() => handleMenuClick(item.key)}
-  style={{
-    color: isActive ? "#3F72AF" : "#112D4E",
-    fontWeight: isActive ? "bold" : "normal",
-    fontSize: 17,
-    textDecoration: "none",
-    padding: "12px 0",
-    borderBottom: "none", // << ไม่มีเส้นใต้
-    transition: "all 0.3s ease",
-  }}
->
-  {item.label}
-</Link>
+                key={item.key}
+                to={item.to}
+                onClick={() => handleMenuClick(item.key)}
+                style={{
+                  color: isActive ? "#3F72AF" : "#112D4E",
+                  fontWeight: isActive ? "bold" : "normal",
+                  fontSize: 17,
+                  textDecoration: "none",
+                  padding: "12px 0",
+                  borderBottom: "none", // << ไม่มีเส้นใต้
+                  transition: "all 0.3s ease",
+                }}
+              >
+                {item.label}
+              </Link>
             );
           })}
 

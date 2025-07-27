@@ -1,10 +1,19 @@
-/* AdminSidebar.css */
+AdminSidebar.css
+.admin {
+  height: 100vh;
+  display: flex;
+}
+
 .admin .sider {
+  width: 250px;
   height: 100vh;
   background-color: #112D4E;
   color: #fff;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  position: fixed;       /* ✅ ฟิกซ์กับหน้าจอ */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;       /* ✅ scroll ใน sidebar เองถ้าสูงเกิน */
 }
 
 .admin .logo {

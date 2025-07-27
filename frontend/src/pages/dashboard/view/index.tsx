@@ -3,7 +3,8 @@ import { Calendar } from 'lucide-react';
 import Navbar from '../../../components/Navbar/Navbar';
 import { GetDashboard } from '../../../services/https';
 import { DashboardInterface } from '../../../interfaces/IDashboard';
-import { Layout, Pagination } from 'antd';
+import { Layout, Pagination, Tooltip, Tag } from 'antd';
+import bannerImage from "../../../assets/w3.jpg";
 
 const DashboardView = () => {
   const [dashboards, setDashboards] = useState<DashboardInterface[]>([]);
@@ -28,7 +29,8 @@ const DashboardView = () => {
   }, []);
 
   const totalPages = Math.ceil(dashboards.length / pageSize);
-  const paginated = dashboards.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+ const sortedDashboards = dashboards.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
+const paginated = sortedDashboards.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -45,47 +47,30 @@ const DashboardView = () => {
       <Layout style={{ backgroundColor: "#F9F7F7", minHeight: "100vh" }}>
         {/* Hero Section */}
         <div style={{
-          background: 'linear-gradient(135deg, #3F72AF 0%, #112D4E 100%)',
-          marginTop: 24,
+          backgroundImage: `url(${bannerImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           position: 'relative',
           overflow: 'hidden',
-          paddingTop: '8px',
-          paddingBottom: '8px'
         }}>
           <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0.1,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
-          }} />
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 24px',
+            backgroundColor: 'rgba(33, 62, 155, 0.3)',
+            padding: '40px 24px',
             textAlign: 'center',
-            position: 'relative',
-            zIndex: 2
+            color: 'white'
           }}>
             <h1 style={{
-              fontSize: '58px',
+              fontSize: '48px',
               fontWeight: 'bold',
-              color: 'white',
-              marginBottom: '16px',
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              marginBottom: '16px'
             }}>
               ข่าวประชาสัมพันธ์
             </h1>
             <p style={{
-              color: 'white',
-              fontSize: '20px',
+              fontSize: '18px',
               maxWidth: '700px',
-              marginInline: 'auto',
-              lineHeight: 1.6,
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
-              fontWeight: 400
+              margin: '0 auto',
+              lineHeight: 1.6
             }}>
               ศูนย์รวมข่าวสาร กิจกรรม และประกาศสำคัญจากมหาวิทยาลัยเทคโนโลยีสุรนารี
               สำหรับนักศึกษา บุคลากร และผู้สนใจทั่วไป
@@ -110,38 +95,45 @@ const DashboardView = () => {
                     key={item.ID ?? Math.random()}
                     style={{
                       display: 'flex',
-                      backgroundColor: '#F9F7F7',
+                      background: 'linear-gradient(145deg, #156ef598, #73d0e744)',
                       borderRadius: '24px',
                       overflow: 'hidden',
                       boxShadow: '0 8px 32px rgba(17, 78, 78, 0.1)',
-                      border: '1px solid #DBE2EF',
+                      border: '1px solid #fcfcfc60',
                       width: '60%',
                       minHeight: '180px',
-                      margin: '0 auto'
+                      margin: '0 auto',
+                      transition: 'transform 0.3s ease',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                   >
                     {/* Image */}
                     <div style={{
                       width: '25%',
                       minWidth: '160px',
                       maxWidth: '200px',
-                      backgroundColor: '#ffffff',
                       display: 'flex',
+                      marginLeft: 10,
+                      marginTop: 10,
+                      marginBottom: 10,
                       alignItems: 'center',
                       justifyContent: 'center',
                       padding: '12px'
                     }}>
-                      <img
-                        src={item.image ?? ''}
-                        alt={item.subject ?? 'ข่าว'}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '12px',
-                          border: '2px solid #3F72AF'
-                        }}
-                      />
+                      <Tooltip title="ดูภาพข่าว">
+                        <img
+                          src={item.image ?? ''}
+                          alt={item.subject ?? 'ข่าว'}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '12px',
+                            border: '2px solid #3F72AF'
+                          }}
+                        />
+                      </Tooltip>
                     </div>
 
                     {/* Content */}
@@ -158,7 +150,7 @@ const DashboardView = () => {
                         color: '#112D4E',
                         marginBottom: '12px'
                       }}>
-                        {item.subject}
+                        📢 {item.subject} 
                       </h3>
 
                       <p style={{
@@ -174,12 +166,12 @@ const DashboardView = () => {
                       <div style={{
                         fontSize: '14px',
                         color: '#555',
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
                         padding: '6px 14px',
                         borderRadius: '24px',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '10px',
                         boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
                       }}>
                         <Calendar size={16} /> {formatDate(item.dashboardtime ?? '')}
@@ -198,11 +190,11 @@ const DashboardView = () => {
                     total={dashboards.length}
                     onChange={(page) => {
                       setCurrentPage(page);
-                      window.scrollTo({ top: 0, behavior: "smooth" }); // ✅ scroll to top
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     showSizeChanger={false}
-                    showQuickJumper={false} // ✅ hide "Go to page"
-                    style={{ display: "inline-block" }} // ✅ center horizontally
+                    showQuickJumper={false}
+                    style={{ display: "inline-block" }}
                   />
                 </div>
               )}

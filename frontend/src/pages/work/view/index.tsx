@@ -28,6 +28,7 @@ import { WorkInterface } from "../../../interfaces/IWork";
 import { GetWork } from "../../../services/https";
 import { DollarOutlined, HeartFilled } from "@ant-design/icons";
 import Navbar from "../../../components/Navbar/Navbar";
+import bannerImage from "../../../assets/w1.jpg";
 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
@@ -89,26 +90,28 @@ const WorkView = () => {
       <Layout style={{ backgroundColor: "#F9F7F7", minHeight: "100vh" }}>
         <Content style={{ padding: 0 }}>
           {contextHolder}
-          <div
-            style={{
-              background: "linear-gradient(135deg, #3F72AF 0%, #4b7bb1ff 100%)",
-              color: "white",
-              padding: "1px 24px 40px",
-              marginTop: 24,
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                width: "50%",
-                height: "100%",
-                background: "rgba(255,255,255,0.05)",
-                transform: "skewX(-15deg)",
-              }}
-            />
+<div
+  style={{
+    position: "relative",
+    backgroundImage: `url(${bannerImage})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    padding: "1px 24px 60px",
+    color: "white",
+  }}
+>
+  {/* Overlay gradient filter */}
+  <div
+    style={{
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: "linear-gradient(135deg, rgba(18, 52, 94, 0.9), rgba(17, 45, 78, 0.8))",
+      zIndex: 1,
+    }}
+  />
             <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
               <Title level={1} style={{ color: "white", fontSize: "3rem", fontWeight: "bold", textAlign: "center" }}>
                 ค้นหางานที่ใช่สำหรับคุณ
@@ -236,14 +239,14 @@ const WorkView = () => {
                             }}
                           >
                             {work.worktype_id === 1 ? (
-  <>
-    <DollarOutlined /> มีค่าตอบแทน
-  </>
-) : (
-  <>
-    <HeartFilled style={{ color: "white" }} /> จิตอาสา
-  </>
-)}
+                              <>
+                                <DollarOutlined /> มีค่าตอบแทน
+                              </>
+                            ) : (
+                              <>
+                                <HeartFilled style={{ color: "white" }} /> จิตอาสา
+                              </>
+                            )}
                           </div>
                           <Badge
                             count={work.workstatus_id === 1 ? "เปิดรับสมัคร" : "ปิดรับสมัคร"}
@@ -303,22 +306,22 @@ const WorkView = () => {
                             </div>
 
                             <Button
-  type="primary"
-  size="large"
-  block
-  style={{
-    marginTop: 2,
-    backgroundColor: "#5bace2ff",
-    fontWeight: "bold",
-    height: 48,
-  }}
-  onClick={(e) => {
-    e.stopPropagation();
-    navigate(`/work/info/${work.ID}`);
-  }}
->
-  <FileSearchOutlined style={{ fontSize: 18 }} />
-                               แสดงรายละเอียดงาน
+                              type="primary"
+                              size="large"
+                              block
+                              style={{
+                                marginTop: 2,
+                                backgroundColor: "#5bace2ff",
+                                fontWeight: "bold",
+                                height: 48,
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/work/info/${work.ID}`);
+                              }}
+                            >
+                              <FileSearchOutlined style={{ fontSize: 18 }} />
+                              แสดงรายละเอียดงาน
                             </Button>
                           </Space>
                         </div>
@@ -327,20 +330,20 @@ const WorkView = () => {
                   ))}
                 </Row>
 
-               <div style={{ textAlign: "center", marginTop: 40 }}>
-  <Pagination
-    current={currentPage}
-    pageSize={pageSize}
-    total={filteredWorks.length}
-    onChange={(page) => {
-      setCurrentPage(page);
-      window.scrollTo({ top: 0, behavior: "smooth" }); // ให้เลื่อนขึ้นข้างบนเวลาเปลี่ยนหน้า
-    }}
-    showSizeChanger={false}
-    showQuickJumper={false} // ❌ เอา Go to Page ออก
-    style={{ display: "inline-block" }} // ✅ ทำให้สามารถจัดตรงกลางได้
-  />
-</div>
+                <div style={{ textAlign: "center", marginTop: 40 }}>
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={filteredWorks.length}
+                    onChange={(page) => {
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" }); // ให้เลื่อนขึ้นข้างบนเวลาเปลี่ยนหน้า
+                    }}
+                    showSizeChanger={false}
+                    showQuickJumper={false} // ❌ เอา Go to Page ออก
+                    style={{ display: "inline-block" }} // ✅ ทำให้สามารถจัดตรงกลางได้
+                  />
+                </div>
               </>
             )}
           </div>
