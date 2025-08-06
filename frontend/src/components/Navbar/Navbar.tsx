@@ -38,6 +38,9 @@ const Navbar: React.FC = () => {
       <Menu.Item key="account">
         <Link to="/account" onClick={() => handleMenuClick("account")}>โปรไฟล์</Link>
       </Menu.Item>
+      <Menu.Item key="myworks">
+        <Link to="/myworks" onClick={() => handleMenuClick("myworks")}>งานของฉัน</Link>
+      </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="logout" onClick={handleLogout}>
         ออกจากระบบ

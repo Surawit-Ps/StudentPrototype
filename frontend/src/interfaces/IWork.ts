@@ -13,4 +13,5 @@ export interface WorkInterface {
     volunteer?: number | null;  // กรณีเป็นงานจิตอาสา
     workstatus_id?: number;
     worktype_id?: number;
+    poster_id?: number;
 }

@@ -40,7 +40,43 @@ func SetupDatabase() {
 		&entity.WorkHistory{},
 		//dashboard
 		&entity.Dashboard{},
+		//booking
+		&entity.Booking{},
+		//checkin
+		&entity.CheckIn{},
 	)
+
+	checkIn := []entity.CheckIn{
+		{
+			UserID: 1,
+			WorkID: 1,
+		},
+		{	UserID: 2,
+			WorkID: 2,	
+		},
+		{
+			UserID: 3,
+			WorkID: 3,
+		},
+	}
+	for _, c := range checkIn {
+		db.FirstOrCreate(&c, entity.CheckIn{UserID: c.UserID, WorkID: c.WorkID})
+	}
+
+	bookings := []entity.Booking{
+	{ UserID: 2, WorkID: 1, Status: "registered" },
+	{ UserID: 3, WorkID: 1, Status: "registered" },
+	{ UserID: 4, WorkID: 1, Status: "registered" },
+	{ UserID: 3, WorkID: 1, Status: "registered" },
+	{ UserID: 3, WorkID: 2, Status: "registered" },
+	{ UserID: 4, WorkID: 3, Status: "registered" },
+	{ UserID: 5, WorkID: 4, Status: "registered" },
+}
+
+for _, b := range bookings {
+	db.FirstOrCreate(&b, entity.Booking{UserID: b.UserID, WorkID: b.WorkID})
+}
+
 
 	//WorkStatus
 	WorStatusActive := entity.WorkStatus{WorkStatus: "Active"}
@@ -69,6 +105,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,         // Active
 			WorkTypeID:   2,         // Volunteer
 			Volunteer:    IntPtr(3), // 3 ชั่วโมง
+			PosterID:     1,
 		},
 		{
 			Title:        "ผู้ช่วยดูแลบูธนิทรรศการ",
@@ -83,6 +120,7 @@ func SetupDatabase() {
 			WorkStatusID: 2,
 			WorkTypeID:   1,
 			Paid:         IntPtr(300),
+			PosterID:     1,
 		},
 		{
 			Title:        "พี่เลี้ยงกิจกรรมเด็ก",
@@ -97,6 +135,7 @@ func SetupDatabase() {
 			WorkStatusID: 2,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(5),
+			PosterID:     1,
 		},
 		{
 			Title:        "แจกแผ่นพับรณรงค์การอนุรักษ์พลังงาน",
@@ -111,6 +150,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(2),
+			PosterID:     1,
 		},
 		{
 			Title:        "แคชเชียร์ร้านกาแฟ (Part-time)",
@@ -125,6 +165,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(500),
+			PosterID:     1,
 		},
 		{
 			Title:        "ช่างภาพงานรับปริญญา",
@@ -139,6 +180,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(800),
+			PosterID:     1,
 		},
 		{
 			Title:        "งานดูแลสัตว์เลี้ยง (Vol.)",
@@ -153,6 +195,7 @@ func SetupDatabase() {
 			WorkStatusID: 2,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(6),
+			PosterID:     1,
 		},
 		{
 			Title:        "ผู้ช่วยงานแพ็คสินค้า",
@@ -167,6 +210,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(400),
+			PosterID:     1,
 		},
 		{
 			Title:        "อาสาสมัครเก็บขยะชายหาด",
@@ -181,6 +225,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(4),
+			PosterID:     2,
 		},
 		{
 			Title:        "พนักงานแจกสินค้าโปรโมชั่น",
@@ -195,6 +240,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(600),
+			PosterID:     2,
 		},
 		{
 			Title:        "อาสาสมัครอ่านหนังสือให้ผู้พิการทางสายตา",
@@ -209,6 +255,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(3),
+			PosterID:     2,
 		},
 		{
 			Title:        "ผู้ช่วยร้านอาหาร (Part-time)",
@@ -223,6 +270,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(450),
+			PosterID:     2,
 		},
 		{
 			Title:        "กิจกรรมปลูกต้นไม้",
@@ -237,6 +285,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(4),
+			PosterID:     1,
 		},
 		{
 			Title:        "พนักงานต้อนรับงานสัมมนา",
@@ -251,6 +300,7 @@ func SetupDatabase() {
 			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(700),
+			PosterID:     1,
 		},
 	}
 	// บันทึกข้อมูลโปรโมชั่นตัวอย่างลงในฐานข้อมูล

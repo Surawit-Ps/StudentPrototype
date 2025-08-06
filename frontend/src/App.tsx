@@ -19,6 +19,9 @@ import Account from "./pages/account";
 import AccountrCreate from "./pages/account/create";
 import AccountEdit from "./pages/account/edit";
 
+import MyPostedWorks from "./pages/myWork/myWorks";
+import BookingWork from "./pages/myWork/ิbookingWork";
+
 import Login from "./pages/login/login";
 import EnhancedFooter from "./components/Footer/EnhancedFooter";
 const { Content } = Layout;
@@ -52,6 +55,8 @@ const App: React.FC = () => {
             <Route path="/account/create" element={<AccountrCreate />} />
             <Route path="/account/edit/:id" element={<AccountEdit />} />
             <Route path="login" element={<Login />} />
+            <Route path="/myworks" element={<MyPostedWorks />} />
+            <Route path="/myworks/booking/:workId" element={<BookingWork />} />
           </Routes>
         </Content>
 

@@ -66,20 +66,23 @@ const WorkCreate = () => {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  const onFinish = async (values: any) => {
-    const data: WorkInterface = {
-      ...values,
-      worktime: values.worktime.toISOString(),
-      photo: fileList[0]?.thumbUrl || "",
-      paid: workTypeID === 1 ? values.paid : null,
-      volunteer: workTypeID === 2 ? values.volunteer : null,
-      worktype_id: values.WorkTypeID,
-      workstatus_id: values.WorkStatusID,
-      latitude: position[0],
-      longitude: position[1],
-    };
+  const posterId = parseInt(localStorage.getItem("user_id") || "0"); // ✅ ดึงจาก localStorage
 
-    const res = await CreateWork(data);
+  const onFinish = async (values: any) => {
+  const data: WorkInterface = {
+    ...values,
+    worktime: values.worktime.toISOString(),
+    photo: fileList[0]?.thumbUrl || "",
+    paid: workTypeID === 1 ? values.paid : null,
+    volunteer: workTypeID === 2 ? values.volunteer : null,
+    worktype_id: values.WorkTypeID,
+    workstatus_id: values.WorkStatusID,
+    latitude: position[0],
+    longitude: position[1],
+    poster_id: posterId, // ✅ แนบเข้าไป
+  };
+
+  const res = await CreateWork(data);
 
     if (res) {
       messageApi.success("สร้างงานสำเร็จ");

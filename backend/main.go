@@ -46,12 +46,30 @@ func main() {
 		router.PATCH("/work/:id", controller.UpdateWork)
 		router.DELETE("/work/:id", controller.DeleteWork)
 		router.POST("/work/register/:id", controller.RegisterWork)
+		router.GET("/work/poster/:id", controller.GetWorkByPosterID)
 		
 		router.POST("/dashboard", controller.CreateDashboard)
 		router.GET("/dashboard", controller.GetAllDashboard)
 		router.GET("/dashboard/:id", controller.GetDashboard)
 		router.PATCH("/dashboard", controller.UpdateDashboard)
 		router.DELETE("/dashboard/:id", controller.DeleteDashboard)
+
+		// Booking Routes
+		router.GET("/booking/user/:userID", controller.GetBookingByUserID)
+		router.GET("/booking/work/:workID", controller.GetBookingByWorkID)
+		router.POST("/booking", controller.CreateBooking)
+		router.PATCH("/booking/:id", controller.UpdateBooking)
+		router.DELETE("/booking/:id", controller.DeleteBooking)
+		router.GET("/bookings", controller.GetAllBooking)
+		// CheckIn Routes
+		router.GET("/checkin/work/:workID", controller.GetcheckInByWorkID)
+		router.POST("/checkin", controller.CreateCheckIn)
+		router.PATCH("/checkin/:id", controller.UpdateCheckIn)
+		router.DELETE("/checkin/:id", controller.DeleteCheckIn)
+		router.GET("/checkins", controller.GetAllCheckIn)
+		// WorkHistory Routes
+		router.GET("/workhistory/user/:userID", controller.GetWorkHistoryByUserID)
+		router.GET("/workhistory/work/:workID", controller.GetWorkHistoryByWorkID)
 
 	}
 	r.GET("/", func(c *gin.Context) {

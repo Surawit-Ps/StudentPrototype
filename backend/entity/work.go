@@ -27,4 +27,7 @@ type Work struct {
 	WorkType   *WorkType `gorm:"foreignKey: WorkTypeID" json:"worktype"`
 
 	WorkHistories []WorkHistory `gorm:"foreignKey:WorkID"`
+
+	PosterID uint      `json:"poster_id"`
+	Poster   *User     `gorm:"foreignKey:PosterID"`
 }

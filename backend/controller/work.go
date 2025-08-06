@@ -187,3 +187,15 @@ func RegisterWork(c *gin.Context) {
 		"workhistory": workHistory,
 	})
 }
+
+func GetWorkByPosterID(c *gin.Context) {
+	posterID := c.Param("id")
+	var works []entity.Work
+	db := config.DB()
+	result := db.Where("poster_id = ?", posterID).Find(&works)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, works)
+}

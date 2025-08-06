@@ -1,6 +1,8 @@
 import { UsersInterface } from "../../interfaces/IUser";
 import { WorkInterface } from "../../interfaces/IWork";
 import { DashboardInterface } from "../../interfaces/IDashboard";
+import { BookingInterface } from "../../interfaces/IBooking";
+import { CheckInInterface } from "../../interfaces/ICheckIn";
 
 const apiUrl = "http://localhost:8000";
 
@@ -116,7 +118,7 @@ async function GetWorkById(id: Number | undefined) {
   return res.ok ? res.json() : false;
 }
 
-async function UpdateWork(data: WorkInterface) {
+async function UpdateWork(p0: number, data: WorkInterface) {
   const res = await fetch(`${apiUrl}/work/${data.ID}`, authRequestOptions("PATCH", data));
   return res.ok ? res.json() : false;
 }
@@ -160,6 +162,99 @@ async function DeleteDashboardByID(id: Number | undefined) {
   const res = await fetch(`${apiUrl}/dashboard/${id}`, authRequestOptions("DELETE"));
   return res.ok;
 }
+// -------------------- BOOKINGS --------------------
+
+async function GetBookings() {
+  const res = await fetch(`${apiUrl}/bookings`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+async function GetBookingByWorkId(workId: number) {
+  const res = await fetch(`${apiUrl}/booking/work/${workId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+} 
+
+async function GetBookingByUserId(userId: number) {
+  const res = await fetch(`${apiUrl}/bookings/user/${userId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+async function CreateBooking(data: BookingInterface) {
+  const res = await fetch(`${apiUrl}/booking`, authRequestOptions("POST", data));
+  return res.ok ? res.json() : false;
+}
+
+async function GetBookingById(id: Number | undefined) {
+  const res = await fetch(`${apiUrl}/bookings/${id}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+
+async function UpdateBooking(bookingId: number, data: any) {
+  const res = await fetch(`${apiUrl}/booking/${bookingId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(data),
+  });
+  return res.ok ? res.json() : false;
+}
+
+async function DeleteBookingByID(id: Number | undefined) {
+  const res = await fetch(`${apiUrl}/bookings/${id}`, authRequestOptions("DELETE"));
+  return res.ok;
+}
+
+// -------------------- CHECK-INS --------------------
+async function GetCheckIns() {
+  const res = await fetch(`${apiUrl}/checkins`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+async function CreateCheckIn(data: CheckInInterface) {
+  const res = await fetch(`${apiUrl}/checkin`, authRequestOptions("POST", data));
+  return res.ok ? res.json() : false;
+}
+async function GetCheckInById(id: Number | undefined) {
+  const res = await fetch(`${apiUrl}/checkins/${id}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+async function UpdateCheckIn(data: CheckInInterface) {
+  const res = await fetch(`${apiUrl}/checkins/${data.id}`, authRequestOptions("PATCH", data));
+  return res.ok ? res.json() : false;
+}
+async function DeleteCheckInByID(id: Number | undefined) {
+  const res = await fetch(`${apiUrl}/checkins/${id}`, authRequestOptions("DELETE"));
+  return res.ok;
+}
+
+async function GetCheckInByWorkId(workId: number) {
+  const res = await fetch(`${apiUrl}/checkins/work/${workId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+async function GetCheckInByUserId(userId: number) {
+  const res = await fetch(`${apiUrl}/checkins/user/${userId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+
+// -------------------- WORK HISTORY --------------------
+
+async function GetWorkHistoryByUserId(userId: number) {
+  const res = await fetch(`${apiUrl}/work/history/${userId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+async function GetWorkHistoryByWorkId(workId: number) {
+  const res = await fetch(`${apiUrl}/work/history/work/${workId}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
+async function GetWorkByPosterID(id: Number | undefined) {
+  const res = await fetch(`${apiUrl}/work/poster/${id}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
 
 export {
   // user
@@ -176,10 +271,30 @@ export {
   UpdateWork,
   DeleteWorkByID,
   RegisterWork,
+  GetWorkByPosterID,
   // dashboard
   CreateDashboard,
   GetDashboard,
   GetDashboardById,
   UpdateDashboard,
   DeleteDashboardByID,
+  // bookings
+  GetBookings,
+  CreateBooking,
+  GetBookingById,
+  UpdateBooking,
+  DeleteBookingByID,
+  GetBookingByWorkId,
+  GetBookingByUserId,
+  // check-ins
+  GetCheckIns,
+  CreateCheckIn,
+  GetCheckInById,
+  UpdateCheckIn,
+  DeleteCheckInByID,
+  GetCheckInByWorkId,
+  GetCheckInByUserId,
+  // work history
+  GetWorkHistoryByUserId,
+  GetWorkHistoryByWorkId,
 };
