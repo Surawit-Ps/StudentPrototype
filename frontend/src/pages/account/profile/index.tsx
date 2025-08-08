@@ -27,52 +27,48 @@ const ProfileView = () => {
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return;
+  const fetchData = async () => {
+    if (!id) return;
 
-      try {
-        // 1. ดึงข้อมูลผู้ใช้
-        const data = await GetUserById(Number(id));
-        if (data && data.ID) {
-          setUser(data);
+    try {
+      // 1. ดึงข้อมูลผู้ใช้
+      const data = await GetUserById(Number(id));
+      if (data && data.ID) {
+        setUser(data);
 
-          // 2. ดึงข้อมูล WorkHistory ทั้งหมด
-          const histories = await GetWorkHistory();
+        // 2. ดึงข้อมูล WorkHistory ทั้งหมด
+        const histories = await GetWorkHistory();
 
-          if (histories && Array.isArray(histories)) {
-            const mapped = histories.map((item: any) => ({
-              ...item,
-              PaidAmount: item.paid_amount,
-              VolunteerHour: item.volunteer_hour,
-            }));
+        if (histories && Array.isArray(histories)) {
+          // ดึงเฉพาะของ user คนนี้
+          const userHistories = histories.filter(
+            (h: any) => h.User?.ID === data.ID
+          );
 
-            const userHistories = mapped.filter((h) => h.User?.ID === data.ID);
+          // รวมค่าตอบแทน (paid) และชั่วโมงจิตอาสา (volunteer)
+          const totalPaid = userHistories.reduce(
+            (sum: number, h: any) => sum + (h.Work?.paid || 0),
+            0
+          );
+          const totalVolunteer = userHistories.reduce(
+            (sum: number, h: any) => sum + (h.Work?.volunteer || 0),
+            0
+          );
 
-            const totalPaid = userHistories.reduce(
-              (sum, h) => sum + (h.PaidAmount || 0),
-              0
-            );
-            const totalVolunteer = userHistories.reduce(
-              (sum, h) => sum + (h.VolunteerHour || 0),
-              0
-            );
-
-            // 5. เซตค่า state
-            setPaidAmountTotal(totalPaid);
-            setVolunteerHourTotal(totalVolunteer);
-          }
-
-        } else {
-          messageApi.error("ไม่สามารถโหลดข้อมูลผู้ใช้");
+          setPaidAmountTotal(totalPaid);
+          setVolunteerHourTotal(totalVolunteer);
         }
-      } catch (error) {
-        messageApi.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-        console.error("Fetch error:", error);
+      } else {
+        messageApi.error("ไม่สามารถโหลดข้อมูลผู้ใช้");
       }
-    };
+    } catch (error) {
+      messageApi.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+      console.error("Fetch error:", error);
+    }
+  };
 
-    fetchData();
-  }, [id]);
+  fetchData();
+}, [id]);
 
 
   const calculateAge = (birthdate: string): number => {

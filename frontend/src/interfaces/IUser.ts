@@ -9,4 +9,7 @@ export interface UsersInterface {
   Gender?: GendersInterface;
   Password?: string;
   Profile?: string;
+
+  TotalPaidAmount?: number;
+  TotalVolunteerHour?: number;
 }

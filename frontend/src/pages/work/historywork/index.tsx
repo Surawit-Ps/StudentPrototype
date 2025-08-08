@@ -30,19 +30,21 @@ const WorkHistoryTablePage = () => {
     const [messageApi, contextHolder] = message.useMessage();
 
     const fetchHistoryList = async () => {
-    const res = await GetWorkHistory();
-    if (res) {
-        const mapped = res.map((item: any) => ({
-            ...item,
-            PaidAmount: item.paid_amount,
-            VolunteerHour: item.volunteer_hour,
-        }));
-        setHistories(mapped);
-        setFilteredHistories(mapped);
-    } else {
-        messageApi.error("ไม่สามารถดึงข้อมูลประวัติงานได้");
-    }
-};
+        const res = await GetWorkHistory();
+        if (res) {
+            const mapped = res.map((item: any) => ({
+                ...item,
+                // ไม่จำเป็น
+                // PaidAmount: item.paid_amount,
+                // VolunteerHour: item.volunteer_hour,
+            }));
+            setHistories(mapped);
+            setHistories(mapped);
+            setFilteredHistories(mapped);
+        } else {
+            messageApi.error("ไม่สามารถดึงข้อมูลประวัติงานได้");
+        }
+    };
 
 
     useEffect(() => {
@@ -86,14 +88,15 @@ const WorkHistoryTablePage = () => {
             title: "ค่าตอบแทน",
             key: "PaidAmount",
             render: (_: any, record: WorkHistoryInterface) =>
-                record.PaidAmount != null ? `${record.PaidAmount} บาท` : "-",
+                record.Work?.paid != null ? `${record.Work.paid} บาท` : "-",
         },
         {
             title: "ชั่วโมงจิตอาสา",
             key: "VolunteerHour",
             render: (_: any, record: WorkHistoryInterface) =>
-                record.VolunteerHour != null ? `${record.VolunteerHour} ชม.` : "-",
+                record.Work?.volunteer != null ? `${record.Work.volunteer} ชม.` : "-",
         },
+
 
 
         {
