@@ -12,14 +12,16 @@ import {
   Select,
   DatePicker,
   Upload,
+  notification,
 } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { UsersInterface } from "../../../interfaces/IUser";
 import { GendersInterface } from "../../../interfaces/IGender";
 import { CreateUser, GetGenders } from "../../../services/https";
 import { useNavigate } from "react-router-dom";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import ImgCrop from "antd-img-crop";
+import { RcFile } from 'antd/es/upload';
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -27,7 +29,14 @@ const { Option } = Select;
 
 function CustomerCreate() {
   const navigate = useNavigate();
-  const [messageApi, contextHolder] = message.useMessage();
+  const openNotification = (type: "success" | "error", description: string) => {
+  notification[type]({
+    message: type === "success" ? "สำเร็จ" : "เกิดข้อผิดพลาด",
+    description,
+    placement: "bottomRight",
+  });
+};
+
   const [genders, setGenders] = useState<GendersInterface[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -51,24 +60,25 @@ function CustomerCreate() {
   };
 
   const onFinish = async (values: UsersInterface) => {
-    values.Profile = fileList[0].thumbUrl;
+  if (!fileList.length || !fileList[0].originFileObj) {
+    openNotification("error", "กรุณาอัปโหลดรูปภาพ");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    values.Profile = reader.result as string;
     let res = await CreateUser(values);
-    console.log(res);
     if (res) {
-      messageApi.open({
-        type: "success",
-        content: "บันทึกข้อมูลสำเร็จ",
-      });
-      setTimeout(function () {
-        navigate("/customer");
-      }, 2000);
+      openNotification("success", res.message || "สร้างข้อมูลสำเร็จ");
+      setTimeout(() => navigate("/account"), 2000);
     } else {
-      messageApi.open({
-        type: "error",
-        content: "เกิดข้อผิดพลาด !",
-      });
+      openNotification("error", "เกิดข้อผิดพลาด !");
     }
   };
+  reader.readAsDataURL(fileList[0].originFileObj as RcFile);
+};
+
 
   const getGender = async () => {
     let res = await GetGenders();
@@ -82,10 +92,16 @@ function CustomerCreate() {
   }, []);
 
   return (
-    <div>
-      {contextHolder}
+    <div style={{ 
+    minHeight: "100vh", 
+    display: "flex", 
+    flexDirection: "column", 
+    justifyContent: "center", 
+    padding: "32px" // เพิ่มระยะห่างขอบจอ
+  }}>
+      {/* {contextHolder} */}
       <Card>
-        <h2> เพิ่มข้อมูล ผู้ดูแลระบบ</h2>
+        <h2> เพิ่มข้อมูลผู้ใช้งาน</h2>
         <Divider />
         <Form
           name="basic"
@@ -94,33 +110,64 @@ function CustomerCreate() {
           autoComplete="off"
         >
           <Row gutter={[16, 16]}>
-            <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-              <Form.Item
-                label="รูปประจำตัว"
-                name="Profile"
-                valuePropName="fileList"
-              >
-                <ImgCrop rotationSlider>
-                  <Upload
-                    fileList={fileList}
-                    onChange={onChange}
-                    onPreview={onPreview}
-                    beforeUpload={(file) => {
-                      setFileList([...fileList, file]);
-                      return false;
-                    }}
-                    maxCount={1}
-                    multiple={false}
-                    listType="picture-card"
-                  >
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>อัพโหลด</div>
-                    </div>
-                  </Upload>
-                </ImgCrop>
-              </Form.Item>
+            <Col span={24}>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <Form.Item name="Profile" valuePropName="fileList" style={{ marginBottom: "24px", marginTop: "12px" }}>
+                  <ImgCrop rotationSlider>
+                    <Upload
+                      fileList={fileList}
+                      onChange={onChange}
+                      onPreview={onPreview}
+                      beforeUpload={(file) => {
+                        setFileList([file]); // จำกัด 1 รูป
+                        return false;
+                      }}
+                      maxCount={1}
+                      multiple={false}
+                      listType="picture-card"
+                      showUploadList={false} // ✅ ซ่อน list อัตโนมัติของ Upload
+                    >
+                      {fileList.length === 0 ? (
+                        <div>
+                          <PlusOutlined />
+                          <div style={{ marginTop: 8 }}>อัพโหลด</div>
+                        </div>
+                      ) : (
+                        <div style={{ position: "relative" }}>
+                          <img
+                            src={
+                              fileList[0].thumbUrl ||
+                              (fileList[0].originFileObj && URL.createObjectURL(fileList[0].originFileObj))
+                            }
+                            alt="avatar"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: 8,
+                            }}
+                          />
+                          <EditOutlined
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              fontSize: 28,
+                              color: "#fff",
+                              backgroundColor: "rgba(0,0,0,0.4)",
+                              borderRadius: "50%",
+                              padding: 8,
+                            }}
+                          />
+                        </div>
+                      )}
+                    </Upload>
+                  </ImgCrop>
+                </Form.Item>
+              </div>
             </Col>
+
 
             <Col xs={24} sm={24} md={24} lg={24} xl={12}>
               <Form.Item
@@ -188,12 +235,12 @@ function CustomerCreate() {
               <Form.Item
                 label="วัน/เดือน/ปี เกิด"
                 name="birthday"
-                // rules={[
-                //   {
-                //     required: true,
-                //     message: "กรุณาเลือกวัน/เดือน/ปี เกิด !",
-                //   },
-                // ]}
+              // rules={[
+              //   {
+              //     required: true,
+              //     message: "กรุณาเลือกวัน/เดือน/ปี เกิด !",
+              //   },
+              // ]}
               >
                 <DatePicker style={{ width: "100%" }} />
               </Form.Item>
@@ -213,12 +260,31 @@ function CustomerCreate() {
                 </Select>
               </Form.Item>
             </Col>
+            {/* <Col xs={24} sm={24} md={24} lg={24} xl={12}>
+              <Form.Item
+                label="เบอร์โทร"
+                name="Contact"
+                rules={[
+                  {
+                    required: true,
+                    message: "กรุณากรอกเบอร์โทร !",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </Col> */}
           </Row>
+
           <Row justify="end">
             <Col style={{ marginTop: "40px" }}>
               <Form.Item>
                 <Space>
-                  <Button htmlType="button" style={{ marginRight: "10px" }}>
+                  <Button
+                    htmlType="button"
+                    style={{ marginRight: "10px" }}
+                    onClick={() => navigate(-1)}
+                  >
                     ยกเลิก
                   </Button>
                   <Button

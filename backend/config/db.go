@@ -123,6 +123,31 @@ for _, b := range bookings {
 		PaidAmount:    &paid2,
 		VolunteerHour: &zero,
 	},
+
+	{
+			UserID:        1,
+			WorkID:        1,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(3),
+		},
+		{
+			UserID:        1,
+			WorkID:        2,
+			PaidAmount:    IntPtr(300),
+			VolunteerHour: nil,
+		},
+		{
+			UserID:        1,
+			WorkID:        3,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(5),
+		},
+		{
+			UserID:        2,
+			WorkID:        1,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(5),
+		},
 	
 	}
 
@@ -447,6 +472,22 @@ for _, b := range bookings {
 	}
 	db.FirstOrCreate(User, &entity.User{
 		Email: "sa@gmail.com",
+	})
+
+	hashedPassword2, _ := HashPassword("123456")
+	BirthDay2, _ := time.Parse("2006-01-02", "1990-05-20")
+	User2 := &entity.User{
+		FirstName: "Software",
+		LastName:  "Engineering",
+		Email:     "se@gmail.com",
+		Password:  hashedPassword2,
+		BirthDay:  BirthDay2,
+		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
+		GenderID:  2,
+		// Contact:   "0987654321",
+	}
+	db.FirstOrCreate(User2, &entity.User{
+		Email: "se@gmail.com",
 	})
 
 }

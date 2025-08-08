@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(localStorage.getItem("page") || "home");
   const [user, setUser] = useState<UsersInterface | null>(null);
   const [isHover, setIsHover] = useState(false);
+  const userId = localStorage.getItem("user_id");
 
   const handleMenuClick = (key: string) => {
     setCurrentPage(key);
@@ -36,10 +37,15 @@ const Navbar: React.FC = () => {
         <Link to="/work" onClick={() => handleMenuClick("admin")}>แอดมิน</Link>
       </Menu.Item>
       <Menu.Item key="account">
-        <Link to="/account" onClick={() => handleMenuClick("account")}>โปรไฟล์</Link>
+        <Link to={`/account/profile/${userId}`} onClick={() => handleMenuClick("account")}>โปรไฟล์</Link>
       </Menu.Item>
       <Menu.Item key="myworks">
         <Link to="/myworks" onClick={() => handleMenuClick("myworks")}>งานของฉัน</Link>
+      </Menu.Item>
+      <Menu.Item key="historywork">
+        <Link to={`/work/historywork/${userId}`} onClick={() => handleMenuClick("historywork")}>
+          ประวัติการทำงาน
+        </Link>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="logout" onClick={handleLogout}>

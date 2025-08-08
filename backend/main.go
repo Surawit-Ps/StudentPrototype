@@ -28,6 +28,7 @@ func main() {
 	r.POST("/signin", user.SignIn) //Sign in == login
 	r.GET("/genders", controller.ListGenders)
 	r.POST("/users", controller.CreateUser)
+	r.GET("/workhistories", controller.GetWorkHistories)
 
 	router := r.Group("")
 	

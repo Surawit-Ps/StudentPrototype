@@ -243,12 +243,12 @@ async function GetCheckInByUserId(userId: number) {
 // -------------------- WORK HISTORY --------------------
 
 async function GetWorkHistoryByUserId(userId: number) {
-  const res = await fetch(`${apiUrl}/work/history/${userId}`, authRequestOptions("GET"));
+  const res = await fetch(`${apiUrl}/workhistory/user/${userId}`, authRequestOptions("GET"));
   return res.ok ? res.json() : false;
 }
 
 async function GetWorkHistoryByWorkId(workId: number) {
-  const res = await fetch(`${apiUrl}/work/history/work/${workId}`, authRequestOptions("GET"));
+  const res = await fetch(`${apiUrl}/workhistory/work/${workId}`, authRequestOptions("GET"));
   return res.ok ? res.json() : false;
 }
 
@@ -261,6 +261,13 @@ async function CreateWorkHistory(data: IWorkHistory) {
   const res = await fetch(`${apiUrl}/work/history`, authRequestOptions("POST", data));
   return res.ok ? res.json() : false;
 }
+
+async function GetWorkHistory(): Promise<IWorkHistory[] | false> {
+  const userID = localStorage.getItem("user_id"); // 👈 ดึง user_id จาก localStorage
+  const res = await fetch(`${apiUrl}/workhistories?userID=${userID}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
+
 
 export {
   // user
@@ -304,4 +311,6 @@ export {
   GetWorkHistoryByUserId,
   GetWorkHistoryByWorkId,
   CreateWorkHistory,
+
+  GetWorkHistory,
 };

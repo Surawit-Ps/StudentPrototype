@@ -1,167 +1,175 @@
-import React, { useState, useEffect } from "react";
-import { Space, Table, Button, Col, Row, Divider, Modal, message } from "antd";
-import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import type { ColumnsType } from "antd/es/table";
-import { GetUsers, DeleteUserByID } from "../../services/https";
+import { useEffect, useState } from "react";
+import {
+  Button, Col, Row, Card, Table, Typography, Divider, message, Layout, Modal
+} from "antd";
+import {
+  PlusOutlined, EditOutlined, DeleteOutlined
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { UsersInterface } from "../../interfaces/IUser";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  GetUsers, DeleteUserByID
+} from "../../services/https";
+import AdminSidebar from "../../components/Sider/AdminSidebar";
+import styles from "./AccountTablePage.module.css";
 import dayjs from "dayjs";
 
-function Customers() {
-  const columns: ColumnsType<UsersInterface> = [
+const { Title } = Typography;
+const { Content } = Layout;
+
+const UserTablePage = () => {
+  const [users, setUsers] = useState<UsersInterface[]>([]);
+  const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const fetchUsers = async () => {
+    const res = await GetUsers();
+    if (res) {
+      setUsers(res);
+    } else {
+      messageApi.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
+    }
+  };
+
+  const handleDelete = async (id?: number, name?: string) => {
+    Modal.confirm({
+      title: "ยืนยันการลบ",
+      content: `คุณต้องการลบผู้ใช้ "${name}" ใช่หรือไม่?`,
+      okText: "ลบ",
+      okType: "danger",
+      cancelText: "ยกเลิก",
+      onOk: async () => {
+        const res = await DeleteUserByID(id);
+        if (res) {
+          messageApi.success("ลบข้อมูลสำเร็จ");
+          fetchUsers();
+        } else {
+          messageApi.error("เกิดข้อผิดพลาด");
+        }
+      },
+    });
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const columns = [
     {
       title: "ลำดับ",
-      dataIndex: "ID",
-      key: "id",
+      key: "index",
+      width: 60,
+      align: "center" as const,
+      render: (_: any, __: any, index: number) => index + 1,
     },
     {
       title: "รูปประจำตัว",
       dataIndex: "Profile",
-      key: "profile",
-      width: "15%",
-      render: (text, record, index) => (
-        <img src={record.Profile} className="w3-left w3-circle w3-margin-right" width="100%" />
-      )
+      key: "Profile",
+      width: 100,
+      render: (profile: string) =>
+        profile ? (
+          <img src={profile} alt="profile" className={styles.photo} />
+        ) : (
+          "-"
+        ),
     },
     {
       title: "ชื่อ",
       dataIndex: "FirstName",
-      key: "firstname",
+      key: "FirstName",
+      align: "center" as const,
     },
     {
       title: "นามสกุล",
       dataIndex: "LastName",
-      key: "lastname",
-    },
-    {
-      title: "เพศ",
-      dataIndex: "Gender",
-      key: "gender",
-      render: (item) => Object.values(item.Name),
+      key: "LastName",
+      align: "center" as const,
     },
     {
       title: "อีเมล",
       dataIndex: "Email",
-      key: "email",
+      key: "Email",
+      align: "center" as const,
     },
     {
       title: "วันเกิด",
       dataIndex: "BirthDay",
-      key: "birthday",
-      render: (record) => <p>{dayjs(record).format("dddd DD MMM YYYY")}</p>,
+      key: "BirthDay",
+      align: "center" as const,
+      render: (value: string) => dayjs(value).format("DD/MM/YYYY"),
     },
     {
-      title: "จัดการ",
-      dataIndex: "Manage",
-      key: "manage",
-      render: (text, record, index) => (
-        <>
-          <Button
-            onClick={() => navigate(`/account/edit/${record.ID}`)}
-            shape="circle"
+      title: "เพศ",
+      dataIndex: "Gender",
+      key: "Gender",
+      align: "center" as const,
+      render: (gender: any) => gender?.Name ?? "-",
+    },
+    {
+      title: "การจัดการ",
+      key: "actions",
+      align: "center" as const,
+      render: (_: any, record: UsersInterface) => (
+        <div className={styles.actions}>
+          {/* <Button
             icon={<EditOutlined />}
-            size={"large"}
-          />
+            onClick={() => navigate(`/account/edit/${record.ID}`)}
+            className={styles.editButton}
+          /> */}
           <Button
-            onClick={() => showModal(record)}
-            style={{ marginLeft: 10 }}
-            shape="circle"
             icon={<DeleteOutlined />}
-            size={"large"}
             danger
+            onClick={() => handleDelete(record.ID, `${record.FirstName} ${record.LastName}`)}
+            className={styles.deleteButton}
+            style={{ marginLeft: 8 }}
           />
-        </>
+        </div>
       ),
     },
   ];
 
-  const navigate = useNavigate();
-
-  const [users, setUsers] = useState<UsersInterface[]>([]);
-
-  const [messageApi, contextHolder] = message.useMessage();
-
-  // Model
-  const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState<String>();
-  const [deleteId, setDeleteId] = useState<Number>();
-
-  const getUsers = async () => {
-    let res = await GetUsers();
-    if (res) {
-      setUsers(res);
-    }
-  };
-
-  const showModal = (val: UsersInterface) => {
-    setModalText(
-      `คุณต้องการลบข้อมูลผู้ใช้ "${val.FirstName} ${val.LastName}" หรือไม่ ?`
-    );
-    setDeleteId(val.ID);
-    setOpen(true);
-  };
-
-  const handleOk = async () => {
-    setConfirmLoading(true);
-    let res = await DeleteUserByID(deleteId);
-    if (res) {
-      setOpen(false);
-      messageApi.open({
-        type: "success",
-        content: "ลบข้อมูลสำเร็จ",
-      });
-      getUsers();
-    } else {
-      setOpen(false);
-      messageApi.open({
-        type: "error",
-        content: "เกิดข้อผิดพลาด !",
-      });
-    }
-    setConfirmLoading(false);
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
-  };
-
-  useEffect(() => {
-    getUsers();
-  }, []);
-
   return (
-    <>
-      {contextHolder}
-      <Row>
-        <Col span={12}>
-          <h2>จัดการข้อมูลสมาชิก</h2>
-        </Col>
-        <Col span={12} style={{ textAlign: "end", alignSelf: "center" }}>
-          <Space>
-            <Link to="/account/create">
-              <Button type="primary" icon={<PlusOutlined />}>
-                สร้างข้อมูล
-              </Button>
-            </Link>
-          </Space>
-        </Col>
-      </Row>
-      <Divider />
-      <div style={{ marginTop: 20 }}>
-        <Table rowKey="ID" columns={columns} dataSource={users} />
+    <Layout className={styles.layout}>
+      <div className={styles.sidebarWrapper}>
+        <AdminSidebar />
       </div>
-      <Modal
-        title="ลบข้อมูล ?"
-        open={open}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
-        <p>{modalText}</p>
-      </Modal>
-    </>
-  );
-}
 
-export default Customers;
+      <Layout style={{ marginLeft: 250 }}>
+        <Content className={styles.content}>
+          {contextHolder}
+          <Card className={styles.card}>
+            <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+              <Col>
+                <Title level={3} className={styles.pageTitle}>
+                  จัดการบัญชีผู้ใช้
+                </Title>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate("/account/create")}
+                  className={styles.createButton}
+                >
+                  สร้างบัญชี
+                </Button>
+              </Col>
+            </Row>
+            <Divider />
+            <Table
+              bordered
+              rowKey="ID"
+              columns={columns}
+              dataSource={users}
+              pagination={{ pageSize: 10 }}
+              scroll={{ x: "max-content" }}
+            />
+          </Card>
+        </Content>
+      </Layout>
+    </Layout>
+  );
+};
+
+export default UserTablePage;

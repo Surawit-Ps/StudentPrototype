@@ -1,3 +1,4 @@
+import { GendersInterface } from "./IGender";
 export interface UsersInterface {
   ID?: number;
   FirstName?: string;
@@ -5,6 +6,7 @@ export interface UsersInterface {
   Email?: string;
   BirthDay?: string;
   GenderID?: number;
+  Gender?: GendersInterface;
   Password?: string;
   Profile?: string;
 }

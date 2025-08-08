@@ -60,3 +60,16 @@ func CreateWorkHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Work history created successfully", "workHistory": workHistory})
 }
 
+func GetWorkHistories(c *gin.Context) {
+	var histories []entity.WorkHistory
+	userID := c.Query("userID") // 👈 รับ userID จาก query string
+
+	db := config.DB()
+	if err := db.Preload("User").Preload("Work").
+		Where("user_id = ?", userID). // 👈 filter by userID
+		Find(&histories).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, histories)
+}

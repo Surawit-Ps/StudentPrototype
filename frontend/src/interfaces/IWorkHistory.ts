@@ -1,7 +1,15 @@
 export interface IWorkHistory {
   ID?: number;
-  user_id: number | undefined;
+  user_id: number;
   work_id: number;
-  paid_amount: number;
-  volunteer_hour: number;
+  paid_amount: number | null;
+  volunteer_hour: number | null;
+  Work?: {
+    title?: string;
+    description?: string;
+  };
+  User?: {
+    FirstName?: string;
+    LastName?: string;
+  };
 }
