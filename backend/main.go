@@ -70,7 +70,7 @@ func main() {
 		// WorkHistory Routes
 		router.GET("/workhistory/user/:userID", controller.GetWorkHistoryByUserID)
 		router.GET("/workhistory/work/:workID", controller.GetWorkHistoryByWorkID)
-
+		router.POST("/work/history", controller.CreateWorkHistory)
 	}
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "API RUNNING... PORT: %s", PORT)

@@ -24,6 +24,7 @@ import BookingWork from "./pages/myWork/ิbookingWork";
 
 import Login from "./pages/login/login";
 import EnhancedFooter from "./components/Footer/EnhancedFooter";
+import CompleteWork from "./pages/workComplete/completeWork";
 const { Content } = Layout;
 
 const App: React.FC = () => {
@@ -57,6 +58,7 @@ const App: React.FC = () => {
             <Route path="login" element={<Login />} />
             <Route path="/myworks" element={<MyPostedWorks />} />
             <Route path="/myworks/booking/:workId" element={<BookingWork />} />
+            <Route path="/work/complete/:workId" element={<CompleteWork />} />
           </Routes>
         </Content>
 

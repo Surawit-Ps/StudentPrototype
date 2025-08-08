@@ -3,6 +3,7 @@ import { WorkInterface } from "../../interfaces/IWork";
 import { DashboardInterface } from "../../interfaces/IDashboard";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
+import { IWorkHistory } from "../../interfaces/IWorkHistory";
 
 const apiUrl = "http://localhost:8000";
 
@@ -256,6 +257,11 @@ async function GetWorkByPosterID(id: Number | undefined) {
   return res.ok ? res.json() : false;
 }
 
+async function CreateWorkHistory(data: IWorkHistory) {
+  const res = await fetch(`${apiUrl}/work/history`, authRequestOptions("POST", data));
+  return res.ok ? res.json() : false;
+}
+
 export {
   // user
   GetUsers,
@@ -297,4 +303,5 @@ export {
   // work history
   GetWorkHistoryByUserId,
   GetWorkHistoryByWorkId,
+  CreateWorkHistory,
 };

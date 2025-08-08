@@ -23,6 +23,7 @@ import {
   EyeOutlined,
   EditOutlined,
   CheckCircleOutlined,
+  FileDoneOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
@@ -250,6 +251,14 @@ const MyPostedWorks: React.FC = () => {
                         style={{ color: "#27AE60" }}
                       >
                         เช็คชื่อ
+                      </Button>,
+                      <Button
+                        type="text"
+                        icon={<FileDoneOutlined />}
+                        onClick={() => navigate(`/work/complete/${work.ID}`)}
+                        style={{ color: "#FF9800" }}
+                      >
+                        สรุปงาน
                       </Button>,
                     ]}
                   >

@@ -33,3 +33,30 @@ func GetWorkHistoryByWorkID(c *gin.Context) {
 	c.JSON(http.StatusOK, workHistories)
 	return
 }
+
+func CreateWorkHistory(c *gin.Context) {
+	var input entity.CreateWorkHistoryInput
+
+	// รับข้อมูล JSON และตรวจสอบ required fields
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request, missing required fields"})
+		return
+	}
+
+	// แปลงข้อมูลจาก input เป็น entity.WorkHistory
+	workHistory := entity.WorkHistory{
+		UserID:        input.UserID,
+		WorkID:        input.WorkID,
+		PaidAmount:    input.PaidAmount,
+		VolunteerHour: input.VolunteerHour,
+	}
+
+	db := config.DB()
+	if result := db.Create(&workHistory); result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create work history"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Work history created successfully", "workHistory": workHistory})
+}
+

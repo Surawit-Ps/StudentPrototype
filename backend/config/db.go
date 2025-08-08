@@ -75,7 +75,60 @@ func SetupDatabase() {
 
 for _, b := range bookings {
 	db.FirstOrCreate(&b, entity.Booking{UserID: b.UserID, WorkID: b.WorkID})
-}
+}	
+
+	// สร้างข้อมูล WorkHistory ตัวอย่าง
+	paid1 := 5000
+	paid2 := 3000
+	zero := 0
+	hours := 10
+
+	workHistories := []entity.WorkHistory{
+		{
+		UserID:        1,
+		WorkID:        1,
+		PaidAmount:    &paid1,
+		VolunteerHour: &zero,
+		
+	},
+	{
+		UserID:        2,
+		WorkID:        2,
+		PaidAmount:    &zero,
+		VolunteerHour: &hours,
+		
+	},
+	{
+		UserID:        3,
+		WorkID:        3,
+		PaidAmount:    &paid2,
+		VolunteerHour: &zero,
+		
+	},
+	{
+		UserID:        4,
+		WorkID:        4,
+		PaidAmount:    &zero,
+		VolunteerHour: &hours,
+	}, 
+	{
+		UserID:        5,
+		WorkID:        5,
+		PaidAmount:    &zero,
+		VolunteerHour: &hours,
+	},
+	{
+		UserID:        6,
+		WorkID:        6,
+		PaidAmount:    &paid2,
+		VolunteerHour: &zero,
+	},
+	
+	}
+
+	for _, wh := range workHistories {
+		db.FirstOrCreate(&wh, entity.WorkHistory{UserID: wh.UserID, WorkID: wh.WorkID})
+	}
 
 
 	//WorkStatus

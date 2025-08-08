@@ -16,4 +16,12 @@ type WorkHistory struct {
 
 	PaidAmount     *int `json:"paid_amount"`      // nullable สำหรับกรณี volunteer
 	VolunteerHour  *int `json:"volunteer_hour"`   // nullable สำหรับกรณี paid
+
+}
+
+type CreateWorkHistoryInput struct {
+	UserID        uint `json:"user_id" binding:"required"`
+	WorkID        uint `json:"work_id" binding:"required"`
+	PaidAmount    *int `json:"paid_amount"`
+	VolunteerHour *int `json:"volunteer_hour"`
 }
