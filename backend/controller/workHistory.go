@@ -62,11 +62,13 @@ func CreateWorkHistory(c *gin.Context) {
 
 func GetWorkHistories(c *gin.Context) {
 	var histories []entity.WorkHistory
-	userID := c.Query("userID") // 👈 รับ userID จาก query string
+	userID := c.Query("userID") // ดึง user id จาก query string เช่น /work_histories?userID=1
 
 	db := config.DB()
-	if err := db.Preload("User").Preload("Work").
-		Where("user_id = ?", userID). // 👈 filter by userID
+	if err := db.
+		Preload("User").
+		Preload("Work").
+		Where("user_id = ?", userID).
 		Find(&histories).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
