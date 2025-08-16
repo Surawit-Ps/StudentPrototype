@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card, Col, Row, Typography, Divider, Avatar, message, Button
-} from "antd";
-import {
-  UserOutlined,
-  EditOutlined,
-  ArrowLeftOutlined
-} from "@ant-design/icons";
+import { Card, Col, Row, Typography, Divider, Avatar, message, Button, Statistic } from "antd";
+import { UserOutlined, EditOutlined, ArrowLeftOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { GetUserById } from "../../../services/https";
 import { UsersInterface } from "../../../interfaces/IUser";
 import { GetWorkHistory } from "../../../services/https";
-import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
+// import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
 // import { GendersInterface } from "../../../interfaces/IGender";
 // import { UserStatusInterface } from "../../../interfaces/IUserStatus";
 
@@ -19,7 +13,7 @@ const { Title, Text } = Typography;
 
 const ProfileView = () => {
   const { id } = useParams<{ id: string }>();
-  const [user, setUser] = useState<UsersInterface>({}); // ✅ ใช้ interface
+  const [user, setUser] = useState<UsersInterface>({});
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [paidAmountTotal, setPaidAmountTotal] = useState<number>(0);
@@ -27,48 +21,48 @@ const ProfileView = () => {
 
 
   useEffect(() => {
-  const fetchData = async () => {
-    if (!id) return;
+    const fetchData = async () => {
+      if (!id) return;
 
-    try {
-      // 1. ดึงข้อมูลผู้ใช้
-      const data = await GetUserById(Number(id));
-      if (data && data.ID) {
-        setUser(data);
+      try {
+        // 1. ดึงข้อมูลผู้ใช้
+        const data = await GetUserById(Number(id));
+        if (data && data.ID) {
+          setUser(data);
 
-        // 2. ดึงข้อมูล WorkHistory ทั้งหมด
-        const histories = await GetWorkHistory();
+          // 2. ดึงข้อมูล WorkHistory ทั้งหมด
+          const histories = await GetWorkHistory();
 
-        if (histories && Array.isArray(histories)) {
-          // ดึงเฉพาะของ user คนนี้
-          const userHistories = histories.filter(
-            (h: any) => h.User?.ID === data.ID
-          );
+          if (histories && Array.isArray(histories)) {
+            // ดึงเฉพาะของ user คนนี้
+            const userHistories = histories.filter(
+              (h: any) => h.User?.ID === data.ID
+            );
 
-          // รวมค่าตอบแทน (paid) และชั่วโมงจิตอาสา (volunteer)
-          const totalPaid = userHistories.reduce(
-            (sum: number, h: any) => sum + (h.Work?.paid || 0),
-            0
-          );
-          const totalVolunteer = userHistories.reduce(
-            (sum: number, h: any) => sum + (h.Work?.volunteer || 0),
-            0
-          );
+            // รวมค่าตอบแทน (paid) และชั่วโมงจิตอาสา (volunteer)
+            const totalPaid = userHistories.reduce(
+              (sum: number, h: any) => sum + (h.Work?.paid || 0),
+              0
+            );
+            const totalVolunteer = userHistories.reduce(
+              (sum: number, h: any) => sum + (h.Work?.volunteer || 0),
+              0
+            );
 
-          setPaidAmountTotal(totalPaid);
-          setVolunteerHourTotal(totalVolunteer);
+            setPaidAmountTotal(totalPaid);
+            setVolunteerHourTotal(totalVolunteer);
+          }
+        } else {
+          messageApi.error("ไม่สามารถโหลดข้อมูลผู้ใช้");
         }
-      } else {
-        messageApi.error("ไม่สามารถโหลดข้อมูลผู้ใช้");
+      } catch (error) {
+        messageApi.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+        console.error("Fetch error:", error);
       }
-    } catch (error) {
-      messageApi.error("เกิดข้อผิดพลาดในการโหลดข้อมูล");
-      console.error("Fetch error:", error);
-    }
-  };
+    };
 
-  fetchData();
-}, [id]);
+    fetchData();
+  }, [id]);
 
 
   const calculateAge = (birthdate: string): number => {
@@ -112,33 +106,50 @@ const ProfileView = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-end",
-          gap: 8
+          gap: 16,
+          width: 200
         }}>
-          <div style={{
-            backgroundColor: "#e8f5e9",
-            border: "1px solid #81c784",
-            borderRadius: 8,
-            padding: "8px 16px",
-            color: "#2e7d32",
-            fontWeight: "bold",
-            minWidth: 120,
-            textAlign: "center"
-          }}>
-            ค่าตอบแทน: {paidAmountTotal} บาท
-          </div>
-          <div style={{
-            backgroundColor: "#e3f2fd",
-            border: "1px solid #64b5f6",
-            borderRadius: 8,
-            padding: "8px 16px",
-            color: "#1565c0",
-            fontWeight: "bold",
-            minWidth: 120,
-            textAlign: "center"
-          }}>
-            ชั่วโมงจิตอาสา: {volunteerHourTotal} ชม.
-          </div>
+          <Card
+            bordered={false}
+            style={{
+              borderRadius: 12,
+              backgroundColor: "#e8f5e9",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              textAlign: "center"
+            }}
+          >
+            <Statistic
+  title="ค่าตอบแทน"
+  value={paidAmountTotal}
+  precision={0}
+  prefix="฿"
+  suffix="บาท"
+  valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
+/>
+
+          </Card>
+
+          <Card
+            bordered={false}
+            style={{
+              borderRadius: 12,
+              backgroundColor: "#e3f2fd",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              textAlign: "center"
+            }}
+          >
+            <Statistic
+              title="ชั่วโมงจิตอาสา"
+              value={volunteerHourTotal}
+              precision={0}
+              prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
+              suffix="ชม."
+              valueStyle={{ color: "#1565c0", fontWeight: "bold" }}
+            />
+          </Card>
         </div>
+
+
 
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <Avatar
