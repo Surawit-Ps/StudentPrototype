@@ -22,6 +22,7 @@ const LoginPage = () => {
     lastName: '',
     birthDay: '',
     genderID: '',
+    role: 'user',
   });
 
   useEffect(() => {
@@ -88,6 +89,7 @@ const LoginPage = () => {
           BirthDay: new Date(formData.birthDay).toISOString(), // ✅ แปลงเป็น ISO string
           Profile: base64Image,
           GenderID: parseInt(formData.genderID),
+          Role: formData.role,
         };
 
         const res = await CreateUser(payload);
@@ -214,6 +216,18 @@ const LoginPage = () => {
                         {g.Name}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div style={styles.inputGroup}>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleInputChange}
+                    required
+                    style={styles.input}
+                  >
+                    <option value="user">นักศึกษา</option>
+                    <option value="employer">บุคคลภายนอก</option>
                   </select>
                 </div>
               </>

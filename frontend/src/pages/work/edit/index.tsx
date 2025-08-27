@@ -14,7 +14,7 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { PlusOutlined, FileImageOutlined } from "@ant-design/icons";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ImgCrop from "antd-img-crop";
 import { WorkInterface } from "../../../interfaces/IWork";
 import { GetWorkById, UpdateWork } from "../../../services/https/index";
@@ -23,6 +23,8 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 import AdminSidebar from "../../../components/Sider/AdminSidebar";
+import { UsersInterface } from "../../../interfaces/IUser";
+import { GetUserById } from "../../../services/https";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -47,7 +49,18 @@ const WorkEdit = () => {
   const [workTypeID, setWorkTypeID] = useState<number>(1);
   const [position, setPosition] = useState<[number, number] | null>(defaultPosition);
   const [workDataState, setWorkDataState] = useState<WorkInterface | null>(null);
+  const [user, setUser] = useState<UsersInterface | null>(null);
 
+  useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      GetUserById(Number(userId)).then((res) => {
+        if (res) {
+          setUser(res);
+        }
+      });
+    }
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       if (!id) {
@@ -130,7 +143,7 @@ const WorkEdit = () => {
 
     const data: WorkInterface = {
       ...values,
-      ID: Number(id),
+      ID: id ? Number(id) : 0,
       worktime: values.worktime.toISOString(),
       photo: fileList[0]?.thumbUrl || "",
       paid: workTypeID === 1 ? values.paid : null,
@@ -141,13 +154,14 @@ const WorkEdit = () => {
       longitude: position[1],
     };
 
+
     console.log("📤 Submitting data:", data);
 
-    const res = await UpdateWork(data);
+    const res = await UpdateWork(data.ID!, data);
 
     if (res) {
       messageApi.success("แก้ไขงานสำเร็จ");
-      setTimeout(() => navigate("/work"), 1500);
+      setTimeout(() => navigate("/myworks"), 1500);
     } else {
       messageApi.error("เกิดข้อผิดพลาดในการแก้ไขงาน");
     }
@@ -155,10 +169,12 @@ const WorkEdit = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
-      <div style={{ width: 250, height: "100vh", position: "fixed", top: 0, left: 0, backgroundColor: "#1E3A8A", zIndex: 1000 }}>
-        <AdminSidebar />
-      </div>
-      <Layout style={{ marginLeft: 250 }}>
+      {user?.Role === "admin" && (
+        <div style={{ width: 250, height: "100vh", position: "fixed", top: 0, left: 0, backgroundColor: "#1E3A8A", zIndex: 1000 }}>
+          <AdminSidebar />
+        </div>
+      )}
+      <Layout style={{ marginLeft: user?.Role === "admin" ? 250 : 0 }}>
         <Content style={{ padding: "32px", backgroundColor: "#dbe2ef" }}>
           {contextHolder}
           <Card style={{ width: "100%", padding: 24, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", backgroundColor: "#ffffff" }}>
@@ -313,9 +329,7 @@ const WorkEdit = () => {
                 </Col>
 
                 <Col span={24} style={{ display: "flex", justifyContent: "flex-end", marginTop: 32, gap: 10 }}>
-                  <Link to="/work">
-                    <Button>ยกเลิก</Button>
-                  </Link>
+                  <Button onClick={() => navigate(-1)}>ยกเลิก</Button>
                   <Button type="primary" htmlType="submit" icon={<PlusOutlined />} style={{ backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}>
                     บันทึกงาน
                   </Button>
@@ -330,4 +344,3 @@ const WorkEdit = () => {
 };
 
 export default WorkEdit;
-

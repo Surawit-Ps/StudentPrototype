@@ -7,4 +7,5 @@ export interface SignUpInterface {
   BirthDay: string; // ใช้ ISO string เช่น '2000-01-01'
   Profile: string;
   GenderID: number;
+  Role?: string;
 }

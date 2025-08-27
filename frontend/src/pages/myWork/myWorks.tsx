@@ -122,6 +122,25 @@ const MyPostedWorks: React.FC = () => {
         <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.2rem" }}>
           จัดการและติดตามงานที่คุณได้โพสต์ไว้
         </Text>
+        {works.length > 0 && (
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              type="primary"
+              size="large"
+              style={{
+                marginBottom: "20px",
+                background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
+                border: "none",
+                borderRadius: "25px",
+                padding: "10px 30px",
+                height: "auto",
+              }}
+              onClick={() => navigate("/work/create")}
+            >
+              สร้างงานใหม่
+            </Button>
+          </div>
+        )}
         <div style={{ marginTop: "20px" }}>
           <Tag
             color="blue"
@@ -172,6 +191,7 @@ const MyPostedWorks: React.FC = () => {
                 padding: "10px 30px",
                 height: "auto",
               }}
+              onClick={() => navigate("/work/create")}
             >
               เริ่มโพสต์งานแรก
             </Button>

@@ -30,12 +30,12 @@ const { Option } = Select;
 function CustomerCreate() {
   const navigate = useNavigate();
   const openNotification = (type: "success" | "error", description: string) => {
-  notification[type]({
-    message: type === "success" ? "สำเร็จ" : "เกิดข้อผิดพลาด",
-    description,
-    placement: "bottomRight",
-  });
-};
+    notification[type]({
+      message: type === "success" ? "สำเร็จ" : "เกิดข้อผิดพลาด",
+      description,
+      placement: "bottomRight",
+    });
+  };
 
   const [genders, setGenders] = useState<GendersInterface[]>([]);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -60,24 +60,24 @@ function CustomerCreate() {
   };
 
   const onFinish = async (values: UsersInterface) => {
-  if (!fileList.length || !fileList[0].originFileObj) {
-    openNotification("error", "กรุณาอัปโหลดรูปภาพ");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = async () => {
-    values.Profile = reader.result as string;
-    let res = await CreateUser(values);
-    if (res) {
-      openNotification("success", res.message || "สร้างข้อมูลสำเร็จ");
-      setTimeout(() => navigate("/account"), 2000);
-    } else {
-      openNotification("error", "เกิดข้อผิดพลาด !");
+    if (!fileList.length || !fileList[0].originFileObj) {
+      openNotification("error", "กรุณาอัปโหลดรูปภาพ");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      values.Profile = reader.result as string;
+      let res = await CreateUser(values);
+      if (res) {
+        openNotification("success", res.message || "สร้างข้อมูลสำเร็จ");
+        setTimeout(() => navigate("/account"), 2000);
+      } else {
+        openNotification("error", "เกิดข้อผิดพลาด !");
+      }
+    };
+    reader.readAsDataURL(fileList[0].originFileObj as RcFile);
   };
-  reader.readAsDataURL(fileList[0].originFileObj as RcFile);
-};
 
 
   const getGender = async () => {
@@ -92,13 +92,13 @@ function CustomerCreate() {
   }, []);
 
   return (
-    <div style={{ 
-    minHeight: "100vh", 
-    display: "flex", 
-    flexDirection: "column", 
-    justifyContent: "center", 
-    padding: "32px" // เพิ่มระยะห่างขอบจอ
-  }}>
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      padding: "32px" // เพิ่มระยะห่างขอบจอ
+    }}>
       {/* {contextHolder} */}
       <Card>
         <h2> เพิ่มข้อมูลผู้ใช้งาน</h2>
@@ -257,6 +257,19 @@ function CustomerCreate() {
                       {item.Name}
                     </Option>
                   ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={24} lg={24} xl={12}>
+              <Form.Item
+                name="Role"
+                label="ประเภทผู้ใช้งาน"
+                rules={[{ required: true, message: "กรุณาเลือกประเภทผู้ใช้งาน !" }]}
+              >
+                <Select placeholder="เลือกประเภทผู้ใช้งาน">
+                  <Option value="user">นักศึกษา</Option>
+                  <Option value="employer">บุคคลภายนอก</Option>
+                  <Option value="admin">แอดมิน</Option>
                 </Select>
               </Form.Item>
             </Col>

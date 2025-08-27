@@ -33,20 +33,27 @@ const Navbar: React.FC = () => {
 
   const dropdownMenu = (
     <Menu>
-      <Menu.Item key="admin">
-        <Link to="/work" onClick={() => handleMenuClick("admin")}>แอดมิน</Link>
-      </Menu.Item>
+      {user?.Role === "admin" && (
+        <Menu.Item key="admin">
+          <Link to="/work" onClick={() => handleMenuClick("admin")}>แอดมิน</Link>
+        </Menu.Item>
+      )}
       <Menu.Item key="account">
         <Link to={`/account/profile/${userId}`} onClick={() => handleMenuClick("account")}>โปรไฟล์</Link>
       </Menu.Item>
-      <Menu.Item key="myworks">
-        <Link to="/myworks" onClick={() => handleMenuClick("myworks")}>งานของฉัน</Link>
-      </Menu.Item>
-      <Menu.Item key="historywork">
-        <Link to={`/work/historywork/${userId}`} onClick={() => handleMenuClick("historywork")}>
-          ประวัติการทำงาน
-        </Link>
-      </Menu.Item>
+      {(user?.Role === "admin" || user?.Role === "employer") && (
+        <Menu.Item key="myworks">
+          <Link to="/myworks" onClick={() => handleMenuClick("myworks")}>งานของฉัน</Link>
+        </Menu.Item>
+      )}
+      {(user?.Role === "user" ) && (
+        <Menu.Item key="historywork">
+          <Link to={`/work/historywork/${userId}`} onClick={() => handleMenuClick("historywork")}>
+            ประวัติการทำงาน
+          </Link>
+        </Menu.Item>
+      )}
+
       <Menu.Divider />
       <Menu.Item key="logout" onClick={handleLogout}>
         ออกจากระบบ
@@ -73,7 +80,7 @@ const Navbar: React.FC = () => {
         left: 0,
         width: "100%",
         zIndex: 1000,
-        padding: "0 24px", // ✅ เพิ่ม padding ซ้าย-ขวาเหมือน Footer
+        padding: "0 24px",
         backgroundColor: "#fcfcfcff",
         boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
       }}
@@ -83,15 +90,13 @@ const Navbar: React.FC = () => {
           width: "100%",
           maxWidth: 1400,
           margin: "0 auto",
-          padding: "0 12px", // ✅ เพิ่ม padding ซ้ายขวาภายใน div
+          padding: "0 12px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           height: 64,
         }}
       >
-
-
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <img src={logo} alt="Logo" style={{ height: 40 }} />
@@ -113,7 +118,7 @@ const Navbar: React.FC = () => {
                   fontSize: 17,
                   textDecoration: "none",
                   padding: "12px 0",
-                  borderBottom: "none", // << ไม่มีเส้นใต้
+                  borderBottom: "none",
                   transition: "all 0.3s ease",
                 }}
               >
@@ -134,7 +139,7 @@ const Navbar: React.FC = () => {
               onMouseEnter={() => setIsHover(true)}
               onMouseLeave={() => setIsHover(false)}
             >
-              <Tooltip title="เปิดเมนูโปรไฟล์" placement="bottom">
+              <Tooltip placement="bottom">
                 <div
                   style={{
                     transform: isHover ? "scale(1.1)" : "scale(1)",
@@ -165,5 +170,6 @@ const Navbar: React.FC = () => {
     </Header>
   );
 };
+
 
 export default Navbar;

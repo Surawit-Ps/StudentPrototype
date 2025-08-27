@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  UserOutlined,
-  DashboardOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, DashboardOutlined, FileTextOutlined, LogoutOutlined  } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./AdminSidebar.css";
+import LogoImg from "../../components/Sider/logojob.png";
 
 const { Sider } = Layout;
 
@@ -17,10 +15,10 @@ type CustomMenuItem = {
 };
 
 const items: CustomMenuItem[] = [
-  { key: "/work", label: "งานทั้งหมด", icon: <DashboardOutlined />, className: "menu-work" },
-  { key: "/dashboard", label: "แดชบอร์ด", icon: <UserOutlined />, className: "menu-dashboard" },
+  { key: "/work", label: "งานทั้งหมด", icon: <FileTextOutlined />, className: "menu-work" },
+  { key: "/dashboard", label: "แดชบอร์ด", icon: <DashboardOutlined />, className: "menu-dashboard" },
   { key: "/account", label: "ผู้ใช้งานทั้งหมด", icon: <UserOutlined />, className: "menu-work" },
-  { key: "/", label: "ออกจากระบบ", icon: <UserOutlined />, className: "menu-logout" },
+  { key: "/", label: "ออก", icon: <LogoutOutlined  />, className: "menu-logout" },
 ];
 
 const AdminSidebar: React.FC = () => {
@@ -40,10 +38,16 @@ const AdminSidebar: React.FC = () => {
     <div className="admin">
       <Sider width={250} className="sider" theme="light">
         <div className="logo">
-          <div className="logo-circle">
-            <span className="logo-initial">S</span>
-          </div>
-          <span className="logo-text">Student Job Hub</span>
+          <img
+            src={LogoImg}
+            alt="Logo"
+            style={{
+              width: "200px",
+              height: "60px",
+              objectFit: "contain",
+              marginBottom: 10,
+            }}
+          />
         </div>
 
         <Menu

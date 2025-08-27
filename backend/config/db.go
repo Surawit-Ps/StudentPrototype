@@ -47,12 +47,12 @@ func SetupDatabase() {
 	)
 
 	checkIn := []entity.CheckIn{
-		{
-			UserID: 1,
-			WorkID: 1,
-		},
-		{	UserID: 2,
-			WorkID: 2,	
+		// {
+		// 	UserID: 1,
+		// 	WorkID: 1,
+		// },
+		{UserID: 2,
+			WorkID: 2,
 		},
 		{
 			UserID: 3,
@@ -64,97 +64,92 @@ func SetupDatabase() {
 	}
 
 	bookings := []entity.Booking{
-	{ UserID: 2, WorkID: 1, Status: "registered" },
-	{ UserID: 3, WorkID: 1, Status: "registered" },
-	{ UserID: 4, WorkID: 1, Status: "registered" },
-	{ UserID: 3, WorkID: 1, Status: "registered" },
-	{ UserID: 3, WorkID: 2, Status: "registered" },
-	{ UserID: 4, WorkID: 3, Status: "registered" },
-	{ UserID: 5, WorkID: 4, Status: "registered" },
-}
+		{UserID: 2, WorkID: 1, Status: "registered"},
+		{UserID: 3, WorkID: 1, Status: "registered"},
+		{UserID: 4, WorkID: 1, Status: "registered"},
+		{UserID: 3, WorkID: 1, Status: "registered"},
+		{UserID: 3, WorkID: 2, Status: "registered"},
+		{UserID: 4, WorkID: 3, Status: "registered"},
+		{UserID: 5, WorkID: 4, Status: "registered"},
+	}
 
-for _, b := range bookings {
-	db.FirstOrCreate(&b, entity.Booking{UserID: b.UserID, WorkID: b.WorkID})
-}	
+	for _, b := range bookings {
+		db.FirstOrCreate(&b, entity.Booking{UserID: b.UserID, WorkID: b.WorkID})
+	}
 
 	// สร้างข้อมูล WorkHistory ตัวอย่าง
-	paid1 := 5000
+	// paid1 := 5000
 	paid2 := 3000
 	zero := 0
 	hours := 10
 
 	workHistories := []entity.WorkHistory{
+		// {
+		// 	UserID:        1,
+		// 	WorkID:        1,
+		// 	PaidAmount:    &paid1,
+		// 	VolunteerHour: &zero,
+		// },
 		{
-		UserID:        1,
-		WorkID:        1,
-		PaidAmount:    &paid1,
-		VolunteerHour: &zero,
-		
-	},
-	{
-		UserID:        2,
-		WorkID:        2,
-		PaidAmount:    &zero,
-		VolunteerHour: &hours,
-		
-	},
-	{
-		UserID:        3,
-		WorkID:        3,
-		PaidAmount:    &paid2,
-		VolunteerHour: &zero,
-		
-	},
-	{
-		UserID:        4,
-		WorkID:        4,
-		PaidAmount:    &zero,
-		VolunteerHour: &hours,
-	}, 
-	{
-		UserID:        5,
-		WorkID:        5,
-		PaidAmount:    &zero,
-		VolunteerHour: &hours,
-	},
-	{
-		UserID:        6,
-		WorkID:        6,
-		PaidAmount:    &paid2,
-		VolunteerHour: &zero,
-	},
-
-	{
-			UserID:        1,
-			WorkID:        1,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(3),
-		},
-		{
-			UserID:        1,
+			UserID:        2,
 			WorkID:        2,
-			PaidAmount:    IntPtr(300),
-			VolunteerHour: nil,
+			PaidAmount:    &zero,
+			VolunteerHour: &hours,
 		},
 		{
-			UserID:        1,
+			UserID:        3,
 			WorkID:        3,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(5),
+			PaidAmount:    &paid2,
+			VolunteerHour: &zero,
 		},
+		{
+			UserID:        4,
+			WorkID:        4,
+			PaidAmount:    &zero,
+			VolunteerHour: &hours,
+		},
+		{
+			UserID:        5,
+			WorkID:        5,
+			PaidAmount:    &zero,
+			VolunteerHour: &hours,
+		},
+		{
+			UserID:        6,
+			WorkID:        6,
+			PaidAmount:    &paid2,
+			VolunteerHour: &zero,
+		},
+
+		// {
+		// 	UserID:        1,
+		// 	WorkID:        1,
+		// 	PaidAmount:    nil,
+		// 	VolunteerHour: IntPtr(3),
+		// },
+		// {
+		// 	UserID:        1,
+		// 	WorkID:        2,
+		// 	PaidAmount:    IntPtr(300),
+		// 	VolunteerHour: nil,
+		// },
+		// {
+		// 	UserID:        1,
+		// 	WorkID:        3,
+		// 	PaidAmount:    nil,
+		// 	VolunteerHour: IntPtr(5),
+		// },
 		{
 			UserID:        2,
 			WorkID:        1,
 			PaidAmount:    nil,
 			VolunteerHour: IntPtr(5),
 		},
-	
 	}
 
 	for _, wh := range workHistories {
 		db.FirstOrCreate(&wh, entity.WorkHistory{UserID: wh.UserID, WorkID: wh.WorkID})
 	}
-
 
 	//WorkStatus
 	WorStatusActive := entity.WorkStatus{WorkStatus: "Active"}
@@ -389,64 +384,64 @@ for _, b := range bookings {
 	//dashboard
 	dashboards := []entity.Dashboard{
 		{
-			Subject:     "รับสมัครนักศึกษาจิตอาสา กิจกรรมต้อนรับนักศึกษาใหม่",
-			Information: "มทส. เปิดรับสมัครนักศึกษาร่วมเป็นจิตอาสาในการดูแลและแนะนำรุ่นน้องในงานปฐมนิเทศ",
+			Subject:       "รับสมัครนักศึกษาจิตอาสา กิจกรรมต้อนรับนักศึกษาใหม่",
+			Information:   "มทส. เปิดรับสมัครนักศึกษาร่วมเป็นจิตอาสาในการดูแลและแนะนำรุ่นน้องในงานปฐมนิเทศ",
 			DashboardTime: time.Date(2025, 8, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "ขอเชิญร่วมกิจกรรมวิ่ง SU Running 2025",
-			Information: "กิจกรรมเดิน-วิ่งเพื่อสุขภาพรอบอ่างเก็บน้ำภายใน มทส. สมัครฟรี มีเสื้อและของที่ระลึก",
+			Subject:       "ขอเชิญร่วมกิจกรรมวิ่ง SU Running 2025",
+			Information:   "กิจกรรมเดิน-วิ่งเพื่อสุขภาพรอบอ่างเก็บน้ำภายใน มทส. สมัครฟรี มีเสื้อและของที่ระลึก",
 			DashboardTime: time.Date(2024, 8, 2, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "ประกาศปิดเส้นทางชั่วคราวในวันสอบกลางภาค",
-			Information: "โปรดหลีกเลี่ยงถนนด้านหลังศูนย์อาหารกลาง เวลา 07.30 - 16.00 น.",
+			Subject:       "ประกาศปิดเส้นทางชั่วคราวในวันสอบกลางภาค",
+			Information:   "โปรดหลีกเลี่ยงถนนด้านหลังศูนย์อาหารกลาง เวลา 07.30 - 16.00 น.",
 			DashboardTime: time.Date(2023, 1, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "กิจกรรมปลูกต้นไม้เนื่องในวันสิ่งแวดล้อมโลก",
-			Information: "ขอเชิญชวนนักศึกษาร่วมปลูกต้นไม้ภายในเขตมหาวิทยาลัย ณ ลานกิจกรรมกลาง",
+			Subject:       "กิจกรรมปลูกต้นไม้เนื่องในวันสิ่งแวดล้อมโลก",
+			Information:   "ขอเชิญชวนนักศึกษาร่วมปลูกต้นไม้ภายในเขตมหาวิทยาลัย ณ ลานกิจกรรมกลาง",
 			DashboardTime: time.Date(2025, 4, 1, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "โครงการอบรมเตรียมตัวสอบทุนต่างประเทศ",
-			Information: "ศูนย์แนะแนว มทส. จัดอบรมฟรี พร้อมให้คำปรึกษาการสมัครทุนและเตรียมเอกสาร",
+			Subject:       "โครงการอบรมเตรียมตัวสอบทุนต่างประเทศ",
+			Information:   "ศูนย์แนะแนว มทส. จัดอบรมฟรี พร้อมให้คำปรึกษาการสมัครทุนและเตรียมเอกสาร",
 			DashboardTime: time.Date(2025, 7, 28, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "แจ้งซ่อมระบบน้ำบริเวณหอพัก 12-14",
-			Information: "การประปาจะปิดน้ำชั่วคราว วันที่ 15 ก.ค. เวลา 08.00 - 14.00 น.",
+			Subject:       "แจ้งซ่อมระบบน้ำบริเวณหอพัก 12-14",
+			Information:   "การประปาจะปิดน้ำชั่วคราว วันที่ 15 ก.ค. เวลา 08.00 - 14.00 น.",
 			DashboardTime: time.Date(2025, 1, 12, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "รับสมัครนักศึกษาเข้าร่วมกิจกรรม Open House",
-			Information: "เปิดรับนักศึกษาร่วมเป็นวิทยากรนำชมมหาวิทยาลัยให้กับน้อง ม.ปลาย",
+			Subject:       "รับสมัครนักศึกษาเข้าร่วมกิจกรรม Open House",
+			Information:   "เปิดรับนักศึกษาร่วมเป็นวิทยากรนำชมมหาวิทยาลัยให้กับน้อง ม.ปลาย",
 			DashboardTime: time.Date(2025, 2, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "เปิดให้บริการ Co-working Space แห่งใหม่",
-			Information: "ห้องทำงานกลุ่มแห่งใหม่ที่อาคารเรียนรวม เปิดให้ใช้แล้ววันนี้!",
+			Subject:       "เปิดให้บริการ Co-working Space แห่งใหม่",
+			Information:   "ห้องทำงานกลุ่มแห่งใหม่ที่อาคารเรียนรวม เปิดให้ใช้แล้ววันนี้!",
 			DashboardTime: time.Date(2025, 8, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "ขอเชิญร่วมอบรม Cybersecurity Awareness",
-			Information: "งานไอทีจัดอบรมให้ความรู้ด้านความปลอดภัยบนโลกออนไลน์ (รับชั่วโมงกิจกรรม)",
+			Subject:       "ขอเชิญร่วมอบรม Cybersecurity Awareness",
+			Information:   "งานไอทีจัดอบรมให้ความรู้ด้านความปลอดภัยบนโลกออนไลน์ (รับชั่วโมงกิจกรรม)",
 			DashboardTime: time.Date(2025, 8, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 		{
-			Subject:     "การแข่งขัน Startup Pitching รอบคัดเลือก",
-			Information: "ชมผลงานนวัตกรรมของนักศึกษาพร้อมลุ้นผู้ชนะตัวแทนไปแข่งขันระดับประเทศ",
+			Subject:       "การแข่งขัน Startup Pitching รอบคัดเลือก",
+			Information:   "ชมผลงานนวัตกรรมของนักศึกษาพร้อมลุ้นผู้ชนะตัวแทนไปแข่งขันระดับประเทศ",
 			DashboardTime: time.Date(2025, 8, 22, 0, 0, 0, 0, time.UTC),
-			Image:       "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
+			Image:         "https://i.pinimg.com/736x/92/e9/9f/92e99ffbcef0895a3b37eba1a1e78c38.jpg",
 		},
 	}
 	for _, d := range dashboards {
@@ -459,35 +454,47 @@ for _, b := range bookings {
 	db.FirstOrCreate(&GenderMale, &entity.Gender{Name: "Male"})
 	db.FirstOrCreate(&GenderFemale, &entity.Gender{Name: "Female"})
 
+	// สร้าง Users ตัวอย่าง พร้อม Role
 	hashedPassword, _ := HashPassword("123456")
-	BirthDay, _ := time.Parse("2006-01-02", "1988-11-12")
-	User := &entity.User{
-		FirstName: "Software",
-		LastName:  "Analysis",
+	birthAdmin, _ := time.Parse("2006-01-02", "1985-01-15")
+	Admin := &entity.User{
+		FirstName: "Admin",
+		LastName:  "System",
 		Email:     "sa@gmail.com",
 		Password:  hashedPassword,
-		BirthDay:  BirthDay,
+		BirthDay:  birthAdmin,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
 		GenderID:  1,
+		Role:      "admin",
 	}
-	db.FirstOrCreate(User, &entity.User{
-		Email: "sa@gmail.com",
-	})
+	db.FirstOrCreate(Admin, &entity.User{Email: "sa@gmail.com"})
 
 	hashedPassword2, _ := HashPassword("123456")
-	BirthDay2, _ := time.Parse("2006-01-02", "1990-05-20")
-	User2 := &entity.User{
-		FirstName: "Software",
-		LastName:  "Engineering",
-		Email:     "se@gmail.com",
+	birthUser, _ := time.Parse("2006-01-02", "1995-03-22")
+	NormalUser := &entity.User{
+		FirstName: "Tong",
+		LastName:  "Jab",
+		Email:     "sut@gmail.com",
 		Password:  hashedPassword2,
-		BirthDay:  BirthDay2,
+		BirthDay:  birthUser,
+		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
+		GenderID:  1,
+		Role:      "user",
+	}
+	db.FirstOrCreate(NormalUser, &entity.User{Email: "sut@gmail.com"})
+
+	hashedPassword3, _ := HashPassword("123456")
+	birthEmployer, _ := time.Parse("2006-01-02", "1992-07-10")
+	Employer := &entity.User{
+		FirstName: "Suda",
+		LastName:  "Employer",
+		Email:     "em@gmail.com",
+		Password:  hashedPassword3,
+		BirthDay:  birthEmployer,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
 		GenderID:  2,
-		// Contact:   "0987654321",
+		Role:      "employer",
 	}
-	db.FirstOrCreate(User2, &entity.User{
-		Email: "se@gmail.com",
-	})
+	db.FirstOrCreate(Employer, &entity.User{Email: "em@gmail.com"})
 
 }

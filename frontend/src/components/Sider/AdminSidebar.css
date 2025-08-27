@@ -9,19 +9,28 @@ AdminSidebar.css
   height: 100vh;
   background-color: #112D4E;
   color: #fff;
-  position: fixed;       /* ✅ ฟิกซ์กับหน้าจอ */
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  overflow-y: auto;       /* ✅ scroll ใน sidebar เองถ้าสูงเกิน */
+  overflow-y: auto;
 }
 
 .admin .logo {
-  text-align: center;
-  padding: 30px 0 10px;
-  color: #fff;
-  font-size: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* จัดให้อยู่ตรงกลางแนวแกน X */
+  justify-content: center;
+  padding: 20px 0;
 }
+
+.admin .logo img {
+  width: 60px;          /* ปรับขนาดความกว้างของรูป */
+  height: 60px;         /* ปรับขนาดความสูง */
+  object-fit: contain;  /* ไม่บิดรูป */
+  margin-bottom: 10px;  /* เว้นระยะกับข้อความ */
+}
+
 
 .admin .logo-circle {
   background: #3F72AF;
@@ -43,8 +52,9 @@ AdminSidebar.css
 
 .admin .logo-text {
   color: #F9F7F7;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: bold;
+  text-align: center;
 }
 
 .admin .menu {
@@ -94,7 +104,7 @@ AdminSidebar.css
 
 .admin .menu-work {
   font-size: 18px;
-  color: #F6F8D5;
+  color: #DBE2EF;
 }
 
 .admin .menu-dashboard {

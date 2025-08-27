@@ -12,9 +12,9 @@ import {
   Upload,
   Layout,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlusOutlined, FileImageOutlined } from "@ant-design/icons";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ImgCrop from "antd-img-crop";
 import { WorkInterface } from "../../../interfaces/IWork";
 import { CreateWork } from "../../../services/https/index";
@@ -23,6 +23,8 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 import AdminSidebar from "../../../components/Sider/AdminSidebar";
+import { UsersInterface } from "../../../interfaces/IUser";
+import { GetUserById } from "../../../services/https";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -45,6 +47,18 @@ const WorkCreate = () => {
   const [fileList, setFileList] = useState<any[]>([]);
   const [workTypeID, setWorkTypeID] = useState<number>(1);
   const [position, setPosition] = useState<[number, number]>(defaultPosition);
+  const [user, setUser] = useState<UsersInterface | null>(null);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    if (userId) {
+      GetUserById(Number(userId)).then((res) => {
+        if (res) {
+          setUser(res);
+        }
+      });
+    }
+  }, []);
 
   const onChange = ({ fileList: newFileList }: { fileList: any[] }) => {
     setFileList(newFileList);
@@ -69,24 +83,24 @@ const WorkCreate = () => {
   const posterId = parseInt(localStorage.getItem("user_id") || "0"); // ✅ ดึงจาก localStorage
 
   const onFinish = async (values: any) => {
-  const data: WorkInterface = {
-    ...values,
-    worktime: values.worktime.toISOString(),
-    photo: fileList[0]?.thumbUrl || "",
-    paid: workTypeID === 1 ? values.paid : null,
-    volunteer: workTypeID === 2 ? values.volunteer : null,
-    worktype_id: values.WorkTypeID,
-    workstatus_id: values.WorkStatusID,
-    latitude: position[0],
-    longitude: position[1],
-    poster_id: posterId, // ✅ แนบเข้าไป
-  };
+    const data: WorkInterface = {
+      ...values,
+      worktime: values.worktime.toISOString(),
+      photo: fileList[0]?.thumbUrl || "",
+      paid: workTypeID === 1 ? values.paid : null,
+      volunteer: workTypeID === 2 ? values.volunteer : null,
+      worktype_id: values.WorkTypeID,
+      workstatus_id: values.WorkStatusID,
+      latitude: position[0],
+      longitude: position[1],
+      poster_id: posterId, // ✅ แนบเข้าไป
+    };
 
-  const res = await CreateWork(data);
+    const res = await CreateWork(data);
 
     if (res) {
       messageApi.success("สร้างงานสำเร็จ");
-      setTimeout(() => navigate("/work"), 1500);
+      setTimeout(() => navigate("/myworks"), 1500);
     } else {
       messageApi.error("เกิดข้อผิดพลาดในการสร้างงาน");
     }
@@ -94,23 +108,24 @@ const WorkCreate = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: 250,
-          height: "100vh",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          backgroundColor: "#1E3A8A",
-          zIndex: 1000,
-        }}
-      >
-        <AdminSidebar />
-      </div>
+      {user?.Role === "admin" && (
+        <div
+          style={{
+            width: 250,
+            height: "100vh",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            backgroundColor: "#1E3A8A",
+            zIndex: 1000,
+          }}
+        >
+          <AdminSidebar />
+        </div>
+      )}
 
       {/* Main Content */}
-      <Layout style={{ marginLeft: 250 }}>
+      <Layout style={{ marginLeft: user?.Role === "admin" ? 250 : 0 }}>
         <Content style={{ padding: "32px", backgroundColor: "#dbe2ef" }}>
           {contextHolder}
           <Card
@@ -143,7 +158,7 @@ const WorkCreate = () => {
                   backgroundColor: "#434c86",
                   marginTop: 21,
                   borderRadius: 2,
-                  
+
                 }}
               />
             </div>
@@ -274,9 +289,9 @@ const WorkCreate = () => {
 
                 {/* Buttons */}
                 <Col span={24} style={{ display: "flex", justifyContent: "flex-end", marginTop: 32, gap: 10 }}>
-                  <Link to="/work">
-                    <Button>ยกเลิก</Button>
-                  </Link>
+
+                  <Button onClick={() => navigate(-1)}>ยกเลิก</Button>
+
                   <Button
                     type="primary"
                     htmlType="submit"

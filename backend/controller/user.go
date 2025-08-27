@@ -41,6 +41,7 @@ func CreateUser(c *gin.Context) {
 		Profile:   user.Profile, // ตั้งค่าฟิลด์ Profile
 		GenderID:  user.GenderID,
 		Gender:    gender, // โยงความสัมพันธ์กับ Entity Gender
+		Role:	user.Role,
 	}
 
 	// บันทึก

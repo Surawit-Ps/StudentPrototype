@@ -119,10 +119,11 @@ async function GetWorkById(id: Number | undefined) {
   return res.ok ? res.json() : false;
 }
 
-async function UpdateWork(p0: number, data: WorkInterface) {
-  const res = await fetch(`${apiUrl}/work/${data.ID}`, authRequestOptions("PATCH", data));
+async function UpdateWork(id: number, data: WorkInterface) {
+  const res = await fetch(`${apiUrl}/work/${id}`, authRequestOptions("PATCH", data));
   return res.ok ? res.json() : false;
 }
+
 
 async function DeleteWorkByID(id: Number | undefined) {
   const res = await fetch(`${apiUrl}/work/${id}`, authRequestOptions("DELETE"));

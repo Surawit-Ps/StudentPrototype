@@ -14,7 +14,7 @@ type User struct {
 	Password  string    `json:"Password" binding:"required"`
 	BirthDay  time.Time `json:"BirthDay"`
 	Profile   string    `json:"Profile" gorm:"type:longtext"`
-	Role 	string    `json:"Role" gorm:"default:'user'"` // กำหนดค่าเริ่มต้นเป็น 'user'
+	Role      string    `json:"Role"`
 
 	// GenderID ทำหน้าที่เป็น FK
 	GenderID uint
