@@ -78,72 +78,49 @@ func SetupDatabase() {
 	}
 
 	// สร้างข้อมูล WorkHistory ตัวอย่าง
-	// paid1 := 5000
-	paid2 := 3000
-	zero := 0
-	hours := 10
 
 	workHistories := []entity.WorkHistory{
-		// {
-		// 	UserID:        1,
-		// 	WorkID:        1,
-		// 	PaidAmount:    &paid1,
-		// 	VolunteerHour: &zero,
-		// },
 		{
-			UserID:        2,
+			UserID:        3,
+			WorkID:        1,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(3),
+		},
+		{
+			UserID:        3,
 			WorkID:        2,
-			PaidAmount:    &zero,
-			VolunteerHour: &hours,
+			PaidAmount:    IntPtr(300),
+			VolunteerHour: nil,
 		},
 		{
 			UserID:        3,
 			WorkID:        3,
-			PaidAmount:    &paid2,
-			VolunteerHour: &zero,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(5),
+		},
+		{
+			UserID:        4,
+			WorkID:        3,
+			PaidAmount:    nil,
+			VolunteerHour: IntPtr(5),
 		},
 		{
 			UserID:        4,
 			WorkID:        4,
-			PaidAmount:    &zero,
-			VolunteerHour: &hours,
-		},
-		{
-			UserID:        5,
-			WorkID:        5,
-			PaidAmount:    &zero,
-			VolunteerHour: &hours,
-		},
-		{
-			UserID:        6,
-			WorkID:        6,
-			PaidAmount:    &paid2,
-			VolunteerHour: &zero,
-		},
-
-		// {
-		// 	UserID:        1,
-		// 	WorkID:        1,
-		// 	PaidAmount:    nil,
-		// 	VolunteerHour: IntPtr(3),
-		// },
-		// {
-		// 	UserID:        1,
-		// 	WorkID:        2,
-		// 	PaidAmount:    IntPtr(300),
-		// 	VolunteerHour: nil,
-		// },
-		// {
-		// 	UserID:        1,
-		// 	WorkID:        3,
-		// 	PaidAmount:    nil,
-		// 	VolunteerHour: IntPtr(5),
-		// },
-		{
-			UserID:        2,
-			WorkID:        1,
 			PaidAmount:    nil,
-			VolunteerHour: IntPtr(5),
+			VolunteerHour: IntPtr(2),
+		},
+		{
+			UserID:        4,
+			WorkID:        5,
+			PaidAmount:    IntPtr(500),
+			VolunteerHour: nil,
+		},
+		{
+			UserID:        4,
+			WorkID:        10,
+			PaidAmount:    IntPtr(600),
+			VolunteerHour: nil,
 		},
 	}
 
@@ -458,43 +435,85 @@ func SetupDatabase() {
 	hashedPassword, _ := HashPassword("123456")
 	birthAdmin, _ := time.Parse("2006-01-02", "1985-01-15")
 	Admin := &entity.User{
-		FirstName: "Admin",
-		LastName:  "System",
+		FirstName: "Software",
+		LastName:  "Analyst",
 		Email:     "sa@gmail.com",
 		Password:  hashedPassword,
 		BirthDay:  birthAdmin,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
-		GenderID:  1,
+		GenderID:  2,
 		Role:      "admin",
 	}
 	db.FirstOrCreate(Admin, &entity.User{Email: "sa@gmail.com"})
 
+	hashedPassword4, _ := HashPassword("123456")
+	birthAdmin2, _ := time.Parse("2006-01-02", "1988-11-05")
+	Admin2 := &entity.User{
+		FirstName: "Kibutsuji",
+		LastName:  "Muzan",
+		Email:     "admin@gmail.com",
+		Password:  hashedPassword4,
+		BirthDay:  birthAdmin2,
+		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
+		GenderID:  1,
+		Role:      "admin",
+	}
+	db.FirstOrCreate(Admin2, &entity.User{Email: "admin@gmail.com"})
+
 	hashedPassword2, _ := HashPassword("123456")
 	birthUser, _ := time.Parse("2006-01-02", "1995-03-22")
 	NormalUser := &entity.User{
-		FirstName: "Tong",
-		LastName:  "Jab",
-		Email:     "sut@gmail.com",
+		FirstName: "Tokito",
+		LastName:  "Muichiro",
+		Email:     "s1@gmail.com",
 		Password:  hashedPassword2,
 		BirthDay:  birthUser,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
 		GenderID:  1,
 		Role:      "user",
 	}
-	db.FirstOrCreate(NormalUser, &entity.User{Email: "sut@gmail.com"})
+	db.FirstOrCreate(NormalUser, &entity.User{Email: "s1@gmail.com"})
+
+	hashedPassword5, _ := HashPassword("123456")
+	birthUser2, _ := time.Parse("2006-01-02", "1998-09-14")
+	NormalUser2 := &entity.User{
+		FirstName: "Tomioka",
+		LastName:  "Giyu",
+		Email:     "s2@gmail.com",
+		Password:  hashedPassword5,
+		BirthDay:  birthUser2,
+		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
+		GenderID:  1,
+		Role:      "user",
+	}
+	db.FirstOrCreate(NormalUser2, &entity.User{Email: "s2@gmail.com"})
 
 	hashedPassword3, _ := HashPassword("123456")
 	birthEmployer, _ := time.Parse("2006-01-02", "1992-07-10")
 	Employer := &entity.User{
-		FirstName: "Suda",
-		LastName:  "Employer",
-		Email:     "em@gmail.com",
+		FirstName: "Akaza",
+		LastName:  "Demon",
+		Email:     "em1@gmail.com",
 		Password:  hashedPassword3,
 		BirthDay:  birthEmployer,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
-		GenderID:  2,
+		GenderID:  1,
 		Role:      "employer",
 	}
-	db.FirstOrCreate(Employer, &entity.User{Email: "em@gmail.com"})
+	db.FirstOrCreate(Employer, &entity.User{Email: "em1@gmail.com"})
+
+	hashedPassword6, _ := HashPassword("123456")
+	birthEmployer2, _ := time.Parse("2006-01-02", "1990-05-30")
+	Employer2 := &entity.User{
+		FirstName: "Kamado",
+		LastName:  "Nezuko",
+		Email:     "em2@gmail.com",
+		Password:  hashedPassword6,
+		BirthDay:  birthEmployer2,
+		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
+		GenderID:  1,
+		Role:      "employer",
+	}
+	db.FirstOrCreate(Employer2, &entity.User{Email: "em2@gmail.com"})
 
 }
