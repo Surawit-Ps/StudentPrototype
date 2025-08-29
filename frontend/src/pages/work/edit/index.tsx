@@ -281,7 +281,6 @@ const WorkEdit = () => {
                         label="รูปภาพ"
                         valuePropName="fileList"
                         getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
-                        rules={[{ required: true }]}
                       >
                         <ImgCrop rotationSlider>
                           <Upload
@@ -289,7 +288,13 @@ const WorkEdit = () => {
                             fileList={fileList}
                             onChange={onChange}
                             onPreview={onPreview}
-                            beforeUpload={() => false}
+                            beforeUpload={(file) => {
+                              const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+                              if (!isJpgOrPng) {
+                                message.error("สามารถอัปโหลดได้เฉพาะไฟล์ PNG หรือ JPG เท่านั้น");
+                              }
+                              return isJpgOrPng || Upload.LIST_IGNORE;
+                            }}
                             maxCount={1}
                           >
                             {fileList.length < 1 && (

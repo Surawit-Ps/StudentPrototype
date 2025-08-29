@@ -307,7 +307,7 @@ const MyPostedWorks: React.FC = () => {
 
                         <Paragraph
                           style={{ margin: "8px 0", fontSize: "13px", lineHeight: "1.4" }}
-                          ellipsis={{ rows: 2 }}
+                          ellipsis={{ rows: 1 }}
                         >
                           {work.description || "ไม่มีรายละเอียด"}
                         </Paragraph>

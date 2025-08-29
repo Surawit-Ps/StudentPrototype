@@ -3,7 +3,7 @@ import { WorkInterface } from "../../interfaces/IWork";
 import { DashboardInterface } from "../../interfaces/IDashboard";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
-import { IWorkHistory } from "../../interfaces/IWorkHistory";
+import { WorkHistoryInterface } from "../../interfaces/IHistorywork";
 
 const apiUrl = "http://localhost:8000";
 
@@ -258,12 +258,12 @@ async function GetWorkByPosterID(id: Number | undefined) {
   return res.ok ? res.json() : false;
 }
 
-async function CreateWorkHistory(data: IWorkHistory) {
+async function CreateWorkHistory(data: WorkHistoryInterface) {
   const res = await fetch(`${apiUrl}/work/history`, authRequestOptions("POST", data));
   return res.ok ? res.json() : false;
 }
 
-async function GetWorkHistory(): Promise<IWorkHistory[] | false> {
+async function GetWorkHistory(): Promise<WorkHistoryInterface[] | false> {
   const userID = localStorage.getItem("user_id"); // 👈 ดึง user_id จาก localStorage
   const res = await fetch(`${apiUrl}/workhistories?userID=${userID}`, authRequestOptions("GET"));
   return res.ok ? res.json() : false;

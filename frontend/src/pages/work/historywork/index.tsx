@@ -1,299 +1,363 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Button,
+    Card,
     Col,
     Row,
-    Card,
-    Table,
     Typography,
+    Empty,
+    Spin,
+    Tag,
+    Button,
+    Space,
     Divider,
-    message,
-    Layout,
+    Badge,
     Input,
 } from "antd";
-import { SearchOutlined, FilePdfOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import {
+    CalendarOutlined,
+    EnvironmentOutlined,
+    WalletOutlined,
+    HeartOutlined,
+    FilePdfOutlined,
+    SearchOutlined,
+    ClockCircleOutlined,
+} from "@ant-design/icons";
 import Navbar from "../../../components/Navbar/Navbar";
 import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
 import { GetWorkHistory } from "../../../services/https/index";
-import styles from "./HistoryWorkTablePage.module.css";
-
+import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { thSarabunNewBase64 } from "../historywork/thaibase64";
 import logo from "../historywork/logojob.png";
 
-const { Title } = Typography;
-const { Content } = Layout;
 
-const WorkHistoryTablePage = () => {
+const { Title, Text, Paragraph } = Typography;
+
+const WorkHistoryPage: React.FC = () => {
     const [histories, setHistories] = useState<WorkHistoryInterface[]>([]);
-    const [filteredHistories, setFilteredHistories] = useState<WorkHistoryInterface[]>([]);
+    const [filtered, setFiltered] = useState<WorkHistoryInterface[]>([]);
+    const [loading, setLoading] = useState(true);
     const [searchTitle, setSearchTitle] = useState("");
-
-
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
-
-    const fetchHistoryList = async () => {
-        const res = await GetWorkHistory();
-        if (res) {
-            const mapped = res.map((item: any) => ({
-                ...item,
-            }));
-            setHistories(mapped);
-            setFilteredHistories(mapped);
-        } else {
-            messageApi.error("ไม่สามารถดึงข้อมูลประวัติงานได้");
-        }
-    };
 
     useEffect(() => {
-        fetchHistoryList();
+        const fetchData = async () => {
+            const res = await GetWorkHistory();
+            if (res) {
+                setHistories(res);
+                setFiltered(res);
+            }
+            setLoading(false);
+        };
+        fetchData();
     }, []);
 
     useEffect(() => {
-        let filtered = histories;
+        let f = histories;
         if (searchTitle.trim() !== "") {
-            filtered = filtered.filter((h) =>
+            f = f.filter((h) =>
                 h.Work?.title?.toLowerCase().includes(searchTitle.toLowerCase())
             );
         }
-        setFilteredHistories(filtered);
+        setFiltered(f);
     }, [searchTitle, histories]);
+
+    const formatWorkTime = (worktime: string | undefined) => {
+        if (!worktime) return "-";
+        const date = new Date(worktime);
+        return date.toLocaleDateString("th-TH", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
 
     const generatePDF = (record: WorkHistoryInterface) => {
         const doc = new jsPDF("p", "mm", "a4");
+        const pageWidth = doc.internal.pageSize.getWidth();
 
         // === ฟอนต์ไทย ===
         doc.addFileToVFS("THSarabunNew.ttf", thSarabunNewBase64);
         doc.addFont("THSarabunNew.ttf", "THSarabunNew", "normal");
+        doc.addFont("THSarabunNew.ttf", "THSarabunNew", "bold");
         doc.setFont("THSarabunNew", "normal");
 
-        const pdfWidth = doc.internal.pageSize.getWidth();
-        const pdfHeight = doc.internal.pageSize.getHeight();
-
-        const imgProps = doc.getImageProperties(logo);
-        const logoWidth = 60;
-        const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
-        doc.addImage(logo, "PNG", (pdfWidth - logoWidth) / 2, 25, logoWidth, logoHeight);
-
-        // === ชื่อผู้ใช้งาน ===
-        let y = 55;
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(20);
-        doc.text(
-            `ชื่อผู้ใช้งาน: ${record.User?.FirstName || ""} ${record.User?.LastName || ""}`,
-            14,
-            y
+        // === ใส่โลโก้ตรงกลางด้านบน ===
+        const logoWidth = 120;
+        const logoHeight = 40;
+        doc.addImage(
+            logo,
+            "PNG",
+            (pageWidth - logoWidth) / 2,
+            8,
+            logoWidth,
+            logoHeight
         );
-        y += 8;
+
+        // === หัวข้อเอกสาร ===
+        doc.setFont("THSarabunNew", "bold");
+        doc.setFontSize(20);
+        doc.text("เอกสารแสดงชั่วโมงจิตอาสา", pageWidth / 2, 60, { align: "center" });
+
+        doc.setFont("THSarabunNew", "normal");
         doc.setFontSize(16);
-        doc.text("รายงานสรุปการทำงานและชั่วโมงจิตอาสา", 14, y);
 
-        // === กล่อง Summary ===
-        y += 15;
-        const boxWidth = (pdfWidth - 80) / 3; // ลดนิดหน่อยให้เล็กลง
-        const boxHeight = 30;
-        const gap = 20; // ระยะห่างระหว่างกล่อง
+        let currentY = 80; // ตำแหน่งเริ่มต้น
 
-        // คำนวณตำแหน่งเริ่มต้นให้อยู่ตรงกลาง
-        const totalWidth = boxWidth * 2 + gap;
-        const startX = (pdfWidth - totalWidth) / 2;
+        // === หัวข้องาน ===
+        doc.text(`• หัวข้องาน: ${record.Work?.title || "-"}`, 14, currentY);
+        currentY += 10;
 
-        const drawBox = (x: number, title: string, value: string) => {
-            doc.setDrawColor(200);
-            doc.rect(x, y, boxWidth, boxHeight);
-            doc.setFontSize(16);
-            doc.text(value, x + boxWidth / 2, y + 14, { align: "center" });
-            doc.setFontSize(16);
-            doc.setTextColor(100);
-            doc.text(title, x + boxWidth / 2, y + 24, { align: "center" });
-            doc.setTextColor(0, 0, 0);
-        };
+        // === รายละเอียด (split text) ===
+        const description = record.Work?.description || "-";
+        const descriptionLines = doc.splitTextToSize(`• รายละเอียด: ${description}`, pageWidth - 28); // 14 margin * 2
+        doc.text(descriptionLines, 14, currentY);
+        currentY += descriptionLines.length * 5; // ปรับตำแหน่งบรรทัดถัดไป
 
-        // กล่อง 1 (ซ้าย)
-        drawBox(startX, "รายการ", "1");
-        // กล่อง 2 (ขวา)
-        drawBox(startX + boxWidth + gap, "ชั่วโมงจิตอาสา", record.Work?.volunteer ? `${record.Work.volunteer} ชม.` : "0");
-
-
-        // === ตารางรายละเอียด ===
-        y += boxHeight + 25;
-        autoTable(doc, {
-            startY: y,
-            head: [["หัวข้องาน", "รายละเอียด", "วันเวลา", "สถานที่", "ชั่วโมงจิตอาสา"]],
-            body: [[
-                record.Work?.title || "-",
-                record.Work?.description || "-",
-                record.Work?.worktime
-                    ? new Date(record.Work.worktime).toLocaleDateString("th-TH", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })
-                    : "-",
-                record.Work?.place || "-",
-                record.Work?.volunteer ? `${record.Work.volunteer} ชม.` : "-"
-            ]],
-            styles: {
-                font: "THSarabunNew",   
-                fontSize: 16           
-            },
-            headStyles: {
-                fillColor: [103, 58, 183], 
-                textColor: 255,
-                font: "THSarabunNew",      
-                fontStyle: "normal",       
-                fontSize: 16
-            },
-            bodyStyles: {
-                font: "THSarabunNew",      
-                fontSize: 16
-            },
-        });
-
-        // === Footer ===
-        const footerY = pdfHeight - 15;
-        doc.setFontSize(10);
-        doc.setTextColor(120);
-        doc.text("© 2568 StudentJobHub", 14, footerY);
-        doc.text(
-            `สร้างเมื่อ: ${new Date().toLocaleDateString("th-TH", {
+        // === วันที่ ===
+        const workDate = record.Work?.worktime
+            ? new Date(record.Work.worktime).toLocaleDateString("th-TH", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
-            })}`,
-            pdfWidth - 14,
-            footerY,
-            { align: "right" }
-        );
+            })
+            : "-";
+        doc.text(`• วันที่: ${workDate}`, 14, currentY);
+        currentY += 10;
 
-        doc.save(`work_history_${record.ID}.pdf`);
+        // === สถานที่ ===
+        doc.text(`• สถานที่: ${record.Work?.place || "-"}`, 14, currentY);
+        currentY += 10;
+
+        // === ชั่วโมงจิตอาสา ===
+        doc.text(
+            `• ชั่วโมงจิตอาสา: ${record.Work?.volunteer ? record.Work.volunteer + " ชม." : "-"}`,
+            14,
+            currentY
+        );
+        currentY += 10;
+
+        // === เส้นแบ่งใต้หัวข้อ ===
+        doc.setLineWidth(0.5);
+        doc.line(14, currentY + 2, pageWidth - 14, currentY + 2);
+
+        doc.save(`ชั่วโมงจิตอาสา.pdf`);
     };
 
-    const columns = [
-        {
-            title: "ลำดับ",
-            key: "index",
-            width: 60,
-            align: "center" as const,
-            render: (_: any, __: any, index: number) => index + 1,
-        },
-        {
-            title: "หัวข้องาน",
-            key: "title",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.title || "-",
-        },
-        {
-            title: "รายละเอียด",
-            key: "description",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.description || "-",
-            ellipsis: true,
-        },
-        {
-            title: "วันเวลา",
-            key: "worktime",
-            render: (_: any, record: WorkHistoryInterface) => {
-                if (!record.Work?.worktime) return "-";
-                const date = new Date(record.Work.worktime);
-                return date.toLocaleDateString("th-TH", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-            },
-        },
-        {
-            title: "สถานที่",
-            key: "place",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.place || "-",
-        },
-        {
-            title: "ค่าตอบแทน",
-            key: "PaidAmount",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.paid != null ? `${record.Work.paid} บาท` : "-",
-        },
-        {
-            title: "ชั่วโมงจิตอาสา",
-            key: "VolunteerHour",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.volunteer != null ? `${record.Work.volunteer} ชม.` : "-",
-        },
-        {
-            title: "PDF",
-            key: "pdf",
-            render: (_: any, record: WorkHistoryInterface) =>
-                record.Work?.volunteer != null ? (
-                    <Button
-                        type="primary"
-                        icon={<FilePdfOutlined />}
-                        size="middle"
-                        onClick={() => generatePDF(record)}
-                    >
-                        ดาวน์โหลด PDF
-                    </Button>
-                ) : null,
-        }
-    ];
+
+    if (loading) {
+        return (
+            <div
+                style={{
+                    minHeight: "100vh",
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Spin size="large" />
+                <Title level={3} style={{ color: "white", marginTop: 20 }}>
+                    กำลังโหลดข้อมูล...
+                </Title>
+            </div>
+        );
+    }
 
     return (
-        <Layout className={styles.layout}>
+        <div
+            style={{
+                minHeight: "100vh",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            }}
+        >
             <Navbar />
-            <Layout>
-                <Content className={styles.content}>
-                    {contextHolder}
-                    <Card className={styles.card}>
-                        <Row
-                            justify="space-between"
-                            align="middle"
-                            style={{
-                                flexWrap: "wrap",
-                                rowGap: 12,
-                                columnGap: 12,
-                                marginBottom: 16,
-                            }}
-                        >
-                            <Col flex="1 1 200px">
-                                <Title level={3} className={styles.pageTitle} style={{ marginBottom: 0 }}>
-                                    ประวัติการทำงาน
-                                </Title>
+
+            <div style={{ padding: "60px 40px 40px", textAlign: "center" }}>
+                <Title
+                    level={1}
+                    style={{
+                        color: "white",
+                        fontSize: "3rem",
+                        fontWeight: "bold",
+                        marginBottom: "10px",
+                        textShadow: "0 4px 8px rgba(0,0,0,0.3)",
+                    }}
+                >
+                    ประวัติการทำงาน
+                </Title>
+                <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.2rem" }}>
+                    บันทึกและดาวน์โหลดชั่วโมงการทำงานของคุณ
+                </Text>
+
+                <div style={{ marginTop: "20px" }}>
+                    <Input
+                        placeholder="ค้นหาหัวข้องาน"
+                        prefix={<SearchOutlined />}
+                        value={searchTitle}
+                        onChange={(e) => setSearchTitle(e.target.value)}
+                        style={{
+                            width: "300px",
+                            borderRadius: "25px",
+                            padding: "8px 16px",
+                        }}
+                    />
+                </div>
+
+                <div style={{ marginTop: "20px" }}>
+                    <Tag
+                        color="blue"
+                        style={{
+                            fontSize: "16px",
+                            padding: "8px 16px",
+                            borderRadius: "20px",
+                        }}
+                    >
+                        ทั้งหมด {filtered.length} งาน
+                    </Tag>
+                </div>
+            </div>
+
+            <div
+                style={{
+                    padding: "0 40px 60px",
+                    background: "rgba(255,255,255,0.05)",
+                    backdropFilter: "blur(10px)",
+                    borderRadius: "30px 30px 0 0",
+                    minHeight: "60vh",
+                }}
+            >
+                {filtered.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "80px 20px", color: "white" }}>
+                        <Empty
+                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                            description={
+                                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "18px" }}>
+                                    ไม่มีประวัติงาน
+                                </Text>
+                            }
+                        />
+                    </div>
+                ) : (
+                    <Row gutter={[24, 24]} style={{ paddingTop: "40px" }}>
+                        {filtered.map((h) => (
+                            <Col xs={24} sm={12} lg={8} xl={6} key={h.ID}>
+                                <Card
+                                    hoverable
+                                    onClick={() => navigate(`/work/info/${h.Work?.ID}`)}
+                                    style={{
+                                        borderRadius: "20px",
+                                        overflow: "hidden",
+                                        border: "none",
+                                        boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+                                        background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
+                                        height: "100%"
+                                        
+                                    }}
+                                    cover={
+                                        <img
+                                            alt="รูปงาน"
+                                            src={h.Work?.photo || "/default-image.png"}
+                                            style={{ height: "200px", objectFit: "cover", width: "100%" }}
+                                        />
+                                    }
+                                    actions={
+
+                                        h.Work?.paid
+                                            ? []
+                                            : [
+                                                <Button
+                                                    type="text"
+                                                    icon={<FilePdfOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // ❗ ป้องกันไม่ให้กดแล้วเด้งไปหน้า work/info ด้วย
+                                                        generatePDF(h);
+                                                    }}
+                                                    style={{ color: "#E74C3C" }}
+                                                >
+                                                    ดาวน์โหลด PDF
+                                                </Button>,
+                                            ]
+                                    }
+                                >
+                                    <div style={{ padding: "0 8px" }}>
+                                        <Title
+                                            level={4}
+                                            style={{
+                                                margin: "0 0 8px 0",
+                                                background: "linear-gradient(45deg, #667eea, #764ba2)",
+                                                backgroundClip: "text",
+                                                WebkitBackgroundClip: "text",
+                                                WebkitTextFillColor: "transparent",
+                                                fontSize: "18px",
+                                            }}
+                                        >
+                                            {h.Work?.title}
+                                        </Title>
+
+                                        <Paragraph
+                                            style={{ margin: "8px 0", fontSize: "13px", lineHeight: "1.4" }}
+                                            ellipsis={{ rows: 1 }}
+                                        >
+                                            {h.Work?.description || "ไม่มีรายละเอียด"}
+                                        </Paragraph>
+
+                                        <Divider style={{ margin: "12px 0" }} />
+
+                                        <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                                            <Space>
+                                                <CalendarOutlined style={{ color: "#4ECDC4" }} />
+                                                <Text style={{ fontSize: "13px" }}>
+                                                    {formatWorkTime(h.Work?.worktime)}
+                                                </Text>
+                                            </Space>
+
+                                            <Space>
+                                                <EnvironmentOutlined style={{ color: "#FF6B6B" }} />
+                                                <Text type="secondary" style={{ fontSize: "14px" }}>
+                                                    {h.Work?.place}
+                                                </Text>
+                                            </Space>
+
+                                            <Space>
+                                                {h.Work?.paid ? (
+                                                    <>
+                                                        <WalletOutlined style={{ color: "#27AE60" }} />
+                                                        <Text strong style={{ fontSize: "14px", color: "#27AE60" }}>
+                                                            {h.Work?.paid} บาท
+                                                        </Text>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <HeartOutlined style={{ color: "#E74C3C" }} />
+                                                        <Text style={{ color: "#E74C3C", fontSize: "14px" }}>
+                                                            งานจิตอาสา
+                                                        </Text>
+                                                    </>
+                                                )}
+                                            </Space>
+
+                                            {!h.Work?.paid && (
+                                                <Space>
+                                                    <ClockCircleOutlined style={{ color: "#FF9800" }} />
+                                                    <Text style={{ fontSize: "13px" }}>
+                                                        {h.Work?.volunteer ? `${h.Work.volunteer} ชม.` : "-"}
+                                                    </Text>
+                                                </Space>
+                                            )}
+                                        </Space>
+                                    </div>
+                                </Card>
                             </Col>
-
-                            <Col flex="1 1 200px">
-                                <Input
-                                    placeholder="ค้นหาหัวข้องาน"
-                                    prefix={<SearchOutlined />}
-                                    value={searchTitle}
-                                    onChange={(e) => setSearchTitle(e.target.value)}
-                                />
-                            </Col>
-                        </Row>
-
-                        <Divider />
-
-                        <div className={styles.tableWrapper}>
-                            <Table
-                                bordered
-                                columns={columns}
-                                dataSource={filteredHistories.map((item) => ({ ...item, key: item.ID?.toString() }))}
-                                pagination={{ pageSize: 10 }}
-                                scroll={{ x: "max-content" }}
-                            />
-                        </div>
-                    </Card>
-                </Content>
-            </Layout>
-        </Layout>
+                        ))}
+                    </Row>
+                )}
+            </div>
+        </div>
     );
 };
 
-export default WorkHistoryTablePage;
+export default WorkHistoryPage;

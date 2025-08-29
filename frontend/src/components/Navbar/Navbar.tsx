@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
     <Menu>
       {user?.Role === "admin" && (
         <Menu.Item key="admin">
-          <Link to="/work" onClick={() => handleMenuClick("admin")}>แอดมิน</Link>
+          <Link to="/work" onClick={() => handleMenuClick("admin")}>จัดการ</Link>
         </Menu.Item>
       )}
       <Menu.Item key="account">

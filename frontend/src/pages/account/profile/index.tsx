@@ -119,13 +119,13 @@ const ProfileView = () => {
             }}
           >
             <Statistic
-  title="ค่าตอบแทน"
-  value={paidAmountTotal}
-  precision={0}
-  prefix="฿"
-  suffix="บาท"
-  valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
-/>
+              title="รายได้ทั้งหมด"
+              value={paidAmountTotal}
+              precision={0}
+              prefix="฿"
+              suffix="บาท"
+              valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
+            />
 
           </Card>
 
@@ -139,7 +139,7 @@ const ProfileView = () => {
             }}
           >
             <Statistic
-              title="ชั่วโมงจิตอาสา"
+              title="ชั่วโมงจิตอาสาทั้งหมด"
               value={volunteerHourTotal}
               precision={0}
               prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}

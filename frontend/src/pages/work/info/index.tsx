@@ -6,6 +6,7 @@ import {
 import { useParams } from 'react-router-dom';
 import { GetWorkById, CreateBooking, GetBookings, UpdateWork, CreateCheckIn, GetCheckIns } from '../../../services/https';
 import { WorkInterface } from '../../../interfaces/IWork';
+import { UsersInterface } from '../../../interfaces/IUser';
 import { BookingInterface } from '../../../interfaces/IBooking';
 import { CheckInInterface } from '../../../interfaces/ICheckIn';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
@@ -13,6 +14,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import { message } from "antd";
 import 'leaflet/dist/leaflet.css';
 import Navbar from '../../../components/Navbar/Navbar';
+import { GetUserById } from "../../../services/https";
 
 const defaultPosition: [number, number] = [14.883451, 102.010589];
 
@@ -23,27 +25,44 @@ const WorkInfo = () => {
     const [hasBooked, setHasBooked] = useState(false);
     const [hasCheckedIn, setHasCheckedIn] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
+    const [user, setUser] = useState<UsersInterface | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUserAndWork = async () => {
+            // ดึงข้อมูลผู้ใช้
+            const userIdStr = localStorage.getItem("user_id");
+            let userId: number | null = null;
+            if (userIdStr) {
+                userId = Number(userIdStr);
+                const userData = await GetUserById(userId);
+                if (userData) {
+                    setUser(userData);
+                }
+            }
+
+            // ดึงข้อมูลงาน
             if (!id) return;
-            const data = await GetWorkById(Number(id));
-            if (data) {
-                setWork(data);
-                if (data.latitude !== undefined && data.longitude !== undefined) {
-                    setPosition([data.latitude, data.longitude]);
+            const workData = await GetWorkById(Number(id));
+            if (workData) {
+                setWork(workData);
+                if (workData.latitude !== undefined && workData.longitude !== undefined) {
+                    setPosition([workData.latitude, workData.longitude]);
                 }
 
-                const user_id = Number(localStorage.getItem("user_id"));
-                if (data.poster_id === user_id) {
+                if (userId !== null && workData.poster_id === userId) {
                     setIsOwner(true);
                 }
             }
+
+            // ตรวจสอบสถานะ Booking และ Check-in
             await checkBookingStatus();
             await checkCheckInStatus();
         };
-        fetchData();
+
+        fetchUserAndWork();
     }, [id]);
+
+
 
     const checkBookingStatus = async () => {
         const user_id = Number(localStorage.getItem("user_id"));
@@ -210,7 +229,7 @@ const WorkInfo = () => {
                             <div style={{ backgroundColor: work.workstatus_id === 1 ? '#ECFDF5' : '#FEF2F2', color: work.workstatus_id === 1 ? '#10B981' : '#EF4444', padding: '12px', borderRadius: '12px', textAlign: 'center', fontWeight: 'bold', marginBottom: '20px' }}>
                                 {work.workstatus_id === 1 ? 'เปิดรับสมัครแล้ว' : 'ปิดรับสมัครแล้ว'}
                             </div>
-                            {!isOwner && (
+                            {!isOwner && user?.Role === "user" && (
                                 <>
                                     <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                                         <div style={{ color: '#6B7280' }}>{work.worktype_id === 1 ? 'คุณจะได้รับ' : 'ชั่วโมงจิตอาสา'}</div>

@@ -79,6 +79,7 @@ function CustomerEdit() {
         Email: res.Email,
         BirthDay: dayjs(res.BirthDay),
         Contact: res.Contact,
+        Role: res.Role,
       });
     }
   };
@@ -202,11 +203,12 @@ function CustomerEdit() {
                 </Select>
               </Form.Item>
             </Col>
-            {/* <Col xs={24} md={12}>
-              <Form.Item label="เบอร์โทร" name="Contact" rules={[{ required: true, message: "กรุณากรอกเบอร์โทร!" }]}>
+            <Col xs={24} md={12}>
+              <Form.Item label="Role" name="Role" style={{ display: "none" }}>
                 <Input />
               </Form.Item>
-            </Col> */}
+            </Col>
+
           </Row>
 
           <Row justify="end">
