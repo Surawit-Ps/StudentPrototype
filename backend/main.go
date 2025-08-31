@@ -8,6 +8,8 @@ import (
 	"github.com/tanapon395/sa-67-example/middlewares"
 	"github.com/tanapon395/sa-67-example/controller"
 	"github.com/tanapon395/sa-67-example/controller/user"
+	"time"
+	
 
 )
 
@@ -20,6 +22,12 @@ func main() {
 
 	// Generate databases
 	config.SetupDatabase()
+	go func() {
+		for {
+			controller.UpdateWorkStatusAutomatically()
+			time.Sleep(1 * time.Minute) // ตรวจสอบทุก 1 นาที
+		}
+	}()
 
 	r := gin.Default()
 
@@ -48,6 +56,7 @@ func main() {
 		router.DELETE("/work/:id", controller.DeleteWork)
 		router.POST("/work/register/:id", controller.RegisterWork)
 		router.GET("/work/poster/:id", controller.GetWorkByPosterID)
+		router.PATCH("/work/updateStatus/:id", controller.UpdateWorkStatus)
 		
 		router.POST("/dashboard", controller.CreateDashboard)
 		router.GET("/dashboard", controller.GetAllDashboard)
@@ -62,6 +71,7 @@ func main() {
 		router.PATCH("/booking/:id", controller.UpdateBooking)
 		router.DELETE("/booking/:id", controller.DeleteBooking)
 		router.GET("/bookings", controller.GetAllBooking)
+		router.DELETE("/bookings/work/:workID", controller.DeleteAllBookingByWorkID)
 		// CheckIn Routes
 		router.GET("/checkin/work/:workID", controller.GetcheckInByWorkID)
 		router.POST("/checkin", controller.CreateCheckIn)

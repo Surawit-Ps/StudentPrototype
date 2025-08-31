@@ -4,7 +4,10 @@ import {
     CheckCircle, XCircle, Calendar, Map
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { GetWorkById, CreateBooking, GetBookings, UpdateWork, CreateCheckIn, GetCheckIns } from '../../../services/https';
+import { 
+    GetWorkById, CreateBooking, GetBookings, UpdateWork, 
+    CreateCheckIn, GetCheckIns, DeleteBooking, GetUserById 
+} from '../../../services/https';
 import { WorkInterface } from '../../../interfaces/IWork';
 import { UsersInterface } from '../../../interfaces/IUser';
 import { BookingInterface } from '../../../interfaces/IBooking';
@@ -14,7 +17,6 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import { message } from "antd";
 import 'leaflet/dist/leaflet.css';
 import Navbar from '../../../components/Navbar/Navbar';
-import { GetUserById } from "../../../services/https";
 
 const defaultPosition: [number, number] = [14.883451, 102.010589];
 
@@ -24,23 +26,20 @@ const WorkInfo = () => {
     const [position, setPosition] = useState<[number, number]>(defaultPosition);
     const [hasBooked, setHasBooked] = useState(false);
     const [hasCheckedIn, setHasCheckedIn] = useState(false);
+    const [hasOtherBooking, setHasOtherBooking] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
     const [user, setUser] = useState<UsersInterface | null>(null);
 
     useEffect(() => {
         const fetchUserAndWork = async () => {
-            // ดึงข้อมูลผู้ใช้
             const userIdStr = localStorage.getItem("user_id");
             let userId: number | null = null;
             if (userIdStr) {
                 userId = Number(userIdStr);
                 const userData = await GetUserById(userId);
-                if (userData) {
-                    setUser(userData);
-                }
+                if (userData) setUser(userData);
             }
 
-            // ดึงข้อมูลงาน
             if (!id) return;
             const workData = await GetWorkById(Number(id));
             if (workData) {
@@ -48,13 +47,11 @@ const WorkInfo = () => {
                 if (workData.latitude !== undefined && workData.longitude !== undefined) {
                     setPosition([workData.latitude, workData.longitude]);
                 }
-
                 if (userId !== null && workData.poster_id === userId) {
                     setIsOwner(true);
                 }
             }
 
-            // ตรวจสอบสถานะ Booking และ Check-in
             await checkBookingStatus();
             await checkCheckInStatus();
         };
@@ -62,18 +59,25 @@ const WorkInfo = () => {
         fetchUserAndWork();
     }, [id]);
 
-
-
     const checkBookingStatus = async () => {
         const user_id = Number(localStorage.getItem("user_id"));
         if (!user_id || !id) return;
 
         try {
             const bookings: BookingInterface[] = await GetBookings();
+
+            // งานนี้
             const matched = bookings.find(
                 (b) => b.user_id === user_id && b.work_id === Number(id)
             );
             if (matched) setHasBooked(true);
+
+            // งานอื่น
+            const otherBooking = bookings.find(
+                (b) => b.user_id === user_id && b.work_id !== Number(id) && b.status === "registered"
+            );
+            if (otherBooking) setHasOtherBooking(true);
+
         } catch (error) {
             console.error("Error fetching bookings", error);
         }
@@ -88,9 +92,7 @@ const WorkInfo = () => {
             const matched = checkIns.find(
                 (ci) => ci.user_id === user_id && ci.work_id === Number(id)
             );
-            if (matched) {
-                setHasCheckedIn(true);
-            }
+            if (matched) setHasCheckedIn(true);
         } catch (error) {
             console.error("Error fetching check-ins", error);
         }
@@ -102,6 +104,11 @@ const WorkInfo = () => {
         const user_id = Number(localStorage.getItem("user_id"));
         if (!user_id) {
             message.error("กรุณาเข้าสู่ระบบก่อนลงทะเบียน");
+            return;
+        }
+
+        if (hasOtherBooking) {
+            message.warning("คุณมีงานที่ลงทะเบียนอยู่แล้ว ไม่สามารถลงทะเบียนงานอื่นได้");
             return;
         }
 
@@ -172,6 +179,45 @@ const WorkInfo = () => {
         }
     };
 
+    const handleCancelBooking = async () => {
+        const user_id = Number(localStorage.getItem("user_id"));
+        if (!user_id || !id) return;
+
+        try {
+            // Find the booking for this user and work
+            const bookings: BookingInterface[] = await GetBookings();
+            const booking = bookings.find(
+                (b) => b.user_id === user_id && b.work_id === Number(id)
+            );
+            if (!booking || !booking.ID) {
+                message.error("ไม่พบข้อมูลการลงทะเบียนนี้");
+                return;
+            }
+            const response = await DeleteBooking(booking.ID);
+            if (response) {
+                message.success("ยกเลิกการลงทะเบียนสำเร็จแล้ว");
+                setHasBooked(false);
+                setHasOtherBooking(false);
+
+                // ลดจำนวนผู้เข้าร่วมงาน
+                if (work) {
+                    const updatedWork: WorkInterface = {
+                        ...work,
+                        workuse: (work.workuse ?? 1) - 1,
+                        workstatus_id: 1 // เปิดรับสมัครอีกครั้งหากถูกปิดไป
+                    };
+                    const updateResponse = await UpdateWork(Number(id), updatedWork);
+                    if (updateResponse) setWork(updatedWork);
+                }
+            } else {
+                message.error("ยกเลิกการลงทะเบียนไม่สำเร็จ");
+            }
+        } catch (error) {
+            console.error("Error canceling booking:", error);
+            message.error("เกิดข้อผิดพลาดในการยกเลิกการลงทะเบียน");
+        }
+    };
+
     const formatDate = (dateString?: string) => {
         if (!dateString) return '-';
         const date = new Date(dateString);
@@ -236,22 +282,50 @@ const WorkInfo = () => {
                                         <div style={{ fontSize: '28px', fontWeight: 'bold', color: work.worktype_id === 1 ? '#10B981' : '#F59E0B' }}>{work.worktype_id === 1 ? `฿ ${work.paid ?? '-'} บาท` : `${work.volunteer ?? '-'} ชั่วโมง`}</div>
                                     </div>
                                     {hasBooked && !hasCheckedIn ? (
-                                        <>
-                                            <button onClick={handleCheckIn} style={{ fontSize: '16px', width: '100%', padding: '16px', backgroundColor: '#10B981', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <button 
+                                                onClick={handleCheckIn} 
+                                                style={{ fontSize: '16px', width: '100%', padding: '16px', backgroundColor: '#10B981', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                            >
                                                 <CheckCircleOutlined /> เช็คอินเข้าร่วมงาน
                                             </button>
-                                            <p style={{ fontSize: '12px', textAlign: 'center', color: '#9CA3AF', marginTop: '12px' }}>กดปุ่มนี้เพื่อยืนยันว่าคุณเข้าร่วมงานแล้ว</p>
-                                        </>
+                                            <button
+                                                onClick={handleCancelBooking}
+                                                style={{ fontSize: '16px', width: '100%', padding: '16px', backgroundColor: '#EF4444', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                            >
+                                                <XCircle size={16} /> ยกเลิกการลงทะเบียน
+                                            </button>
+                                        </div>
                                     ) : hasBooked && hasCheckedIn ? (
                                         <div style={{ textAlign: 'center', color: '#10B981', fontWeight: 'bold', fontSize: '16px' }}>
                                             คุณเช็คอินเข้าร่วมงานนี้แล้ว
                                         </div>
                                     ) : (
                                         <>
-                                            <button onClick={handleRegister} disabled={work.workstatus_id !== 1} style={{ fontSize: '16px', width: '100%', padding: '16px', backgroundColor: work.workstatus_id === 1 ? '#3F72AF' : '#9CA3AF', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '16px', cursor: work.workstatus_id === 1 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                            <button 
+                                                onClick={handleRegister} 
+                                                disabled={work.workstatus_id !== 1 || hasOtherBooking} 
+                                                style={{
+                                                    fontSize: '16px',
+                                                    width: '100%',
+                                                    padding: '16px',
+                                                    backgroundColor: work.workstatus_id === 1 && !hasOtherBooking ? '#3F72AF' : '#9CA3AF',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    border: 'none',
+                                                    borderRadius: '16px',
+                                                    cursor: work.workstatus_id === 1 && !hasOtherBooking ? 'pointer' : 'not-allowed',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px'
+                                                }}
+                                            >
                                                 <CheckCircleOutlined /> ลงทะเบียนเข้าร่วม
                                             </button>
-                                            <p style={{ fontSize: '12px', textAlign: 'center', color: '#9CA3AF', marginTop: '12px' }}>การลงทะเบียนจะมีผลทันทีหลังจากกดยืนยัน</p>
+                                            <p style={{ fontSize: '12px', textAlign: 'center', color: '#9CA3AF', marginTop: '12px' }}>
+                                                {hasOtherBooking ? 'คุณมีงานที่ลงทะเบียนอยู่แล้ว ไม่สามารถลงทะเบียนงานอื่นได้' : 'การลงทะเบียนจะมีผลทันทีหลังจากกดยืนยัน'}
+                                            </p>
                                         </>
                                     )}
                                 </>

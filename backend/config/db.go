@@ -51,12 +51,12 @@ func SetupDatabase() {
 		// 	UserID: 1,
 		// 	WorkID: 1,
 		// },
-		{UserID: 2,
-			WorkID: 2,
+		{UserID: 0,
+			WorkID: 0,
 		},
 		{
-			UserID: 3,
-			WorkID: 3,
+			UserID: 1,
+			WorkID: 0,
 		},
 	}
 	for _, c := range checkIn {
@@ -64,13 +64,7 @@ func SetupDatabase() {
 	}
 
 	bookings := []entity.Booking{
-		{UserID: 2, WorkID: 1, Status: "registered"},
-		{UserID: 3, WorkID: 1, Status: "registered"},
-		{UserID: 4, WorkID: 1, Status: "registered"},
-		{UserID: 3, WorkID: 1, Status: "registered"},
-		{UserID: 3, WorkID: 2, Status: "registered"},
-		{UserID: 4, WorkID: 3, Status: "registered"},
-		{UserID: 5, WorkID: 4, Status: "registered"},
+		{UserID: 0, WorkID: 0, Status: "registered"},
 	}
 
 	for _, b := range bookings {
@@ -165,9 +159,9 @@ func SetupDatabase() {
 			Longitude:    100.510000,
 			WorkUse:      1,
 			WorkCount:    5,
-			WorkTime:     time.Date(2025, 7, 25, 10, 0, 0, 0, time.UTC),
+			WorkTime:     time.Date(2025, 10, 25, 10, 0, 0, 0, time.UTC),
 			Photo:        "https://i.pinimg.com/736x/0b/df/01/0bdf01389cd7541a2a9fc5debc2fc7d0.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(300),
 			PosterID:     1,
@@ -180,9 +174,9 @@ func SetupDatabase() {
 			Longitude:    100.541016,
 			WorkUse:      1,
 			WorkCount:    12,
-			WorkTime:     time.Date(2025, 8, 12, 8, 30, 0, 0, time.UTC),
+			WorkTime:     time.Date(2025, 9, 12, 8, 30, 0, 0, time.UTC),
 			Photo:        "https://i.pinimg.com/736x/0b/df/01/0bdf01389cd7541a2a9fc5debc2fc7d0.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(5),
 			PosterID:     1,
@@ -195,7 +189,7 @@ func SetupDatabase() {
 			Longitude:    100.560318,
 			WorkUse:      1,
 			WorkCount:    6,
-			WorkTime:     time.Date(2025, 7, 28, 15, 0, 0, 0, time.UTC),
+			WorkTime:     time.Date(2025, 8, 28, 15, 0, 0, 0, time.UTC),
 			Photo:        "https://i.pinimg.com/736x/0b/df/01/0bdf01389cd7541a2a9fc5debc2fc7d0.jpg",
 			WorkStatusID: 1,
 			WorkTypeID:   2,
@@ -240,9 +234,9 @@ func SetupDatabase() {
 			Longitude:    100.400000,
 			WorkUse:      1,
 			WorkCount:    4,
-			WorkTime:     time.Date(2025, 7, 27, 9, 0, 0, 0, time.UTC),
+			WorkTime:     time.Date(2025, 9, 27, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://i.pinimg.com/736x/0b/df/01/0bdf01389cd7541a2a9fc5debc2fc7d0.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(6),
 			PosterID:     1,

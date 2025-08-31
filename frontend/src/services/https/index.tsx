@@ -191,6 +191,16 @@ async function GetBookingById(id: Number | undefined) {
   return res.ok ? res.json() : false;
 }
 
+async function DeleteBooking (bookingId: number) {
+  const res = await fetch(`${apiUrl}/booking/${bookingId}`, {
+    method: "DELETE", 
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return res.ok;
+}
 
 async function UpdateBooking(bookingId: number, data: any) {
   const res = await fetch(`${apiUrl}/booking/${bookingId}`, {
@@ -269,9 +279,23 @@ async function GetWorkHistory(): Promise<WorkHistoryInterface[] | false> {
   return res.ok ? res.json() : false;
 }
 
+async function DeleteAllBookingByWorkID(workId: number) {
+  const res = await fetch(`${apiUrl}/bookings/work/${workId}`, authRequestOptions("DELETE"));
+  return res.ok;
+}
+
+async function UpdateWorkStatus(workId: number, status: string) {
+  const res = await fetch(`${apiUrl}/work/updateStatus/${workId}`, authRequestOptions("PATCH", { status }));
+  return res.ok ? res.json() : false;
+}
+
+
+
+
 
 export {
   // user
+  
   GetUsers,
   CreateUser,
   GetGenders,
@@ -300,6 +324,7 @@ export {
   DeleteBookingByID,
   GetBookingByWorkId,
   GetBookingByUserId,
+  DeleteBooking,
   // check-ins
   GetCheckIns,
   CreateCheckIn,
@@ -314,4 +339,7 @@ export {
   CreateWorkHistory,
 
   GetWorkHistory,
+  DeleteAllBookingByWorkID,
+  UpdateWorkStatus,
+
 };

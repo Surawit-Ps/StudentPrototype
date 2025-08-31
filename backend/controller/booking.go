@@ -107,3 +107,14 @@ func GetAllBooking(c *gin.Context) {
 }
 
 // Add this function to list all bookings
+func DeleteAllBookingByWorkID(c *gin.Context) {
+	workID := c.Param("workID")
+	db := config.DB()
+	result := db.Where("work_id = ?", workID).Delete(&entity.Booking{})
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete bookings"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Bookings deleted successfully"})
+}
+
