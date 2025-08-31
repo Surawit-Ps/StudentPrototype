@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import Navbar from '../../../components/Navbar/Navbar';
+import EnhancedFooter from '../../../components/Footer/EnhancedFooter'; 
 import { GetDashboard } from '../../../services/https';
 import { DashboardInterface } from '../../../interfaces/IDashboard';
-import { Layout, Pagination, Tooltip, Tag } from 'antd';
+import { Layout, Pagination, Tooltip } from 'antd';
 import bannerImage from "../../../assets/w3.jpg";
 
 const DashboardView = () => {
@@ -95,7 +96,7 @@ const paginated = sortedDashboards.slice((currentPage - 1) * pageSize, currentPa
                     key={item.ID ?? Math.random()}
                     style={{
                       display: 'flex',
-                      background: 'linear-gradient(145deg, #156ef598, #73d0e744)',
+                      background: 'linear-gradient(145deg, #2e5e8bc0, #75ade644)',
                       borderRadius: '24px',
                       overflow: 'hidden',
                       boxShadow: '0 8px 32px rgba(17, 78, 78, 0.1)',
@@ -202,6 +203,7 @@ const paginated = sortedDashboards.slice((currentPage - 1) * pageSize, currentPa
           )}
         </div>
       </Layout>
+      <EnhancedFooter />
     </div>
   );
 };

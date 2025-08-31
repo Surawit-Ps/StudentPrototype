@@ -214,6 +214,9 @@ const WorkInfo = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                         <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '24px', boxShadow: '0 8px 32px rgba(17, 45, 78, 0.08)' }}>
                             {/* ส่วนแสดงค่าตอบแทน / ชั่วโมงจิตอาสา */}
+                            <div style={{ backgroundColor: work.workstatus_id === 1 ? '#ECFDF5' : '#FEF2F2', color: work.workstatus_id === 1 ? '#10B981' : '#EF4444', padding: '12px', borderRadius: '12px', textAlign: 'center', fontWeight: 'bold', marginBottom: '20px' }}>
+                                {work.workstatus_id === 1 ? 'เปิดรับสมัครแล้ว' : 'ปิดรับสมัครแล้ว'}
+                            </div>
                             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                                 <div style={{ color: '#6B7280' }}>{work.worktype_id === 1 ? 'คุณจะได้รับ' : 'ชั่วโมงจิตอาสา'}</div>
                                 <div style={{ fontSize: '28px', fontWeight: 'bold', color: work.worktype_id === 1 ? '#10B981' : '#F59E0B' }}>

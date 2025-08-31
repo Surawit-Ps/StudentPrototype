@@ -151,16 +151,16 @@ const WorkCreate = () => {
               >
                 สร้างงานใหม่
               </h1>
-              <div
+              {/* <div
                 style={{
-                  width: 1410,
+                  width: "100%",
                   height: 4,
                   backgroundColor: "#434c86",
                   marginTop: 21,
                   borderRadius: 2,
 
                 }}
-              />
+              /> */}
             </div>
             <Form form={form} layout="vertical" onFinish={onFinish}>
               <Row gutter={24}>

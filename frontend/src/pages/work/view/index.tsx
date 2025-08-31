@@ -29,7 +29,7 @@ import { GetWork } from "../../../services/https";
 import { DollarOutlined, HeartFilled } from "@ant-design/icons";
 import Navbar from "../../../components/Navbar/Navbar";
 import bannerImage from "../../../assets/w1.jpg";
-
+import EnhancedFooter from '../../../components/Footer/EnhancedFooter';
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
@@ -75,7 +75,21 @@ const WorkView = () => {
     return matchesSearch && matchesType && matchesStatus;
   });
 
-  const paginatedWorks = filteredWorks.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  // เรียงงานใหม่สุดขึ้นก่อน
+  const sortedWorks = filteredWorks.sort((a, b) => {
+    const timeA = a.worktime ? new Date(a.worktime).getTime() : 0;
+    const timeB = b.worktime ? new Date(b.worktime).getTime() : 0;
+    return timeB - timeA;
+  });
+
+
+
+  // Slice สำหรับ pagination
+  const paginatedWorks = sortedWorks.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
 
   const getProgressColor = (used: number, total: number) => {
     const percentage = (used / total) * 100;
@@ -90,28 +104,28 @@ const WorkView = () => {
       <Layout style={{ backgroundColor: "#F9F7F7", minHeight: "100vh" }}>
         <Content style={{ padding: 0 }}>
           {contextHolder}
-<div
-  style={{
-    position: "relative",
-    backgroundImage: `url(${bannerImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    padding: "1px 24px 60px",
-    color: "white",
-  }}
->
-  {/* Overlay gradient filter */}
-  <div
-    style={{
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      background: "linear-gradient(135deg, rgba(18, 52, 94, 0.9), rgba(17, 45, 78, 0.8))",
-      zIndex: 1,
-    }}
-  />
+          <div
+            style={{
+              position: "relative",
+              backgroundImage: `url(${bannerImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              padding: "1px 24px 60px",
+              color: "white",
+            }}
+          >
+            {/* Overlay gradient filter */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: "linear-gradient(135deg, rgba(18, 52, 94, 0.9), rgba(17, 45, 78, 0.8))",
+                zIndex: 1,
+              }}
+            />
             <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
               <Title level={1} style={{ color: "white", fontSize: "3rem", fontWeight: "bold", textAlign: "center" }}>
                 ค้นหางานที่ใช่สำหรับคุณ
@@ -260,15 +274,21 @@ const WorkView = () => {
                         </div>
 
                         <div style={{ padding: "20px" }}>
-                          <Title level={5} style={{ margin: "0 0 8px", color: "#112D4E", fontSize: "18px" }}>
+                          <Title
+                            level={5}
+                            ellipsis
+                            style={{ margin: "0 0 8px", color: "#112D4E", fontSize: "18px" }}
+                          >
                             {work.title}
                           </Title>
+
                           <Paragraph
                             ellipsis={{ rows: 2 }}
                             style={{ margin: "0 0 16px", color: "#666", lineHeight: 1.6 }}
                           >
                             {work.description}
                           </Paragraph>
+
 
                           <Space direction="vertical" size="small" style={{ width: "100%" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -348,6 +368,7 @@ const WorkView = () => {
             )}
           </div>
         </Content>
+        <EnhancedFooter />
       </Layout>
     </>
   );

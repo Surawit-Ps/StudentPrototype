@@ -107,6 +107,7 @@ const WorkEdit = () => {
           ];
           setFileList(fileListData);
           console.log("🖼️ Set photo fileList:", fileListData);
+          form.setFieldsValue({ photo: fileListData });
         }
       } else {
         console.log("❗ Work not found for ID:", id);
@@ -179,7 +180,7 @@ const WorkEdit = () => {
           {contextHolder}
           <Card style={{ width: "100%", padding: 24, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", backgroundColor: "#ffffff" }}>
             <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 800, color: "#112D4E", textAlign: "center" }}>แก้ไขงาน</h1>
-            <div style={{ width: 1410, height: 4, backgroundColor: "#434c86", marginTop: 21, borderRadius: 2, marginBottom: 24 }} />
+            {/* <div style={{ width: "100%", height: 4, backgroundColor: "#434c86", marginTop: 21, borderRadius: 2, marginBottom: 24 }} /> */}
             <Form form={form} layout="vertical" onFinish={onFinish}>
               <Row gutter={24}>
                 <Col xs={24} md={14}>
@@ -281,6 +282,7 @@ const WorkEdit = () => {
                         label="รูปภาพ"
                         valuePropName="fileList"
                         getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
+                        rules={[{ required: true }]}
                       >
                         <ImgCrop rotationSlider>
                           <Upload
@@ -288,13 +290,7 @@ const WorkEdit = () => {
                             fileList={fileList}
                             onChange={onChange}
                             onPreview={onPreview}
-                            beforeUpload={(file) => {
-                              const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-                              if (!isJpgOrPng) {
-                                message.error("สามารถอัปโหลดได้เฉพาะไฟล์ PNG หรือ JPG เท่านั้น");
-                              }
-                              return isJpgOrPng || Upload.LIST_IGNORE;
-                            }}
+                            beforeUpload={() => false}
                             maxCount={1}
                           >
                             {fileList.length < 1 && (

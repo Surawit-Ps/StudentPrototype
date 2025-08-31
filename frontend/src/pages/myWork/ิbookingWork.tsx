@@ -4,9 +4,12 @@ import {
   GetBookingByWorkId,
   GetUserById,
   UpdateBooking,
+  CreateReview,
+  GetReviewsByUserAndWork, // ต้องมีฟังก์ชันนี้ใน services/https
 } from "../../services/https";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { UsersInterface } from "../../interfaces/IUser";
+import { ReviewInterface } from "../../interfaces/IReview";
 import Navbar from "../../components/Navbar/Navbar";
 import {
   List,
@@ -22,6 +25,8 @@ import {
   Tag,
   Badge,
   Tooltip,
+  Modal,
+  Rate,
 } from "antd";
 import {
   UserOutlined,
@@ -40,6 +45,7 @@ interface CheckedUser extends UsersInterface {
   checkedIn: boolean;
   checkInTime?: Date;
   bookingId: number;
+  hasReviewed?: boolean;
 }
 
 const BookingWork: React.FC = () => {
@@ -53,6 +59,52 @@ const BookingWork: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [saving, setSaving] = useState(false);
 
+  // --- Review Modal ---
+  const [isReviewModalVisible, setIsReviewModalVisible] = useState(false);
+  const [currentReviewUser, setCurrentReviewUser] = useState<CheckedUser | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(0);
+  const [reviewComment, setReviewComment] = useState<string>("");
+
+  const openReviewModal = (user: CheckedUser) => {
+    setCurrentReviewUser(user);
+    setReviewRating(0);
+    setReviewComment("");
+    setIsReviewModalVisible(true);
+  };
+
+  const handleSaveReview = async () => {
+    if (!currentReviewUser) return;
+    if (reviewRating === 0) {
+      message.warning("กรุณาเลือกคะแนนและกรอกความคิดก่อนบันทึก");
+      return;
+    }
+
+    try {
+      const reviewData: ReviewInterface = {
+        user_id: currentReviewUser.ID!,
+        work_id: Number(workId),
+        booking_id: currentReviewUser.bookingId,
+        rating: reviewRating,
+        comment: reviewComment,
+      };
+      await CreateReview(reviewData);
+      message.success("บันทึกรีวิวเรียบร้อยแล้ว");
+
+      // อัปเดตสถานะรีวิวใน state
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.ID === currentReviewUser.ID ? { ...u, hasReviewed: true } : u
+        )
+      );
+
+      setIsReviewModalVisible(false);
+    } catch (error) {
+      console.error(error);
+      message.error("เกิดข้อผิดพลาดในการบันทึกรีวิว");
+    }
+  };
+
+  // --- Fetch bookings & users ---
   useEffect(() => {
     const fetchBookings = async () => {
       if (!workId) return;
@@ -62,11 +114,16 @@ const BookingWork: React.FC = () => {
         for (const booking of bookings) {
           const user = await GetUserById(booking.user_id!);
           if (user) {
+            // ตรวจสอบว่ามีรีวิวงานนี้แล้ว
+            const reviews = await GetReviewsByUserAndWork(user.ID!, Number(workId));
+            const hasReviewed = reviews.length > 0;
+
             userList.push({
               ...user,
               checkedIn: booking.status === "checked-in",
               checkInTime: booking.status === "checked-in" ? new Date() : undefined,
-              bookingId: booking.ID!, // booking ID
+              bookingId: booking.ID!,
+              hasReviewed,
             });
           }
         }
@@ -80,6 +137,7 @@ const BookingWork: React.FC = () => {
     fetchBookings();
   }, [workId]);
 
+  // --- Filter & search ---
   useEffect(() => {
     let filtered = users;
     if (searchText) {
@@ -89,53 +147,45 @@ const BookingWork: React.FC = () => {
           user.Email?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    if (filterStatus === "checked") {
-      filtered = filtered.filter((user) => user.checkedIn);
-    } else if (filterStatus === "not-checked") {
-      filtered = filtered.filter((user) => !user.checkedIn);
-    }
+    if (filterStatus === "checked") filtered = filtered.filter((u) => u.checkedIn);
+    else if (filterStatus === "not-checked") filtered = filtered.filter((u) => !u.checkedIn);
     setFilteredUsers(filtered);
   }, [searchText, filterStatus, users]);
 
+  // --- Check-in functions ---
   const handleCheckIn = (userId: number) => {
     setUsers((prev) =>
-      prev.map((u) =>
-        u.ID === userId ? { ...u, checkedIn: true, checkInTime: new Date() } : u
-      )
+      prev.map((u) => (u.ID === userId ? { ...u, checkedIn: true, checkInTime: new Date() } : u))
     );
     message.success("เช็คชื่อเรียบร้อย");
   };
 
   const handleUndoCheckIn = (userId: number) => {
     setUsers((prev) =>
-      prev.map((u) =>
-        u.ID === userId ? { ...u, checkedIn: false, checkInTime: undefined } : u
-      )
+      prev.map((u) => (u.ID === userId ? { ...u, checkedIn: false, checkInTime: undefined } : u))
     );
     message.info("ยกเลิกเช็คชื่อแล้ว");
   };
 
   const handleSaveAll = async () => {
-  setSaving(true);
-  try {
-    for (const user of users) {
-      const bookingStatus = user.checkedIn ? "checked-in" : "absent";
-      const updateData = {
-        user_id: user.ID,       // ส่ง user_id ด้วย
-        work_id: Number(workId), // ส่ง work_id ด้วย (มาจาก useParams)
-        status: bookingStatus,   // ส่ง status ด้วย
-      };
-      console.log(`Updating Booking ID: ${user.bookingId} with Data:`, updateData);
-      await UpdateBooking(user.bookingId, updateData);
+    setSaving(true);
+    try {
+      for (const user of users) {
+        const bookingStatus = user.checkedIn ? "checked-in" : "absent";
+        const updateData = {
+          user_id: user.ID,
+          work_id: Number(workId),
+          status: bookingStatus,
+        };
+        await UpdateBooking(user.bookingId, updateData);
+      }
+      message.success("บันทึกสถานะเช็คชื่อเรียบร้อยแล้ว");
+    } catch (error) {
+      console.error(error);
+      message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
-    message.success("บันทึกสถานะเช็คชื่อเรียบร้อยแล้ว");
-  } catch (error) {
-    console.error(error);
-    message.error("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-  }
-  setSaving(false);
-};
-
+    setSaving(false);
+  };
 
   if (loading) {
     return (
@@ -151,11 +201,7 @@ const BookingWork: React.FC = () => {
     <div style={{ background: "#f0f2f5", minHeight: "100vh" }}>
       <Navbar />
       <div style={{ padding: "24px 16px" }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate(-1)}
-          style={{ marginBottom: 16 }}
-        >
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 16 }}>
           กลับ
         </Button>
 
@@ -195,23 +241,22 @@ const BookingWork: React.FC = () => {
               actions={[
                 user.checkedIn ? (
                   <Tooltip title="ยกเลิกเช็คชื่อ" key="undo-checkin">
-                    <Button
-                      type="text"
-                      danger
-                      onClick={() => handleUndoCheckIn(user.ID!)}
-                    >
+                    <Button type="text" danger onClick={() => handleUndoCheckIn(user.ID!)}>
                       ยกเลิก
                     </Button>
                   </Tooltip>
                 ) : (
-                  <Button
-                    type="primary"
-                    key="checkin"
-                    onClick={() => handleCheckIn(user.ID!)}
-                  >
+                  <Button type="primary" onClick={() => handleCheckIn(user.ID!)}>
                     เช็คชื่อ
                   </Button>
                 ),
+                <Button
+                  type={user.hasReviewed ? "default" : "primary"}
+                  onClick={() => openReviewModal(user)}
+                  disabled={user.hasReviewed}
+                >
+                  {user.hasReviewed ? "รีวิวแล้ว" : "รีวิว"}
+                </Button>,
               ]}
             >
               <List.Item.Meta
@@ -224,11 +269,7 @@ const BookingWork: React.FC = () => {
                   <span>
                     {user.FirstName} {user.LastName}{" "}
                     {user.checkedIn && (
-                      <Tag
-                        color="success"
-                        icon={<CheckCircleOutlined />}
-                        style={{ marginLeft: 8 }}
-                      >
+                      <Tag color="success" icon={<CheckCircleOutlined />} style={{ marginLeft: 8 }}>
                         มาแล้ว
                       </Tag>
                     )}
@@ -241,15 +282,70 @@ const BookingWork: React.FC = () => {
         />
 
         <div style={{ textAlign: "center", marginTop: 24 }}>
-          <Button
-            type="primary"
-            size="large"
-            loading={saving}
-            onClick={handleSaveAll}
-          >
+          <Button type="primary" size="large" loading={saving} onClick={handleSaveAll}>
             บันทึกสถานะเช็คชื่อทั้งหมด
           </Button>
         </div>
+
+        {/* Review Modal */}
+        <Modal
+  title={
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      {currentReviewUser?.Profile ? (
+        <Avatar src={currentReviewUser.Profile} size={40} />
+      ) : (
+        <Avatar icon={<UserOutlined />} size={40} />
+      )}
+      <div>
+        <div style={{ fontWeight: 600 }}>
+          รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
+        </div>
+        <div style={{ fontSize: 12, color: "#888" }}>
+          ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
+        </div>
+      </div>
+    </div>
+  }
+  visible={isReviewModalVisible}
+  onOk={handleSaveReview}
+  onCancel={() => setIsReviewModalVisible(false)}
+  okText="บันทึก"
+  cancelText="ยกเลิก"
+  width={500}
+  okButtonProps={{
+    disabled: reviewRating === 0 || reviewComment.trim() === "", // ถ้าไม่ได้เลือกดาว หรือความคิดเห็นว่าง จะ disable
+  }}
+>
+  <div style={{ marginBottom: 16 }}>
+    <Text strong>ให้คะแนน: </Text>
+    <Rate
+      value={reviewRating}
+      onChange={setReviewRating}
+      tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
+    />
+    {reviewRating === 0 && (
+      <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+        กรุณาเลือกคะแนนและกรอกความคิดเห็นก่อนบันทึก
+      </div>
+    )}
+  </div>
+  <div>
+    <Text strong>ความคิดเห็น: </Text>
+    <Input.TextArea
+      value={reviewComment}
+      onChange={(e) => setReviewComment(e.target.value)}
+      placeholder="เขียนความคิดเห็นของคุณที่นี่..."
+      autoSize={{ minRows: 4, maxRows: 6 }}
+      style={{ marginTop: 8 }}
+    />
+    {reviewComment.trim() === "" && (
+      <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+        
+      </div>
+    )}
+  </div>
+</Modal>
+
       </div>
     </div>
   );

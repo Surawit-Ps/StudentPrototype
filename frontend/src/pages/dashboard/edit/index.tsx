@@ -28,32 +28,37 @@ const DashboardEdit = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      if (!id) return;
-      const data = await GetDashboardById(Number(id));
-      if (data) {
-        form.setFieldsValue({
-          subject: data.subject,
-          information: data.information,
-        });
-        if (data.image) {
-          setFileList([
-            {
-              uid: "-1",
-              name: "image.png",
-              status: "done",
-              url: data.image,
-              thumbUrl: data.image,
-            },
-          ]);
-        }
-      } else {
-        messageApi.error("ไม่พบข้อมูลข่าว");
-        navigate("/dashboard");
+  const fetchDashboard = async () => {
+    if (!id) return;
+    const data = await GetDashboardById(Number(id));
+    if (data) {
+      form.setFieldsValue({
+        subject: data.subject,
+        information: data.information,
+      });
+
+      if (data.image) {
+        const fileListData = [
+          {
+            uid: "-1",
+            name: "image.png",
+            status: "done",
+            url: data.image,
+            thumbUrl: data.image,
+          },
+        ];
+        setFileList(fileListData);
+        // สำคัญ! ต้องเซ็ตใน form ด้วย
+        form.setFieldsValue({ image: fileListData });
       }
-    };
-    fetchDashboard();
-  }, [id]);
+    } else {
+      messageApi.error("ไม่พบข้อมูลข่าว");
+      navigate("/dashboard");
+    }
+  };
+  fetchDashboard();
+}, [id]);
+
 
   const onChange = ({ fileList: newFileList }: { fileList: any[] }) => {
     setFileList(newFileList);
@@ -131,8 +136,7 @@ const DashboardEdit = () => {
             >
               แก้ไขข่าวประชาสัมพันธ์
             </h1>
-
-            <div
+            {/* <div
               style={{
                 width: "100%",
                 height: 4,
@@ -140,8 +144,7 @@ const DashboardEdit = () => {
                 marginTop: 21,
                 borderRadius: 2,
               }}
-            />
-
+            /> */}
             <Form
               layout="vertical"
               onFinish={onFinish}

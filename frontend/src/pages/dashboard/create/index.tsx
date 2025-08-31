@@ -101,8 +101,7 @@ const DashboardCreate = () => {
             >
               เพิ่มข่าวประชาสัมพันธ์
             </h1>
-
-            <div
+            {/* <div
               style={{
                 width: "100%",
                 height: 4,
@@ -110,8 +109,7 @@ const DashboardCreate = () => {
                 marginTop: 21,
                 borderRadius: 2,
               }}
-            />
-
+            /> */}
             <Form
               layout="vertical"
               onFinish={onFinish}

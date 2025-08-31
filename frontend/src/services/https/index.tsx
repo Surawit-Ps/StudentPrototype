@@ -4,6 +4,8 @@ import { DashboardInterface } from "../../interfaces/IDashboard";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
 import { WorkHistoryInterface } from "../../interfaces/IHistorywork";
+import { ReviewInterface } from "../../interfaces/IReview";
+import axios from "axios";
 
 const apiUrl = "http://localhost:8000";
 
@@ -274,7 +276,7 @@ async function CreateWorkHistory(data: WorkHistoryInterface) {
 }
 
 async function GetWorkHistory(): Promise<WorkHistoryInterface[] | false> {
-  const userID = localStorage.getItem("user_id"); // 👈 ดึง user_id จาก localStorage
+  const userID = localStorage.getItem("user_id");
   const res = await fetch(`${apiUrl}/workhistories?userID=${userID}`, authRequestOptions("GET"));
   return res.ok ? res.json() : false;
 }
@@ -289,9 +291,33 @@ async function UpdateWorkStatus(workId: number, status: string) {
   return res.ok ? res.json() : false;
 }
 
+// -------------------- REVIEW --------------------
+async function CreateReview(data: ReviewInterface) {
+  const res = await fetch(`${apiUrl}/review`, authRequestOptions("POST", data));
+  return res.ok ? res.json() : false;
+}
 
+async function GetAllReview() {
+  const res = await fetch(`${apiUrl}/review`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
 
+async function GetReviewById(id: number) {
+  const res = await fetch(`${apiUrl}/review/${id}`, authRequestOptions("GET"));
+  return res.ok ? res.json() : false;
+}
 
+export const GetReviewsByUserAndWork = async (userId: number, workId: number) => {
+  try {
+    const response = await axios.get<ReviewInterface[]>(
+      `${process.env.REACT_APP_API}/reviews?user_id=${userId}&work_id=${workId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("GetReviewsByUserAndWork error:", error);
+    return [];
+  }
+};
 
 export {
   // user
@@ -341,5 +367,10 @@ export {
   GetWorkHistory,
   DeleteAllBookingByWorkID,
   UpdateWorkStatus,
+
+  //review
+  CreateReview,
+  GetAllReview,
+  GetReviewById,
 
 };

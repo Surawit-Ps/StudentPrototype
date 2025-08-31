@@ -22,11 +22,11 @@ import { GetWork, GetDashboard } from "../../services/https";
 import { DashboardInterface } from "../../interfaces/IDashboard";
 import { Calendar } from "lucide-react";
 import { Carousel, Progress, Badge, Space } from "antd";
+import EnhancedFooter from '../../components/Footer/EnhancedFooter'; 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 // const { Search } = Input;
-
 
 export default function Home() {
     const navigate = useNavigate();
@@ -969,6 +969,7 @@ export default function Home() {
             `}
                     </style>
                 </Content>
+                <EnhancedFooter />
             </Layout>
         </>
     );

@@ -14,6 +14,8 @@ type Booking struct {
 	Work   Work `gorm:"foreignKey:WorkID"`
 
 	Status string `json:"status" gorm:"default:'registered'"` // <-- NEW
+
+	Review []Review `gorm:"foreignKey:WorkID"`
 }
 
 // Struct สำหรับรับ JSON input จาก frontend

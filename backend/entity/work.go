@@ -30,4 +30,6 @@ type Work struct {
 
 	PosterID uint      `json:"poster_id"`
 	Poster   *User     `gorm:"foreignKey:PosterID"`
+
+	Review []Review `gorm:"foreignKey:WorkID"`
 }

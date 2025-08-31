@@ -22,4 +22,9 @@ type User struct {
 
 	WorkHistories []WorkHistory `gorm:"foreignKey:UserID"`
 	Status int `json:"status" gorm:"default:0"`
+
+	Review []Review `gorm:"foreignKey:UserID"`
+
+	TotalRating float64  `json:"TotalRating" gorm:"default:0"`
+	ReviewCount   int     `json:"ReviewCount" gorm:"default:0"`
 }
