@@ -22,11 +22,12 @@ import { GetWork, GetDashboard } from "../../services/https";
 import { DashboardInterface } from "../../interfaces/IDashboard";
 import { Calendar } from "lucide-react";
 import { Carousel, Progress, Badge, Space } from "antd";
-import EnhancedFooter from '../../components/Footer/EnhancedFooter'; 
+import EnhancedFooter from '../../components/Footer/EnhancedFooter';
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 
 // const { Search } = Input;
+
 
 export default function Home() {
     const navigate = useNavigate();
@@ -776,7 +777,7 @@ export default function Home() {
 
                     {/* SUT Media Gallery */}
                     <section style={{ padding: "1px 24px", background: "#ffffff", marginBottom: 20 }}>
-                        <div style={{ maxWidth: "1400px",height: 760, margin: "0 auto" }}>
+                        <div style={{ maxWidth: "1400px", height: 760, margin: "0 auto" }}>
                             <div style={{ textAlign: "center", marginBottom: "60px" }}>
                                 <Title level={2} style={{ color: "#112D4E", fontSize: "3rem" }}>
                                     บรรยากาศในรั้วมหาวิทยาลัย

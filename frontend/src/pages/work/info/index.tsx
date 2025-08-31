@@ -17,6 +17,7 @@ import { CheckCircleOutlined } from "@ant-design/icons";
 import { message } from "antd";
 import 'leaflet/dist/leaflet.css';
 import Navbar from '../../../components/Navbar/Navbar';
+import EnhancedFooter from '../../../components/Footer/EnhancedFooter';
 
 const defaultPosition: [number, number] = [14.883451, 102.010589];
 
@@ -289,6 +290,7 @@ const WorkInfo = () => {
                     </div>
                 </div>
             </div>
+            <EnhancedFooter />
         </>
     );
 };

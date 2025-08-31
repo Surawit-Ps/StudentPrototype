@@ -65,9 +65,6 @@ const App: React.FC = () => {
             <Route path="/work/complete/:workId" element={<CompleteWork />} />
           </Routes>
         </Content>
-
-        <EnhancedFooter />
-
       </Layout>
     </Router>
   );
