@@ -27,9 +27,11 @@ import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
 import { GetWorkHistory } from "../../../services/https/index";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
+
 import autoTable from "jspdf-autotable";
 import { thSarabunNewBase64 } from "../historywork/thaibase64";
 import logo from "../historywork/logojob.png";
+import sutlogo from "../historywork/sutlogo.png";
 
 
 const { Title, Text, Paragraph } = Typography;
@@ -85,66 +87,74 @@ const WorkHistoryPage: React.FC = () => {
         doc.addFont("THSarabunNew.ttf", "THSarabunNew", "bold");
         doc.setFont("THSarabunNew", "normal");
 
-        // === ใส่โลโก้ตรงกลางด้านบน ===
-        const logoWidth = 120;
-        const logoHeight = 40;
-        doc.addImage(
-            logo,
-            "PNG",
-            (pageWidth - logoWidth) / 2,
-            8,
-            logoWidth,
-            logoHeight
-        );
+        // === โลโก้บนหัวกระดาษ ===
+        const logoLeftWidth = 30;   // โลโก้ซ้ายคงที่
+        const logoRightWidth = 50;  // โลโก้ขวากว้างกว่า
+        const logoLeftHeight = 40;
+        const logoRightHeight = 25;
+        const spacing = 10;
+
+        const posY = 10;
+        const rightOffsetY = 7; // ขยับโลโก้ขวาลงมาเพิ่ม
+
+        // คำนวณความกว้างรวม
+        const totalWidth = logoLeftWidth + logoRightWidth + spacing;
+        const startX = (pageWidth - totalWidth) / 2;
+
+        // โลโก้ซ้าย (sutlogo)
+        doc.addImage(sutlogo, "PNG", startX, posY, logoLeftWidth, logoLeftHeight);
+
+        // โลโก้ขวา (logo เดิม) ขยับลงมา
+        doc.addImage(logo, "PNG", startX + logoLeftWidth + spacing, posY + rightOffsetY, logoRightWidth, logoRightHeight);
+
+        let currentY = 65;
 
         // === หัวข้อเอกสาร ===
         doc.setFont("THSarabunNew", "bold");
         doc.setFontSize(20);
-        doc.text("เอกสารแสดงชั่วโมงจิตอาสา", pageWidth / 2, 60, { align: "center" });
+        doc.text("รายงานการทำกิจกรรมจิตอาสา", pageWidth / 2, currentY, {
+            align: "center",
+        });
+        currentY += 15;
 
+        // === รายละเอียดกิจกรรม ===
         doc.setFont("THSarabunNew", "normal");
         doc.setFontSize(16);
 
-        let currentY = 80; // ตำแหน่งเริ่มต้น
-
-        // === หัวข้องาน ===
-        doc.text(`• หัวข้องาน: ${record.Work?.title || "-"}`, 14, currentY);
-        currentY += 10;
-
-        // === รายละเอียด (split text) ===
-        const description = record.Work?.description || "-";
-        const descriptionLines = doc.splitTextToSize(`• รายละเอียด: ${description}`, pageWidth - 28); // 14 margin * 2
-        doc.text(descriptionLines, 14, currentY);
-        currentY += descriptionLines.length * 5; // ปรับตำแหน่งบรรทัดถัดไป
-
-        // === วันที่ ===
-        const workDate = record.Work?.worktime
-            ? new Date(record.Work.worktime).toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })
-            : "-";
-        doc.text(`• วันที่: ${workDate}`, 14, currentY);
-        currentY += 10;
-
-        // === สถานที่ ===
-        doc.text(`• สถานที่: ${record.Work?.place || "-"}`, 14, currentY);
-        currentY += 10;
-
-        // === ชั่วโมงจิตอาสา ===
+        // วันที่
         doc.text(
-            `• ชั่วโมงจิตอาสา: ${record.Work?.volunteer ? record.Work.volunteer + " ชม." : "-"}`,
-            14,
+            `วันที่: ${record.Work?.worktime ? formatWorkTime(record.Work.worktime) : "-"}`,
+            20,
             currentY
         );
         currentY += 10;
 
-        // === เส้นแบ่งใต้หัวข้อ ===
-        doc.setLineWidth(0.5);
-        doc.line(14, currentY + 2, pageWidth - 14, currentY + 2);
+        // สถานที่
+        doc.text(`สถานที่: ${record.Work?.place || "-"}`, 20, currentY);
+        currentY += 10;
 
-        doc.save(`ชั่วโมงจิตอาสา.pdf`);
+        // หัวข้องาน
+        doc.text(`หัวข้องาน: ${record.Work?.title || "-"}`, 20, currentY);
+        currentY += 10;
+
+        // รายละเอียดงาน
+        doc.text(`รายละเอียดงาน: ${record.Work?.description || "-"}`, 20, currentY);
+        currentY += 10;
+
+        // ชั่วโมงจิตอาสา
+        doc.text(
+            `ชั่วโมงจิตอาสา: ${record.Work?.volunteer ? record.Work.volunteer + " ชม." : "-"}`,
+            20,
+            currentY
+        );
+        currentY += 15;
+
+        // === ลงชื่อ ===
+        doc.text("....................................................", pageWidth - 80, currentY);
+        currentY += 7;
+        doc.text("ผู้เข้าร่วมกิจกรรม", pageWidth - 65, currentY);
+
+        doc.save("รายงานกิจกรรมจิตอาสา.pdf");
     };
 
 
@@ -255,7 +265,7 @@ const WorkHistoryPage: React.FC = () => {
                                         boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
                                         background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
                                         height: "100%"
-                                        
+
                                     }}
                                     cover={
                                         <img
