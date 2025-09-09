@@ -1,5 +1,6 @@
 import { UsersInterface } from './IUser';     
-import { WorkInterface } from './IWork'; 
+import { WorkInterface } from './IWork';
+import { ReviewInterface } from './IReview'; 
 
 export interface WorkHistoryInterface {
   ID?: number;
@@ -12,4 +13,6 @@ export interface WorkHistoryInterface {
 
   PaidAmount?: number | null;
   VolunteerHour?: number | null;
+
+  Reviews?: ReviewInterface[];
 }

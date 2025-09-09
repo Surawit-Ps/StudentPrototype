@@ -10,7 +10,7 @@ import {
     Button,
     Space,
     Divider,
-    Badge,
+    Rate,
     Input,
 } from "antd";
 import {
@@ -27,8 +27,6 @@ import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
 import { GetWorkHistory } from "../../../services/https/index";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
-
-import autoTable from "jspdf-autotable";
 import { thSarabunNewBase64 } from "../historywork/thaibase64";
 import logo from "../historywork/logojob.png";
 import sutlogo from "../historywork/sutlogo.png";
@@ -44,26 +42,22 @@ const WorkHistoryPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchAndFilter = async () => {
+            setLoading(true);
             const res = await GetWorkHistory();
-            if (res) {
-                setHistories(res);
-                setFiltered(res);
+            if (!res) return setLoading(false);
+            setHistories(res);
+            let filteredData = res;
+            if (searchTitle.trim() !== "") {
+                filteredData = res.filter((h) =>
+                    h.Work?.title?.toLowerCase().includes(searchTitle.toLowerCase())
+                );
             }
+            setFiltered(filteredData);
             setLoading(false);
         };
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        let f = histories;
-        if (searchTitle.trim() !== "") {
-            f = f.filter((h) =>
-                h.Work?.title?.toLowerCase().includes(searchTitle.toLowerCase())
-            );
-        }
-        setFiltered(f);
-    }, [searchTitle, histories]);
+        fetchAndFilter();
+    }, [searchTitle]);
 
     const formatWorkTime = (worktime: string | undefined) => {
         if (!worktime) return "-";
@@ -314,6 +308,23 @@ const WorkHistoryPage: React.FC = () => {
                                         >
                                             {h.Work?.description || "ไม่มีรายละเอียด"}
                                         </Paragraph>
+
+                                        {h.Reviews && h.Reviews.length > 0 && (
+                                            <div style={{ marginTop: "10px" }}>
+                                                {h.Reviews
+                                                    .filter(r => r.user_id === Number(localStorage.getItem("user_id")))
+                                                    .map((r) => (
+                                                        <div key={r.ID} style={{ marginBottom: "8px", textAlign: "left" }}>
+                                                            <Rate disabled defaultValue={r.rating} />
+                                                            <Paragraph style={{ margin: "4px 0", fontSize: "13px" }}>
+                                                                {r.comment || "-"}
+                                                            </Paragraph>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+
+
 
                                         <Divider style={{ margin: "12px 0" }} />
 

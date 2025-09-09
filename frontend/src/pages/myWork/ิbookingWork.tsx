@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   GetBookingByWorkId,
   GetUserById,
@@ -267,7 +267,12 @@ const BookingWork: React.FC = () => {
                 }
                 title={
                   <span>
-                    {user.FirstName} {user.LastName}{" "}
+                    <Link
+                      to={`/account/showprofile/${user.ID}`}
+                      style={{ color: "#3F72AF", fontWeight: 500, textDecoration: "none" }}
+                    >
+                      {user.FirstName} {user.LastName}
+                    </Link>
                     {user.checkedIn && (
                       <Tag color="success" icon={<CheckCircleOutlined />} style={{ marginLeft: 8 }}>
                         มาแล้ว
@@ -289,62 +294,62 @@ const BookingWork: React.FC = () => {
 
         {/* Review Modal */}
         <Modal
-  title={
-    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-      {currentReviewUser?.Profile ? (
-        <Avatar src={currentReviewUser.Profile} size={40} />
-      ) : (
-        <Avatar icon={<UserOutlined />} size={40} />
-      )}
-      <div>
-        <div style={{ fontWeight: 600 }}>
-          รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
-        </div>
-        <div style={{ fontSize: 12, color: "#888" }}>
-          ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
-        </div>
-      </div>
-    </div>
-  }
-  visible={isReviewModalVisible}
-  onOk={handleSaveReview}
-  onCancel={() => setIsReviewModalVisible(false)}
-  okText="บันทึก"
-  cancelText="ยกเลิก"
-  width={500}
-  okButtonProps={{
-    disabled: reviewRating === 0 || reviewComment.trim() === "", // ถ้าไม่ได้เลือกดาว หรือความคิดเห็นว่าง จะ disable
-  }}
->
-  <div style={{ marginBottom: 16 }}>
-    <Text strong>ให้คะแนน: </Text>
-    <Rate
-      value={reviewRating}
-      onChange={setReviewRating}
-      tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
-    />
-    {reviewRating === 0 && (
-      <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-        กรุณาเลือกคะแนนและกรอกความคิดเห็นก่อนบันทึก
-      </div>
-    )}
-  </div>
-  <div>
-    <Text strong>ความคิดเห็น: </Text>
-    <Input.TextArea
-      value={reviewComment}
-      onChange={(e) => setReviewComment(e.target.value)}
-      placeholder="เขียนความคิดเห็นของคุณที่นี่..."
-      autoSize={{ minRows: 4, maxRows: 6 }}
-      style={{ marginTop: 8 }}
-    />
-    {reviewComment.trim() === "" && (
-      <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-        
-      </div>
-    )}
-  </div>
-</Modal>
+          title={
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {currentReviewUser?.Profile ? (
+                <Avatar src={currentReviewUser.Profile} size={40} />
+              ) : (
+                <Avatar icon={<UserOutlined />} size={40} />
+              )}
+              <div>
+                <div style={{ fontWeight: 600 }}>
+                  รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
+                </div>
+                <div style={{ fontSize: 12, color: "#888" }}>
+                  ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
+                </div>
+              </div>
+            </div>
+          }
+          visible={isReviewModalVisible}
+          onOk={handleSaveReview}
+          onCancel={() => setIsReviewModalVisible(false)}
+          okText="บันทึก"
+          cancelText="ยกเลิก"
+          width={500}
+          okButtonProps={{
+            disabled: reviewRating === 0 || reviewComment.trim() === "", // ถ้าไม่ได้เลือกดาว หรือความคิดเห็นว่าง จะ disable
+          }}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <Text strong>ให้คะแนน: </Text>
+            <Rate
+              value={reviewRating}
+              onChange={setReviewRating}
+              tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
+            />
+            {reviewRating === 0 && (
+              <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+                กรุณาเลือกคะแนนและกรอกความคิดเห็นก่อนบันทึก
+              </div>
+            )}
+          </div>
+          <div>
+            <Text strong>ความคิดเห็น: </Text>
+            <Input.TextArea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="เขียนความคิดเห็นของคุณที่นี่..."
+              autoSize={{ minRows: 4, maxRows: 6 }}
+              style={{ marginTop: 8 }}
+            />
+            {reviewComment.trim() === "" && (
+              <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
+
+              </div>
+            )}
+          </div>
+        </Modal>
 
       </div>
     </div>

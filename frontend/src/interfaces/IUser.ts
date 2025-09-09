@@ -13,4 +13,7 @@ export interface UsersInterface {
 
   TotalPaidAmount?: number;
   TotalVolunteerHour?: number;
+
+  TotalRating?: number;
+  ReviewCount?: number;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Row, Typography, Divider, Avatar, message, Button, Statistic } from "antd";
+import { Card, Col, Row, Typography, Divider, Avatar, message, Button, Statistic, Rate } from "antd";
 import { UserOutlined, EditOutlined, ArrowLeftOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { GetUserById } from "../../../services/https";
@@ -99,57 +99,60 @@ const ProfileView = () => {
           style={{ position: "absolute", top: 16, right: 16 }}
           onClick={() => navigate(`/account/edit/${user.ID}`)}
         />
-        <div style={{
-          position: "absolute",
-          top: 64,
-          right: 16,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
-          gap: 16,
-          width: 200
-        }}>
-          <Card
-            bordered={false}
-            style={{
-              borderRadius: 12,
-              backgroundColor: "#e8f5e9",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              textAlign: "center"
-            }}
-          >
-            <Statistic
-              title="รายได้ทั้งหมด"
-              value={paidAmountTotal}
-              precision={0}
-              prefix="฿"
-              suffix="บาท"
-              valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
-            />
+        <div
+          style={{
+            position: "absolute",
+            top: 64,
+            right: 16,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            gap: 16,
+            width: 200,
+          }}
+        >
+          {user?.Role === "user" && ( // ✅ แสดงเฉพาะ user
+            <>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: "#e8f5e9",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  textAlign: "center",
+                }}
+              >
+                <Statistic
+                  title="รายได้ทั้งหมด"
+                  value={paidAmountTotal}
+                  precision={0}
+                  prefix="฿"
+                  suffix="บาท"
+                  valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
+                />
+              </Card>
 
-          </Card>
-
-          <Card
-            bordered={false}
-            style={{
-              borderRadius: 12,
-              backgroundColor: "#e3f2fd",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-              textAlign: "center"
-            }}
-          >
-            <Statistic
-              title="ชั่วโมงจิตอาสาทั้งหมด"
-              value={volunteerHourTotal}
-              precision={0}
-              prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
-              suffix="ชม."
-              valueStyle={{ color: "#1565c0", fontWeight: "bold" }}
-            />
-          </Card>
+              <Card
+                bordered={false}
+                style={{
+                  borderRadius: 12,
+                  backgroundColor: "#e3f2fd",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                  textAlign: "center",
+                }}
+              >
+                <Statistic
+                  title="ชั่วโมงจิตอาสาทั้งหมด"
+                  value={volunteerHourTotal}
+                  precision={0}
+                  prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
+                  suffix="ชม."
+                  valueStyle={{ color: "#1565c0", fontWeight: "bold" }}
+                />
+              </Card>
+            </>
+          )}
         </div>
-
-
 
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <Avatar
@@ -193,23 +196,22 @@ const ProfileView = () => {
             <Text strong>⚧ เพศ</Text>
             <div>{user.Gender?.Name ?? "-"}</div>
           </Col>
-          {/* <Col span={12}>
-            <Text strong>📞 เบอร์ติดต่อ</Text>
-            <div>{user.Contact}</div>
-          </Col> */}
         </Row>
-
+        
+        {user?.Role === "user" && (
+          <>
         <Divider />
-        {/* <Row gutter={[16, 8]}>
-          <Col span={24}>
-            <Text strong>งานล่าสุด</Text>
-            <div>-</div>
-          </Col>
-          <Col span={8}>
-            <Text strong>การสร้างงาน</Text>
-            <div>-</div>
-          </Col>
-        </Row> */}
+        
+        <div style={{ marginTop: 12 }}>
+          <Rate disabled value={user.TotalRating ?? 0} />
+          <div>
+            <Text type="secondary">
+              ({user.ReviewCount ?? 0} รีวิว)
+            </Text>
+          </div>
+        </div>
+        </>
+        )}
       </Card>
     </div>
   );

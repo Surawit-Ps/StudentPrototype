@@ -68,6 +68,7 @@ func GetWorkHistories(c *gin.Context) {
 	if err := db.
 		Preload("User").
 		Preload("Work").
+		Preload("Reviews").
 		Where("user_id = ?", userID).
 		Find(&histories).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

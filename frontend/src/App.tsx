@@ -20,6 +20,7 @@ import Account from "./pages/account";
 import AccountrCreate from "./pages/account/create";
 import AccountEdit from "./pages/account/edit";
 import AccountProfile from "./pages/account/profile";
+import ShowProfile from "./pages/account/showprofile";
 
 import MyPostedWorks from "./pages/myWork/myWorks";
 import BookingWork from "./pages/myWork/ิbookingWork";
@@ -59,6 +60,7 @@ const App: React.FC = () => {
             <Route path="/account/create" element={<AccountrCreate />} />
             <Route path="/account/edit/:id" element={<AccountEdit />} />
             <Route path="/account/profile/:id" element={<AccountProfile />} />
+            <Route path="/account/showprofile/:id" element={<ShowProfile />} />
             <Route path="login" element={<Login />} />
             <Route path="/myworks" element={<MyPostedWorks />} />
             <Route path="/myworks/booking/:workId" element={<BookingWork />} />

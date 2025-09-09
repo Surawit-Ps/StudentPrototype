@@ -17,6 +17,8 @@ type WorkHistory struct {
 	PaidAmount     *int `json:"paid_amount"`      // nullable สำหรับกรณี volunteer
 	VolunteerHour  *int `json:"volunteer_hour"`   // nullable สำหรับกรณี paid
 
+	Reviews []Review `gorm:"foreignKey:WorkID;references:WorkID" json:"Reviews"`
+
 }
 
 type CreateWorkHistoryInput struct {
