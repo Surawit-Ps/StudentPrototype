@@ -115,7 +115,6 @@ const LoginPage = () => {
       <div style={styles.cardWrapper}>
         <div style={styles.headerContainer as React.CSSProperties}>
           <div style={styles.logoRow}>
-            <div style={styles.logoBox}>S</div>
             <h1 style={styles.title}>Studentjobhub</h1>
           </div>
           <p style={styles.subtitle}>
@@ -150,7 +149,13 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit}>
             {!isLogin && (
               <>
-                <div style={{ marginBottom: 16 }}>
+                <div style={{ 
+  marginBottom: 16, 
+  display: 'flex', 
+  justifyContent: 'center',  // กึ่งกลางแนวนอน
+  alignItems: 'center',      // กึ่งกลางแนวตั้ง
+  flexDirection: 'column',   // ให้ label อยู่ด้านบน upload
+}}>
                   <label>รูปโปรไฟล์</label>
                   <ImgCrop rotationSlider>
                     <Upload
@@ -299,6 +304,10 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+backgroundImage: 'url("/images/login-bg.jpg")',     backgroundSize: 'cover',         // ให้เต็มหน้าจอ
+    backgroundPosition: 'center',    // จัดตรงกลาง
+    backgroundRepeat: 'no-repeat',   // ไม่ซ้ำ
+    
   },
   cardWrapper: {
     width: '100%',

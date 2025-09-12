@@ -76,13 +76,8 @@ const WorkView = () => {
   });
 
   // เรียงงานใหม่สุดขึ้นก่อน
-  const sortedWorks = filteredWorks.sort((a, b) => {
-    const timeA = a.worktime ? new Date(a.worktime).getTime() : 0;
-    const timeB = b.worktime ? new Date(b.worktime).getTime() : 0;
-    return timeB - timeA;
-  });
-
-
+// เรียงตาม ID ใหม่สุดขึ้นก่อน
+const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
 
   // Slice สำหรับ pagination
   const paginatedWorks = sortedWorks.slice(

@@ -17,7 +17,7 @@ const EnhancedFooter = () => (
         <Col xs={24} sm={12} lg={6}>
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <Text strong style={{ color: 'white', fontSize: 18, marginTop:25}}>
+              <Text strong style={{ color: 'white', fontSize: 18, marginTop: 25 }}>
                 StudentJobHub
               </Text>
             </div>
@@ -68,28 +68,24 @@ const EnhancedFooter = () => (
         </Col>
 
         <Col xs={24} lg={4}>
-          <Title level={5} style={{ color: 'white', marginBottom: 16 }}>สถิติล่าสุด</Title>
+          <Title level={5} style={{ color: 'white', marginBottom: 16 }}>ช่องทางร้องเรียน</Title>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div>
-              <Text strong style={{ color: 'white', fontSize: 16 }}>200+</Text>
-              <Text style={{ color: '#DBE2EF', fontSize: 12, display: 'block' }}>
-                นักศึกษาผู้ใช้งาน
-              </Text>
-            </div>
-            <div>
-              <Text strong style={{ color: 'white', fontSize: 16 }}>100+</Text>
-              <Text style={{ color: '#DBE2EF', fontSize: 12, display: 'block' }}>
-                งานที่เปิดรับ
-              </Text>
-            </div>
-            <div>
-              <Text strong style={{ color: 'white', fontSize: 16 }}>90%</Text>
-              <Text style={{ color: '#DBE2EF', fontSize: 12, display: 'block' }}>
-                ความพึงพอใจ
-              </Text>
-            </div>
+            <Text style={{ color: '#DBE2EF', fontSize: 14, lineHeight: 1.6 }}>
+              หากพบปัญหาหรือมีข้อเสนอแนะ<br />
+              กรุณาติดต่อที่
+            </Text>
+            <Text strong style={{ color: 'white', fontSize: 14 }}>
+              <a
+                href="mailto:projectstudentjobhub@gmail.com"
+                style={{ fontSize: '13px', color: '#DBE2EF', textDecoration: 'underline' }}
+              >
+                projectstudentjobhub@gmail.com
+              </a>
+
+            </Text>
           </div>
         </Col>
+
       </Row>
 
       <Divider style={{ borderColor: '#3F72AF', margin: '40px 0 20px' }} />

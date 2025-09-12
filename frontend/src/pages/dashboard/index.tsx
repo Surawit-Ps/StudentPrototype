@@ -34,7 +34,7 @@ const DashboardTablePage = () => {
   const [dashboards, setDashboards] = useState<DashboardInterface[]>([]);
   const [filteredDashboards, setFilteredDashboards] = useState<DashboardInterface[]>([]);
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-
+  const [tablePagination, setTablePagination] = useState({ current: 1, pageSize: 10 });
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -76,8 +76,8 @@ const DashboardTablePage = () => {
 
   useEffect(() => {
     const filtered = dashboards.filter((d) =>
-  d.subject?.toLowerCase().includes(searchKeyword.toLowerCase())
-);
+      d.subject?.toLowerCase().includes(searchKeyword.toLowerCase())
+    );
 
     setFilteredDashboards(filtered);
   }, [searchKeyword, dashboards]);
@@ -88,7 +88,10 @@ const DashboardTablePage = () => {
       key: "index",
       width: 60,
       align: "center" as const,
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => {
+        const { current, pageSize } = tablePagination;
+        return index + 1 + (current - 1) * pageSize; // ต่อเนื่องจากหน้าก่อน
+      },
     },
     {
       title: "รูปภาพ",
@@ -207,9 +210,14 @@ const DashboardTablePage = () => {
                 ...item,
                 key: item.ID?.toString(),
               }))}
-              pagination={{ pageSize: 10 }}
+              pagination={{
+                current: tablePagination.current,
+                pageSize: tablePagination.pageSize,
+                onChange: (page, pageSize) => setTablePagination({ current: page, pageSize }),
+              }}
               scroll={{ x: "max-content" }}
             />
+
           </Card>
         </Content>
       </Layout>

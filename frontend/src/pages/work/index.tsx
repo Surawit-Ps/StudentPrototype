@@ -37,7 +37,7 @@ const WorkTablePage = () => {
   const [searchTitle, setSearchTitle] = useState("");
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [typeFilter, setTypeFilter] = useState<number | null>(null);
-
+  const [tablePagination, setTablePagination] = useState({ current: 1, pageSize: 10 });
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -103,7 +103,10 @@ const WorkTablePage = () => {
       key: "index",
       width: 60,
       align: "center" as const,
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => {
+  const { current, pageSize } = tablePagination; // ต้องเก็บ pagination state
+  return index + 1 + (current - 1) * pageSize;
+}
     },
     {
       title: "รูปภาพ",
@@ -289,12 +292,17 @@ const WorkTablePage = () => {
             <Divider />
 
             <Table
-              bordered
-              columns={columns}
-              dataSource={filteredWorks.map((item) => ({ ...item, key: item.ID?.toString() }))}
-              pagination={{ pageSize: 10 }}
-              scroll={{ x: "max-content" }}
-            />
+  bordered
+  columns={columns}
+  dataSource={filteredWorks.map((item) => ({ ...item, key: item.ID?.toString() }))}
+  pagination={{
+    current: tablePagination.current,
+    pageSize: tablePagination.pageSize,
+    onChange: (page, pageSize) => setTablePagination({ current: page, pageSize }),
+  }}
+  scroll={{ x: "max-content" }}
+/>
+
           </Card>
         </Content>
       </Layout>

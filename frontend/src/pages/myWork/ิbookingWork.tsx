@@ -5,7 +5,7 @@ import {
   GetUserById,
   UpdateBooking,
   CreateReview,
-  GetReviewsByUserAndWork, // ต้องมีฟังก์ชันนี้ใน services/https
+  GetReviewsByUserAndWork,
 } from "../../services/https";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { UsersInterface } from "../../interfaces/IUser";
@@ -31,7 +31,6 @@ import {
 import {
   UserOutlined,
   CheckCircleOutlined,
-  ArrowLeftOutlined,
   SearchOutlined,
   FilterOutlined,
   TeamOutlined,
@@ -74,8 +73,8 @@ const BookingWork: React.FC = () => {
 
   const handleSaveReview = async () => {
     if (!currentReviewUser) return;
-    if (reviewRating === 0) {
-      message.warning("กรุณาเลือกคะแนนและกรอกความคิดก่อนบันทึก");
+    if (reviewRating === 0 || reviewComment.trim() === "") {
+      message.warning("กรุณาเลือกคะแนนและกรอกความคิดเห็นก่อนบันทึก");
       return;
     }
 
@@ -90,7 +89,6 @@ const BookingWork: React.FC = () => {
       await CreateReview(reviewData);
       message.success("บันทึกรีวิวเรียบร้อยแล้ว");
 
-      // อัปเดตสถานะรีวิวใน state
       setUsers((prev) =>
         prev.map((u) =>
           u.ID === currentReviewUser.ID ? { ...u, hasReviewed: true } : u
@@ -114,7 +112,6 @@ const BookingWork: React.FC = () => {
         for (const booking of bookings) {
           const user = await GetUserById(booking.user_id!);
           if (user) {
-            // ตรวจสอบว่ามีรีวิวงานนี้แล้ว
             const reviews = await GetReviewsByUserAndWork(user.ID!, Number(workId));
             const hasReviewed = reviews.length > 0;
 
@@ -198,25 +195,29 @@ const BookingWork: React.FC = () => {
   }
 
   return (
-    <div style={{ background: "#f0f2f5", minHeight: "100vh" }}>
+    <div style={{ background: "#F9F7F7", minHeight: "100vh" }}>
       <Navbar />
-      <div style={{ padding: "24px 16px" }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 16 }}>
-          กลับ
-        </Button>
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 16px" }}>
 
-        <Title level={2}>
-          <TeamOutlined /> รายชื่อผู้ลงทะเบียน
-        </Title>
-        <Text>จัดการการเช็คชื่อผู้เข้าร่วมงาน</Text>
+        {/* Header */}
+        <div style={{ marginBottom: 32, textAlign: "center" }}>
+          <Title level={2} style={{ color: "#112D4E" }}>
+            <TeamOutlined /> รายชื่อผู้ลงทะเบียน
+          </Title>
+          <Text style={{ color: "#3F72AF", fontSize: 16 }}>
+            จัดการการเช็คชื่อผู้เข้าร่วมงาน
+          </Text>
+        </div>
 
-        <Row gutter={16} style={{ marginTop: 24, marginBottom: 16 }}>
+        {/* Search & Filter */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={24} sm={12}>
             <Search
               placeholder="ค้นหาชื่อหรืออีเมล"
               onChange={(e) => setSearchText(e.target.value)}
               enterButton={<SearchOutlined />}
               allowClear
+              size="large"
             />
           </Col>
           <Col xs={24} sm={12}>
@@ -225,6 +226,7 @@ const BookingWork: React.FC = () => {
               value={filterStatus}
               onChange={setFilterStatus}
               suffixIcon={<FilterOutlined />}
+              size="large"
             >
               <Option value="all">ทั้งหมด</Option>
               <Option value="checked">เช็คชื่อแล้ว</Option>
@@ -233,62 +235,121 @@ const BookingWork: React.FC = () => {
           </Col>
         </Row>
 
+        {/* User List */}
         <List
           dataSource={filteredUsers}
+          itemLayout="horizontal"
+          split={false}
           renderItem={(user) => (
             <List.Item
-              style={{ background: "white", borderRadius: 8, marginBottom: 12, padding: 16 }}
+              style={{
+                background: "#DBE2EF",
+                borderRadius: 12,
+                marginBottom: 12,
+                padding: "16px 24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
               actions={[
                 user.checkedIn ? (
                   <Tooltip title="ยกเลิกเช็คชื่อ" key="undo-checkin">
-                    <Button type="text" danger onClick={() => handleUndoCheckIn(user.ID!)}>
+                    <Button
+                      type="text"
+                      danger
+                      onClick={() => handleUndoCheckIn(user.ID!)}
+                    >
                       ยกเลิก
                     </Button>
                   </Tooltip>
                 ) : (
-                  <Button type="primary" onClick={() => handleCheckIn(user.ID!)}>
+                  <Button
+                    type="primary"
+                    style={{ backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
+                    onClick={() => handleCheckIn(user.ID!)}
+                  >
                     เช็คชื่อ
                   </Button>
                 ),
                 <Button
-                  type={user.hasReviewed ? "default" : "primary"}
+                  type={user.checkedIn || user.hasReviewed ? "default" : "primary"}
                   onClick={() => openReviewModal(user)}
-                  disabled={user.hasReviewed}
+                  disabled={user.checkedIn || user.hasReviewed}
+                  style={{
+                    backgroundColor:
+                      user.checkedIn || user.hasReviewed ? undefined : "#112D4E",
+                    color:
+                      user.checkedIn || user.hasReviewed ? undefined : "#F9F7F7",
+                  }}
                 >
-                  {user.hasReviewed ? "รีวิวแล้ว" : "รีวิว"}
+                  {user.checkedIn ? "รีวิวเรียบร้อย" : user.hasReviewed ? "รีวิวแล้ว" : "รีวิว"}
                 </Button>,
               ]}
             >
               <List.Item.Meta
                 avatar={
                   <Badge dot color={user.checkedIn ? "green" : "gray"}>
-                    <Avatar src={user.Profile} icon={!user.Profile && <UserOutlined />} />
+                    <Avatar
+                      src={user.Profile}
+                      icon={!user.Profile && <UserOutlined />}
+                      size={48}
+                    />
                   </Badge>
                 }
                 title={
                   <span>
                     <Link
                       to={`/account/showprofile/${user.ID}`}
-                      style={{ color: "#3F72AF", fontWeight: 500, textDecoration: "none" }}
+                      style={{
+                        color: "#112D4E",
+                        fontWeight: 600,
+                        fontSize: 16,
+                      }}
                     >
                       {user.FirstName} {user.LastName}
                     </Link>
                     {user.checkedIn && (
-                      <Tag color="success" icon={<CheckCircleOutlined />} style={{ marginLeft: 8 }}>
-                        มาแล้ว
+                      <Tag
+                        color="success"
+                        icon={<CheckCircleOutlined />}
+                        style={{ marginLeft: 12 }}
+                      >
+                        เช็คชื่อเรียบร้อย
                       </Tag>
                     )}
                   </span>
                 }
-                description={user.Email}
+                description={<Text style={{ color: "#112D4E" }}>{user.Email}</Text>}
               />
             </List.Item>
           )}
         />
 
-        <div style={{ textAlign: "center", marginTop: 24 }}>
-          <Button type="primary" size="large" loading={saving} onClick={handleSaveAll}>
+        {/* Action Buttons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 16,
+            marginTop: 32,
+          }}
+        >
+          <Button
+            type="primary"
+            size="large"
+            loading={saving}
+            onClick={handleSaveAll}
+            style={{ minWidth: 220, backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
+          >
             บันทึกสถานะเช็คชื่อทั้งหมด
+          </Button>
+
+          <Button
+            size="large"
+            onClick={() => navigate(-1)}
+            style={{ minWidth: 220, backgroundColor: "#112D4E", color: "#F9F7F7" }}
+          >
+            ย้อนกลับ
           </Button>
         </div>
 
@@ -302,10 +363,10 @@ const BookingWork: React.FC = () => {
                 <Avatar icon={<UserOutlined />} size={40} />
               )}
               <div>
-                <div style={{ fontWeight: 600 }}>
+                <div style={{ fontWeight: 600, color: "#112D4E" }}>
                   รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
                 </div>
-                <div style={{ fontSize: 12, color: "#888" }}>
+                <div style={{ fontSize: 12, color: "#3F72AF" }}>
                   ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
                 </div>
               </div>
@@ -318,24 +379,23 @@ const BookingWork: React.FC = () => {
           cancelText="ยกเลิก"
           width={500}
           okButtonProps={{
-            disabled: reviewRating === 0 || reviewComment.trim() === "", // ถ้าไม่ได้เลือกดาว หรือความคิดเห็นว่าง จะ disable
+            disabled: reviewRating === 0 || reviewComment.trim() === "",
           }}
         >
           <div style={{ marginBottom: 16 }}>
-            <Text strong>ให้คะแนน: </Text>
+            <Text strong style={{ color: "#112D4E" }}>
+              ให้คะแนน:{" "}
+            </Text>
             <Rate
               value={reviewRating}
               onChange={setReviewRating}
               tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
             />
-            {reviewRating === 0 && (
-              <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-                กรุณาเลือกคะแนนและกรอกความคิดเห็นก่อนบันทึก
-              </div>
-            )}
           </div>
           <div>
-            <Text strong>ความคิดเห็น: </Text>
+            <Text strong style={{ color: "#112D4E" }}>
+              ความคิดเห็น:{" "}
+            </Text>
             <Input.TextArea
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
@@ -343,14 +403,8 @@ const BookingWork: React.FC = () => {
               autoSize={{ minRows: 4, maxRows: 6 }}
               style={{ marginTop: 8 }}
             />
-            {reviewComment.trim() === "" && (
-              <div style={{ color: "red", fontSize: 12, marginTop: 4 }}>
-
-              </div>
-            )}
           </div>
         </Modal>
-
       </div>
     </div>
   );

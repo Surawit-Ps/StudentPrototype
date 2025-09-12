@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
     MapPin, Users, DollarSign, Heart,
-    CheckCircle, XCircle, Calendar, Map
+    CheckCircle, XCircle, Calendar
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { 
@@ -188,7 +188,12 @@ const WorkInfo = () => {
                         <div style={{ backgroundColor: '#ffffff8a', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(17, 45, 78, 0.08)', border: '1px solid #DBE2EF' }}>
                             <div style={{ position: 'relative' }}>
                                 <img src={work.photo} alt={work.title} style={{ width: '100%', height: '400px', objectFit: 'cover' }} />
+                                <div style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', gap: '12px' }}>
+                                    {work.workstatus_id !== undefined && <StatusBadge status={work.workstatus_id} />}
+                                    {work.worktype_id !== undefined && <TypeBadge type={work.worktype_id} />}
+                                </div>
                             </div>
+                            
                             <div style={{ padding: '16px 32px 32px 32px' }}>
                                 <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: '#112D4E', marginBottom: '8px' }}>{work.title}</h1>
                                 <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '24px' }}>{work.description}</p>
@@ -204,7 +209,7 @@ const WorkInfo = () => {
                         {/* แผนที่ */}
                         <div style={{ backgroundColor: 'white', borderRadius: '24px', padding: '32px', boxShadow: '0 8px 32px rgba(17, 45, 78, 0.08)', border: '1px solid #DBE2EF' }}>
                             <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#112D4E', marginBottom: '12px' }}>ตำแหน่งที่ตั้งสถานที่</h2>
-                            <MapContainer center={position} zoom={14} scrollWheelZoom={false} style={{ height: 400, width: '100%', borderRadius: 16 }}>
+                            <MapContainer center={position} zoom={16} scrollWheelZoom={false} style={{ height: 400, width: '100%', borderRadius: 16 }}>
                                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                                 <Marker position={position} />
                             </MapContainer>
@@ -213,6 +218,7 @@ const WorkInfo = () => {
 
                     {/* กล่องด้านขวา */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        
                         <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '24px', boxShadow: '0 8px 32px rgba(17, 45, 78, 0.08)' }}>
                             {/* ส่วนแสดงค่าตอบแทน / ชั่วโมงจิตอาสา */}
                             <div style={{ backgroundColor: work.workstatus_id === 1 ? '#ECFDF5' : '#FEF2F2', color: work.workstatus_id === 1 ? '#10B981' : '#EF4444', padding: '12px', borderRadius: '12px', textAlign: 'center', fontWeight: 'bold', marginBottom: '20px' }}>
@@ -295,6 +301,7 @@ const WorkInfo = () => {
     );
 };
 
+// --- component ย่อย --- 
 const InfoItem = ({ icon, label, value }: { icon: JSX.Element; label: string; value: string }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', backgroundColor: '#F9F7F7', padding: '16px', borderRadius: '12px' }}>
         <div style={{ backgroundColor: '#3F72AF', color: 'white', padding: '8px', borderRadius: '8px' }}>{icon}</div>
@@ -302,6 +309,40 @@ const InfoItem = ({ icon, label, value }: { icon: JSX.Element; label: string; va
             <div style={{ fontSize: '12px', color: '#6B7280' }}>{label}</div>
             <div style={{ fontSize: '14px', color: '#112D4E', fontWeight: 'bold' }}>{value}</div>
         </div>
+    </div>
+);
+
+const StatusBadge = ({ status }: { status: number }) => (
+    <div style={{ 
+        backgroundColor: status === 1 ? '#10B981' : '#EF4444',
+        color: 'white',
+        padding: '14px 16px',
+        borderRadius: '50px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px'
+    }}>
+        {status === 1 ? <CheckCircle size={16} /> : <XCircle size={16} />}
+        {status === 1 ? 'เปิดรับสมัคร' : 'ปิดรับสมัคร'}
+    </div>
+);
+
+const TypeBadge = ({ type }: { type: number }) => (
+    <div style={{ 
+        backgroundColor: type === 1 ? '#3F72AF' : '#F59E0B',
+        color: 'white',
+        padding: '14px 16px',
+        borderRadius: '50px',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px'
+    }}>
+        {type === 1 ? <DollarSign size={16} /> : <Heart size={16} />}
+        {type === 1 ? 'มีค่าตอบแทน' : 'จิตอาสา'}
     </div>
 );
 

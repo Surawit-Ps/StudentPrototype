@@ -1,5 +1,5 @@
 export interface WorkInterface {
-    ID?: number;
+    ID: number;
     title?: string;
     description?: string;
     place?: string;
