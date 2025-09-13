@@ -28,6 +28,7 @@ type (
 		BirthDay  time.Time `json:"BirthDay"`
 		Profile   string    `json:"Profile" gorm:"type:longtext"`
 		Role      string    `json:"Role"`
+		GenderID  uint      `json:"GenderID"`
 	}
 
 	ResetPassword struct {
@@ -73,50 +74,68 @@ func ResetPasswordUser(c *gin.Context) {
 
 // ------------------------- Sign Up -------------------------
 func SignUp(c *gin.Context) {
-	var payload signUp
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    var payload signUp
 
-	db := config.DB()
+    // Bind JSON payload
+    if err := c.ShouldBindJSON(&payload); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-	// check email duplicate
-	var userCheck entity.User
-	if err := db.Where("email = ?", payload.Email).First(&userCheck).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "email is already registered"})
-		return
-	}
+    db := config.DB()
 
-	hashedPassword, err := config.HashPassword(payload.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Password hashing failed"})
-		return
-	}
+    var userCheck entity.User
 
-	// ถ้า frontend ไม่ส่ง role มา ให้ default = user
-	role := payload.Role
-	if role == "" {
-		role = "user"
-	}
+    // ตรวจสอบว่ามี email ซ้ำหรือไม่
+    result := db.Where("email = ?", payload.Email).First(&userCheck)
+    if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+        // กรณี DB error (ยกเว้น record not found)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+        return
+    }
 
-	user := entity.User{
-		FirstName: payload.FirstName,
-		LastName:  payload.LastName,
-		BirthDay:  payload.BirthDay,
-		Password:  hashedPassword,
-		Email:     payload.Email,
-		Profile:   payload.Profile,
-		Role:      role,
-	}
+    if userCheck.ID != 0 {
+        // ถ้า email มีอยู่แล้ว
+        c.JSON(http.StatusConflict, gin.H{"error": "Email is already registered"})
+        return
+    }
 
-	if err := db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+    // hash password
+    hashedPassword, err := config.HashPassword(payload.Password)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Password hashing failed"})
+        return
+    }
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Sign-up successful", "user": user})
+    // set role default ถ้าไม่ได้ส่งมา
+    role := payload.Role
+    if role == "" {
+        role = "user"
+    }
+
+    // สร้าง user ใหม่
+    user := entity.User{
+        FirstName: payload.FirstName,
+        LastName:  payload.LastName,
+        Email:     payload.Email,
+        Password:  hashedPassword,
+        BirthDay:  payload.BirthDay,
+        Profile:   payload.Profile,
+        Role:      role,
+        GenderID:  payload.GenderID,
+    }
+
+    // save user
+    if err := db.Create(&user).Error; err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // ส่ง response แบบ message เท่านั้น
+    c.JSON(http.StatusCreated, gin.H{"message": "Sign-up successful"})
 }
+
+
 
 // ------------------------- Sign In -------------------------
 func SignIn(c *gin.Context) {

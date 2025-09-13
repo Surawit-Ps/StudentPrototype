@@ -129,7 +129,7 @@ const MyPostedWorks: React.FC = () => {
               size="large"
               style={{
                 marginBottom: "20px",
-                background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
+                background: "linear-gradient(45deg, #FF6B6B, #7a4ecdff)",
                 border: "none",
                 borderRadius: "25px",
                 padding: "10px 30px",

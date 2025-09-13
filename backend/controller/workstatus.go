@@ -46,7 +46,8 @@ func UpdateWorkStatusAutomatically() {
 	now := time.Now()
 
 	for _, work := range works {
-		if work.WorkTime.Before(now) {
+		// ถ้าเลยวันก่อนวันทำงาน (1 วันก่อน)
+		if now.After(work.WorkTime.AddDate(0, 0, -1)) {
 			// อัปเดตสถานะเป็น Inactive (2)
 			work.WorkStatusID = 2
 			if err := config.DB().Save(&work).Error; err != nil {

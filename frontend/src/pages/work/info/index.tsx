@@ -19,7 +19,7 @@ import 'leaflet/dist/leaflet.css';
 import Navbar from '../../../components/Navbar/Navbar';
 import EnhancedFooter from '../../../components/Footer/EnhancedFooter';
 
-const defaultPosition: [number, number] = [14.883451, 102.010589];
+const defaultPosition: [number, number] = [14.8777136, 102.0335502];
 
 // ฟังก์ชันคำนวณระยะทางระหว่าง 2 จุด (เมตร)
 const getDistanceInMeters = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -57,6 +57,7 @@ const WorkInfo = () => {
             }
             if (!id) return;
             const workData = await GetWorkById(Number(id));
+
             if (workData) {
                 setWork(workData);
                 if (workData.latitude !== undefined && workData.longitude !== undefined) {
@@ -73,21 +74,43 @@ const WorkInfo = () => {
     }, [id]);
 
     // ตรวจสอบตำแหน่งทุก 3 วินาที
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (!work?.latitude || !work?.longitude) return;
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const { latitude, longitude } = pos.coords;
-                    const dist = getDistanceInMeters(latitude, longitude, work.latitude!, work.longitude!);
-                    setDistance(dist);
-                    setCanCheckIn(dist <= 40);
-                },
-                (err) => console.error("Error getting location:", err)
-            );
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [work]);
+    // ตรวจสอบตำแหน่ง + เวลาทุก 1 วินาที
+useEffect(() => {
+    const interval = setInterval(() => {
+        if (!work?.latitude || !work?.longitude || !work.worktime) return;
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const { latitude, longitude } = pos.coords;
+                const dist = getDistanceInMeters(
+                    latitude, longitude, 
+                    work.latitude!, work.longitude!
+                );
+                setDistance(dist);
+
+                // เช็คเวลา
+                const now = new Date().getTime();
+                const workStart = new Date(work.worktime ?? '').getTime();
+
+                const checkInStart = workStart - 10 * 60 * 1000; // 10 นาที ก่อนงาน
+                const checkInEnd = workStart + 20 * 60 * 1000;   // 20 นาที หลังงานเริ่ม
+
+                const isWithinTime = now >= checkInStart && now <= checkInEnd;
+
+                // อนุญาตให้เช็คอินได้เมื่ออยู่ในระยะ และเวลาอยู่ในช่วงที่กำหนด
+                if (dist <= 60 && isWithinTime) {  // เช่น กำหนดให้อยู่ใน 100 เมตร
+                    setCanCheckIn(true);
+                } else {
+                    setCanCheckIn(false);
+                }
+            },
+            (err) => console.error("Error getting location:", err)
+        );
+    }, 500);
+
+    return () => clearInterval(interval);
+}, [work]);
+
 
     const checkBookingStatus = async () => {
         const user_id = Number(localStorage.getItem("user_id"));
@@ -129,7 +152,6 @@ const WorkInfo = () => {
                 setHasBooked(true);
                 const updatedWorkuse = (work.workuse ?? 0) + 1;
                 let updatedWorkstatus = work.workstatus_id;
-                if (updatedWorkuse >= (work.workcount ?? 0)) updatedWorkstatus = 2;
                 const updatedWork: WorkInterface = { ...work, workuse: updatedWorkuse, workstatus_id: updatedWorkstatus };
                 const updateResponse = await UpdateWork(Number(id), updatedWork);
                 if (updateResponse) setWork(updatedWork);
@@ -270,26 +292,34 @@ const WorkInfo = () => {
                                     ) : (
                                         <button 
                                             onClick={handleRegister} 
-                                            disabled={work.workstatus_id !== 1 || hasOtherBooking}
+                                            disabled={work.workstatus_id !== 1 && hasOtherBooking && (work.workuse ?? 0) < (work.workcount ?? 0)}
                                             style={{
                                                 fontSize: '16px',
                                                 width: '100%',
                                                 padding: '16px',
-                                                backgroundColor: work.workstatus_id === 1 && !hasOtherBooking ? '#3F72AF' : '#9CA3AF',
+                                                backgroundColor: work.workstatus_id === 1 && !hasOtherBooking && ((work.workuse ?? 0) < (work.workcount ?? 0))? '#3F72AF' : '#9CA3AF',
                                                 color: 'white',
                                                 fontWeight: 'bold',
                                                 border: 'none',
                                                 borderRadius: '16px'
                                             }}
                                         >
-                                            <CheckCircleOutlined /> ลงทะเบียนเข้าร่วม
+                                            <CheckCircleOutlined /> ลงทะเบียนเข้าร่วม 
                                         </button>
                                     )}
-                                    {hasOtherBooking && !hasBooked && (
+                                    {hasOtherBooking && !hasBooked &&  (
                                         <p style={{ fontSize: '12px', textAlign: 'center', color: '#9CA3AF', marginTop: '12px' }}>
                                             คุณมีงานที่ลงทะเบียนอยู่แล้ว ไม่สามารถลงทะเบียนงานอื่นได้
                                         </p>
                                     )}
+
+                                    {(work.workuse ?? 0) >= (work.workcount ?? 0) && !hasBooked &&(
+                                        <p style={{ fontSize: '12px', textAlign: 'center', color: '#9CA3AF', marginTop: '12px' }}>
+                                            งานนี้เต็มแล้ว ไม่สามารถลงทะเบียนได้
+                                        </p>
+                                    )}
+
+                
                                 </>
                             )}
                         </div>

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import { SignIn, CreateUser, GetGenders } from '../../services/https/index';
+import { SignIn, SignUp, GetGenders } from '../../services/https/index';
 import { UsersInterface } from '../../interfaces/IUser';
 import { GendersInterface } from '../../interfaces/IGender';
 import { useNavigate } from 'react-router-dom';
-import { Upload } from 'antd';
+import { Upload ,message} from 'antd';
 import ImgCrop from 'antd-img-crop';
 import type { UploadFile } from 'antd';
 
@@ -58,23 +58,23 @@ const LoginPage = () => {
       try {
         const res = await SignIn(formData.email, formData.password);
         if (res) {
-          alert('เข้าสู่ระบบสำเร็จ');
+          message.success('เข้าสู่ระบบสำเร็จ');
           navigate('/');
         } else {
-          alert('เข้าสู่ระบบไม่สำเร็จ');
+          message.error('เข้าสู่ระบบไม่สำเร็จ');
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
+        message.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
       }
     } else {
       if (formData.password !== formData.confirmPassword) {
-        alert('รหัสผ่านไม่ตรงกัน');
+        message.error('รหัสผ่านไม่ตรงกัน');
         return;
       }
 
       if (!fileList[0] || !fileList[0].originFileObj) {
-        alert('กรุณาอัปโหลดรูปโปรไฟล์');
+        message.error('กรุณาอัปโหลดรูปโปรไฟล์');
         return;
       }
 
@@ -92,20 +92,23 @@ const LoginPage = () => {
           Role: formData.role,
         };
 
-        const res = await CreateUser(payload);
+        const res = await SignUp(payload);
         console.log('API Response:', res);
 
-        // ✅ แก้ตรงนี้ให้เช็ค res.data.ID แทน res.ID
-        if (res?.data?.ID) {
-          alert('สมัครสมาชิกสำเร็จ');
+        if (res?.message === "Sign-up successful") {
+          message.success('สมัครสมาชิกสำเร็จ');
           setIsLogin(true);
         } else {
-          alert('สมัครสมาชิกไม่สำเร็จ');
-          console.log('API Response:', res);
+          message.error('สมัครสมาชิกไม่สำเร็จ');
         }
+
+
+
+
+
       } catch (error) {
         console.error('Signup error:', error);
-        alert('เกิดข้อผิดพลาดในการสมัครสมาชิก');
+        message.error('เกิดข้อผิดพลาดในการสมัครสมาชิก');
       }
     }
   };
