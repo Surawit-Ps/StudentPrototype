@@ -46,18 +46,37 @@ const WorkHistoryPage: React.FC = () => {
             setLoading(true);
             const res = await GetWorkHistory();
             if (!res) return setLoading(false);
+
             setHistories(res);
+
             let filteredData = res;
+
+            // ถ้ามีการค้นหาชื่อ
             if (searchTitle.trim() !== "") {
                 filteredData = res.filter((h) =>
                     h.Work?.title?.toLowerCase().includes(searchTitle.toLowerCase())
                 );
             }
+
+            filteredData.sort((a, b) => {
+                // ถ้า ID ต่างกันให้เรียงตาม ID
+                if (a.ID !== b.ID) {
+                    return Number(b.ID) - Number(a.ID); // ใหม่ก่อน
+                }
+                // ถ้า ID เท่ากันค่อยดูตาม worktime
+                const dateA = new Date(a.Work?.worktime || "").getTime();
+                const dateB = new Date(b.Work?.worktime || "").getTime();
+                return dateB - dateA;
+            });
+
+
+
             setFiltered(filteredData);
             setLoading(false);
         };
         fetchAndFilter();
     }, [searchTitle]);
+
 
     const formatWorkTime = (worktime: string | undefined) => {
         if (!worktime) return "-";
@@ -74,6 +93,8 @@ const WorkHistoryPage: React.FC = () => {
     const generatePDF = (record: WorkHistoryInterface) => {
         const doc = new jsPDF("p", "mm", "a4");
         const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const marginBottom = 20;
 
         // === ฟอนต์ไทย ===
         doc.addFileToVFS("THSarabunNew.ttf", thSarabunNewBase64);
@@ -83,23 +104,18 @@ const WorkHistoryPage: React.FC = () => {
 
         // === โลโก้บนหัวกระดาษ ===
         const logoLeftWidth = 30;   // โลโก้ซ้ายคงที่
-        const logoRightWidth = 50;  // โลโก้ขวากว้างกว่า
+        // const logoRightWidth = 50;  // โลโก้ขวากว้างกว่า
         const logoLeftHeight = 40;
-        const logoRightHeight = 25;
-        const spacing = 10;
+        // const spacing = 10;
 
         const posY = 10;
-        const rightOffsetY = 7; // ขยับโลโก้ขวาลงมาเพิ่ม
 
         // คำนวณความกว้างรวม
-        const totalWidth = logoLeftWidth + logoRightWidth + spacing;
-        const startX = (pageWidth - totalWidth) / 2;
+        // const totalWidth = logoLeftWidth + logoRightWidth + spacing;
+        const startX = (pageWidth - logoLeftWidth) / 2;
 
         // โลโก้ซ้าย (sutlogo)
         doc.addImage(sutlogo, "PNG", startX, posY, logoLeftWidth, logoLeftHeight);
-
-        // โลโก้ขวา (logo เดิม) ขยับลงมา
-        doc.addImage(logo, "PNG", startX + logoLeftWidth + spacing, posY + rightOffsetY, logoRightWidth, logoRightHeight);
 
         let currentY = 65;
 
@@ -141,12 +157,17 @@ const WorkHistoryPage: React.FC = () => {
             20,
             currentY
         );
+        currentY += 10;
+
+        doc.text(`รับรองจาก: Studentjobhub`, 20, currentY);
         currentY += 15;
 
         // === ลงชื่อ ===
-        doc.text("....................................................", pageWidth - 80, currentY);
-        currentY += 7;
-        doc.text("ผู้เข้าร่วมกิจกรรม", pageWidth - 65, currentY);
+        // เส้น
+        doc.text("....................................................", pageWidth - 80, pageHeight - marginBottom);
+
+        // ข้อความ
+        doc.text("ผู้เข้าร่วมกิจกรรม", pageWidth - 65, pageHeight - marginBottom + 7);
 
         doc.save("รายงานกิจกรรมจิตอาสา.pdf");
     };

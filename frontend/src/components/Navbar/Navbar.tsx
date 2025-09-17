@@ -22,11 +22,11 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
   };
 
   const navItems = [
-    { key: "home", label: "หน้าหลัก", to: "/" },
+    { key: "home", label: "หน้าหลัก", to: "/home" },
     { key: "dashboard", label: "กระดานข่าว", to: "/dashboard/view" },
     { key: "work", label: "งานทั้งหมด", to: "/work/view" },
   ];

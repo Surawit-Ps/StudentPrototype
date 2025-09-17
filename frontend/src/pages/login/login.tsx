@@ -59,7 +59,7 @@ const LoginPage = () => {
         const res = await SignIn(formData.email, formData.password);
         if (res) {
           message.success('เข้าสู่ระบบสำเร็จ');
-          navigate('/');
+          navigate('/home');
         } else {
           message.error('เข้าสู่ระบบไม่สำเร็จ');
         }

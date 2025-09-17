@@ -267,8 +267,8 @@ function CustomerCreate() {
                 rules={[{ required: true, message: "กรุณาเลือกประเภทผู้ใช้งาน !" }]}
               >
                 <Select placeholder="เลือกประเภทผู้ใช้งาน">
-                  <Option value="user">นักศึกษา</Option>
-                  <Option value="employer">บุคคลภายนอก</Option>
+                  {/* <Option value="user">นักศึกษา</Option>
+                  <Option value="employer">บุคคลภายนอก</Option> */}
                   <Option value="admin">แอดมิน</Option>
                 </Select>
               </Form.Item>

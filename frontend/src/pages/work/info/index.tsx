@@ -12,6 +12,8 @@ import { WorkInterface } from '../../../interfaces/IWork';
 import { UsersInterface } from '../../../interfaces/IUser';
 import { BookingInterface } from '../../../interfaces/IBooking';
 import { CheckInInterface } from '../../../interfaces/ICheckIn';
+import { CreateWorkHistory } from "../../../services/https"; 
+import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { message } from "antd";

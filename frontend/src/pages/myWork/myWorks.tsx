@@ -27,7 +27,7 @@ import {
 } from "@ant-design/icons";
 import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
-
+import EnhancedFooter from '../../components/Footer/EnhancedFooter';
 const { Title, Text, Paragraph } = Typography;
 
 const MyPostedWorks: React.FC = () => {
@@ -101,7 +101,7 @@ const MyPostedWorks: React.FC = () => {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #090cc58f 0%, #1655df2d 100%)",
       }}
     >
       <Navbar />
@@ -256,14 +256,14 @@ const MyPostedWorks: React.FC = () => {
                       >
                         ดู
                       </Button>,
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/work/edit/${work.ID}`)}
-                        style={{ color: "#667eea" }}
-                      >
-                        แก้ไข
-                      </Button>,
+                      // <Button
+                      //   type="text"
+                      //   icon={<EditOutlined />}
+                      //   onClick={() => navigate(`/work/edit/${work.ID}`)}
+                      //   style={{ color: "#667eea" }}
+                      // >
+                      //   แก้ไข
+                      // </Button>,
                       <Button
                         type="text"
                         icon={<CheckCircleOutlined />}
@@ -365,7 +365,9 @@ const MyPostedWorks: React.FC = () => {
           </Row>
         )}
       </div>
+      <EnhancedFooter />
     </div>
+    
   );
 };
 

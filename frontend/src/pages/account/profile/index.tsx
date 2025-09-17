@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Col, Row, Typography, Divider, Avatar, message, Button, Statistic, Rate } from "antd";
 import { UserOutlined, EditOutlined, ArrowLeftOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useParams, useNavigate } from "react-router-dom";
 import { GetUserById } from "../../../services/https";
 import { UsersInterface } from "../../../interfaces/IUser";
 import { GetWorkHistory } from "../../../services/https";
-// import { WorkHistoryInterface } from "../../../interfaces/IHistorywork";
-// import { GendersInterface } from "../../../interfaces/IGender";
-// import { UserStatusInterface } from "../../../interfaces/IUserStatus";
+import Navbar from "../../../components/Navbar/Navbar";
+import EnhancedFooter from '../../../components/Footer/EnhancedFooter';
 
 const { Title, Text } = Typography;
 
@@ -77,143 +76,147 @@ const ProfileView = () => {
   };
 
   return (
-    <div style={{ padding: 80, background: "linear-gradient(to bottom right, #f0f4ff, #fafbff)", minHeight: "100vh" }}>
-      {contextHolder}
-      <Card style={{ maxWidth: 1000, margin: "0 auto", borderRadius: 16 }} bodyStyle={{ padding: 40 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          style={{
-            background: "#fff",
-            color: "#000",
-            borderColor: "#d9d9d9",
-            position: "absolute",
-            top: 16,
-            left: 16,
-          }}
-          onClick={() => navigate("/")}
-        />
+    <>
+      <Navbar />
+      <div style={{ padding: 80, background: "linear-gradient(to bottom right, #f0f4ff, #fafbff)", minHeight: "100vh" }}>
+        {contextHolder}
+        <Card style={{ maxWidth: 1000, margin: "0 auto", borderRadius: 16 }} bodyStyle={{ padding: 40 }}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            style={{
+              background: "#fff",
+              color: "#000",
+              borderColor: "#d9d9d9",
+              position: "absolute",
+              top: 16,
+              left: 16,
+            }}
+            onClick={() => navigate("/home")}
+          />
 
-        <Button
-          type="primary"
-          icon={<EditOutlined />}
-          style={{ position: "absolute", top: 16, right: 16 }}
-          onClick={() => navigate(`/account/edit/${user.ID}`)}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 64,
-            right: 16,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            gap: 16,
-            width: 200,
-          }}
-        >
-          {user?.Role === "user" && ( // ✅ แสดงเฉพาะ user
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            style={{ position: "absolute", top: 16, right: 16 }}
+            onClick={() => navigate(`/account/edit/${user.ID}`)}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 64,
+              right: 16,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 16,
+              width: 200,
+            }}
+          >
+            {user?.Role === "user" && ( // ✅ แสดงเฉพาะ user
+              <>
+                <Card
+                  bordered={false}
+                  style={{
+                    borderRadius: 12,
+                    backgroundColor: "#e8f5e9",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                    textAlign: "center",
+                  }}
+                >
+                  <Statistic
+                    title="รายได้ทั้งหมด"
+                    value={paidAmountTotal}
+                    precision={0}
+                    prefix="฿"
+                    suffix="บาท"
+                    valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
+                  />
+                </Card>
+
+                <Card
+                  bordered={false}
+                  style={{
+                    borderRadius: 12,
+                    backgroundColor: "#e3f2fd",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                    textAlign: "center",
+                  }}
+                >
+                  <Statistic
+                    title="ชั่วโมงจิตอาสาทั้งหมด"
+                    value={volunteerHourTotal}
+                    precision={0}
+                    prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
+                    suffix="ชม."
+                    valueStyle={{ color: "#1565c0", fontWeight: "bold" }}
+                  />
+                </Card>
+              </>
+            )}
+          </div>
+
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={120}
+              icon={<UserOutlined />}
+              src={user.Profile}
+              style={{
+                border: "4px solid #e0e0e0",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                marginBottom: 16,
+              }}
+            />
+            <div>
+              <Title level={3} style={{ marginBottom: 0 }}>
+                {`${user.FirstName ?? "-"} ${user.LastName ?? ""}`}
+              </Title>
+              <Text type="secondary">
+                อายุ {user.BirthDay ? calculateAge(user.BirthDay) : "-"} ปี
+              </Text>
+            </div>
+          </div>
+
+          <Row gutter={[24, 24]}>
+            <Col span={12}>
+              <Text strong>👤 ชื่อ</Text>
+              <div>{user.FirstName}</div>
+            </Col>
+            <Col span={12}>
+              <Text strong>👥 นามสกุล</Text>
+              <div>{user.LastName}</div>
+            </Col>
+            <Col span={12}>
+              <Text strong>📧 อีเมล</Text>
+              <div>{user.Email}</div>
+            </Col>
+            <Col span={12}>
+              <Text strong>🎂 วันเกิด</Text>
+              <div>{user.BirthDay ? new Date(user.BirthDay).toLocaleDateString("th-TH") : "-"}</div>
+            </Col>
+            <Col span={12}>
+              <Text strong>⚧ เพศ</Text>
+              <div>{user.Gender?.Name ?? "-"}</div>
+            </Col>
+          </Row>
+
+          {user?.Role === "user" && (
             <>
-              <Card
-                bordered={false}
-                style={{
-                  borderRadius: 12,
-                  backgroundColor: "#e8f5e9",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                  textAlign: "center",
-                }}
-              >
-                <Statistic
-                  title="รายได้ทั้งหมด"
-                  value={paidAmountTotal}
-                  precision={0}
-                  prefix="฿"
-                  suffix="บาท"
-                  valueStyle={{ color: "#2e7d32", fontWeight: "bold" }}
-                />
-              </Card>
+              <Divider />
 
-              <Card
-                bordered={false}
-                style={{
-                  borderRadius: 12,
-                  backgroundColor: "#e3f2fd",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-                  textAlign: "center",
-                }}
-              >
-                <Statistic
-                  title="ชั่วโมงจิตอาสาทั้งหมด"
-                  value={volunteerHourTotal}
-                  precision={0}
-                  prefix={<ClockCircleOutlined style={{ color: "#1890ff" }} />}
-                  suffix="ชม."
-                  valueStyle={{ color: "#1565c0", fontWeight: "bold" }}
-                />
-              </Card>
+              <div style={{ marginTop: 12 }}>
+                <Rate disabled value={user.TotalRating ?? 0} />
+                <div>
+                  <Text type="secondary">
+                    ({user.ReviewCount ?? 0} รีวิว)
+                  </Text>
+                </div>
+              </div>
             </>
           )}
-        </div>
-
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <Avatar
-            size={120}
-            icon={<UserOutlined />}
-            src={user.Profile}
-            style={{
-              border: "4px solid #e0e0e0",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              marginBottom: 16,
-            }}
-          />
-          <div>
-            <Title level={3} style={{ marginBottom: 0 }}>
-              {`${user.FirstName ?? "-"} ${user.LastName ?? ""}`}
-            </Title>
-            <Text type="secondary">
-              อายุ {user.BirthDay ? calculateAge(user.BirthDay) : "-"} ปี
-            </Text>
-          </div>
-        </div>
-
-        <Row gutter={[24, 24]}>
-          <Col span={12}>
-            <Text strong>👤 ชื่อ</Text>
-            <div>{user.FirstName}</div>
-          </Col>
-          <Col span={12}>
-            <Text strong>👥 นามสกุล</Text>
-            <div>{user.LastName}</div>
-          </Col>
-          <Col span={12}>
-            <Text strong>📧 อีเมล</Text>
-            <div>{user.Email}</div>
-          </Col>
-          <Col span={12}>
-            <Text strong>🎂 วันเกิด</Text>
-            <div>{user.BirthDay ? new Date(user.BirthDay).toLocaleDateString("th-TH") : "-"}</div>
-          </Col>
-          <Col span={12}>
-            <Text strong>⚧ เพศ</Text>
-            <div>{user.Gender?.Name ?? "-"}</div>
-          </Col>
-        </Row>
-        
-        {user?.Role === "user" && (
-          <>
-        <Divider />
-        
-        <div style={{ marginTop: 12 }}>
-          <Rate disabled value={user.TotalRating ?? 0} />
-          <div>
-            <Text type="secondary">
-              ({user.ReviewCount ?? 0} รีวิว)
-            </Text>
-          </div>
-        </div>
-        </>
-        )}
-      </Card>
-    </div>
+        </Card>
+      </div>
+      <EnhancedFooter />
+    </>
   );
 };
 
