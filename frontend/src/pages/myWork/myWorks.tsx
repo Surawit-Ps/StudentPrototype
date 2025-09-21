@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { WorkInterface } from "../../interfaces/IWork";
-import { GetWorkByPosterID } from "../../services/https/index";
+import { GetWorkByPosterID, DeleteWorkByID } from "../../services/https/index";
 import {
   Card,
   Col,
@@ -13,6 +13,8 @@ import {
   Space,
   Divider,
   Badge,
+  Modal,
+  message,
 } from "antd";
 import {
   CalendarOutlined,
@@ -21,6 +23,7 @@ import {
   DollarOutlined,
   HeartOutlined,
   EyeOutlined,
+  DeleteOutlined,
   EditOutlined,
   CheckCircleOutlined,
   FileDoneOutlined,
@@ -34,24 +37,50 @@ const MyPostedWorks: React.FC = () => {
   const [works, setWorks] = useState<WorkInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  // const [messageApi, contextHolder] = message.useMessage();
 
   const userData = localStorage.getItem("user_id");
   const userId = userData ? Number(userData) : undefined;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-      const res = await GetWorkByPosterID(userId);
-      if (res) {
-        setWorks(res);
-      }
+  const fetchData = async () => {
+    if (!userId) {
       setLoading(false);
-    };
+      return;
+    }
+    const res = await GetWorkByPosterID(userId);
+    if (res) {
+      const sortedWorks = res.sort(
+        (a: { ID: any }, b: { ID: any }) => (b.ID ?? 0) - (a.ID ?? 0)
+      );
+      setWorks(sortedWorks);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchData();
   }, [userId]);
+
+  // const handleDelete = async (id?: number, title?: string) => {
+  //   if (!id) return;
+  //   Modal.confirm({
+  //     title: "คุณแน่ใจหรือไม่?",
+  //     content: `คุณต้องการลบงาน "${title || "นี้"}" ใช่หรือไม่?`,
+  //     okText: "ลบ",
+  //     okType: "danger",
+  //     cancelText: "ยกเลิก",
+  //     centered: true,
+  //     onOk: async () => {
+  //       const res = await DeleteWorkByID(id);
+  //       if (res) {
+  //         messageApi.success("ลบงานสำเร็จ");
+  //         fetchData(); // โหลดใหม่หลังลบ
+  //       } else {
+  //         messageApi.error("ไม่สามารถลบงานได้");
+  //       }
+  //     },
+  //   });
+  // };
 
   const getWorkStatus = (work: WorkInterface) => {
     const remaining = (work.workcount ?? 0) - (work.workuse ?? 0);
@@ -256,14 +285,14 @@ const MyPostedWorks: React.FC = () => {
                       >
                         ดู
                       </Button>,
-                      // <Button
-                      //   type="text"
-                      //   icon={<EditOutlined />}
-                      //   onClick={() => navigate(`/work/edit/${work.ID}`)}
-                      //   style={{ color: "#667eea" }}
-                      // >
-                      //   แก้ไข
-                      // </Button>,
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/work/edit/${work.ID}`)}
+                        style={{ color: "#667eea" }}
+                      >
+                        แก้ไข
+                      </Button>,
                       <Button
                         type="text"
                         icon={<CheckCircleOutlined />}
@@ -280,6 +309,14 @@ const MyPostedWorks: React.FC = () => {
                       >
                         สรุปงาน
                       </Button>,
+                      // <Button
+                      //   type="text"
+                      //   danger
+                      //   icon={<DeleteOutlined />}
+                      //   onClick={() => handleDelete(work.ID, work.title)}
+                      // >
+                      //   ลบ
+                      // </Button>,
                     ]}
                   >
                     <div style={{ padding: "0 8px" }}>
@@ -367,7 +404,7 @@ const MyPostedWorks: React.FC = () => {
       </div>
       <EnhancedFooter />
     </div>
-    
+
   );
 };
 

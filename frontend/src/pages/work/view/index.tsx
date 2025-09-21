@@ -22,14 +22,18 @@ import {
   EnvironmentOutlined,
   FilterOutlined,
   FileSearchOutlined,
+  DollarOutlined,
+  HeartFilled,
+  StarFilled,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { WorkInterface } from "../../../interfaces/IWork";
-import { GetWork } from "../../../services/https";
-import { DollarOutlined, HeartFilled } from "@ant-design/icons";
+import { BookingInterface } from "../../../interfaces/IBooking";
+import { GetWork, GetBookings } from "../../../services/https";
 import Navbar from "../../../components/Navbar/Navbar";
 import bannerImage from "../../../assets/w1.jpg";
 import EnhancedFooter from '../../../components/Footer/EnhancedFooter';
+
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
@@ -37,14 +41,17 @@ const { Option } = Select;
 
 const WorkView = () => {
   const [works, setWorks] = useState<WorkInterface[]>([]);
+  const [bookings, setBookings] = useState<BookingInterface[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterBooked, setFilterBooked] = useState(""); // "" | "booked" | "notBooked"
   const [currentPage, setCurrentPage] = useState(1);
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const pageSize = 9;
 
+  const userId = Number(localStorage.getItem("user_id"));
 
   const fetchWorkList = async () => {
     try {
@@ -56,35 +63,76 @@ const WorkView = () => {
     }
   };
 
-
+  const fetchBookings = async () => {
+    try {
+      if (!userId) return;
+      const res = await GetBookings();
+      if (res) setBookings(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     fetchWorkList();
+    fetchBookings();
   }, []);
 
+const bookedWorkIds = new Set(
+  bookings
+    .filter(b => b.user_id === userId && !b.deleted_at) // กรอง deleted
+    .map(b => b.work_id)
+);
+
+
   const filteredWorks = works.filter((work) => {
-    const matchesSearch = (work.title || "").toLowerCase().includes(searchText.toLowerCase());
-    const matchesType =
-      filterType === "" ||
-      (filterType === "volunteer" && work.worktype_id === 2) ||
-      (filterType === "paid" && work.worktype_id === 1);
-    const matchesStatus =
-      filterStatus === "" ||
-      (filterStatus === "open" && work.workstatus_id === 1) ||
-      (filterStatus === "closed" && work.workstatus_id === 2);
-    return matchesSearch && matchesType && matchesStatus;
+  const matchesSearch = (work.title || "")
+    .toLowerCase()
+    .includes(searchText.toLowerCase());
+
+  const matchesType =
+    filterType === "" ||
+    (filterType === "volunteer" && work.worktype_id === 2) ||
+    (filterType === "paid" && work.worktype_id === 1);
+
+  const isBooked = bookedWorkIds.has(work.ID ?? 0);
+
+  // ✅ ซ่อนงานที่ปิด (workstatus_id === 2) เว้นแต่งานนั้นถูกจองไว้
+  const matchesStatus =
+    filterStatus === "" ||
+    (filterStatus === "open" && work.workstatus_id === 1) ||
+    (filterStatus === "closed" && work.workstatus_id === 2);
+
+  const notHiddenByStatus = !(work.workstatus_id === 2 && !isBooked);
+
+  const matchesBooked =
+    filterBooked === "" ||
+    (filterBooked === "booked" && isBooked) ||
+    (filterBooked === "notBooked" && !isBooked);
+
+  return (
+    matchesSearch &&
+    matchesType &&
+    matchesStatus &&
+    matchesBooked &&
+    notHiddenByStatus
+  );
+});
+
+  // Sort งาน: งานที่จองขึ้นบน, งานอื่นเรียง ID ใหม่สุด
+  const sortedWorks = [...filteredWorks].sort((a, b) => {
+    const aBooked = bookedWorkIds.has(a.ID ?? 0);
+    const bBooked = bookedWorkIds.has(b.ID ?? 0);
+
+    if (aBooked && !bBooked) return -1;
+    if (!aBooked && bBooked) return 1;
+    return (b.ID ?? 0) - (a.ID ?? 0);
   });
 
-  // เรียงงานใหม่สุดขึ้นก่อน
-// เรียงตาม ID ใหม่สุดขึ้นก่อน
-const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
-
-  // Slice สำหรับ pagination
   const paginatedWorks = sortedWorks.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
 
   const getProgressColor = (used: number, total: number) => {
     const percentage = (used / total) * 100;
@@ -99,6 +147,8 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
       <Layout style={{ backgroundColor: "#F9F7F7", minHeight: "100vh" }}>
         <Content style={{ padding: 0 }}>
           {contextHolder}
+
+          {/* Banner */}
           <div
             style={{
               position: "relative",
@@ -109,7 +159,6 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
               color: "white",
             }}
           >
-            {/* Overlay gradient filter */}
             <div
               style={{
                 position: "absolute",
@@ -129,6 +178,7 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                 เชื่อมต่อโอกาสดีๆ ทั้งงานจิตอาสาและงานพาร์ทไทม์ในพื้นที่ของคุณ
               </Paragraph>
 
+              {/* Filters */}
               <Card
                 style={{
                   background: "rgba(255,255,255,0.2)",
@@ -153,7 +203,6 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                       prefix={<SearchOutlined style={{ color: "#3F72AF" }} />}
                     />
                   </Col>
-
                   <Col>
                     <Select
                       defaultValue=""
@@ -164,18 +213,10 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                       suffixIcon={<FilterOutlined style={{ color: "#3F72AF" }} />}
                     >
                       <Option value="">ทุกประเภท</Option>
-                      <Option value="volunteer">
-
-                        งานจิตอาสา
-                      </Option>
-
-                      <Option value="paid">
-
-                        งานค่าตอบแทน
-                      </Option>
+                      <Option value="volunteer">งานจิตอาสา</Option>
+                      <Option value="paid">งานค่าตอบแทน</Option>
                     </Select>
                   </Col>
-
                   <Col>
                     <Select
                       defaultValue=""
@@ -187,10 +228,12 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                     >
                       <Option value="">ทุกสถานะ</Option>
                       <Option value="open">เปิดรับสมัคร</Option>
-                      <Option value="closed"> ปิดรับสมัคร</Option>
+                      <Option value="closed">ปิดรับสมัคร</Option>
                     </Select>
                   </Col>
+                  <Col>
 
+                  </Col>
                   <Col>
                     <Text strong style={{ color: "#ffffff", fontSize: "16px" }}>
                       งานที่พบ {filteredWorks.length} งาน
@@ -201,6 +244,7 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
             </div>
           </div>
 
+          {/* Work Cards */}
           <div style={{ padding: "40px 24px", maxWidth: 1200, margin: "0 auto" }}>
             {filteredWorks.length === 0 ? (
               <Empty
@@ -234,6 +278,8 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                             src={work.photo}
                             style={{ width: "100%", height: 180, objectFit: "cover" }}
                           />
+
+                          {/* แสดงประเภทงาน */}
                           <div
                             style={{
                               position: "absolute",
@@ -245,45 +291,58 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                               borderRadius: 20,
                               fontSize: "15px",
                               fontWeight: "bold",
+                              zIndex: 5,
                             }}
                           >
                             {work.worktype_id === 1 ? (
-                              <>
-                                <DollarOutlined /> มีค่าตอบแทน
-                              </>
+                              <><DollarOutlined /> มีค่าตอบแทน</>
                             ) : (
-                              <>
-                                <HeartFilled style={{ color: "white" }} /> จิตอาสา
-                              </>
+                              <><HeartFilled /> จิตอาสา</>
                             )}
                           </div>
-                          <Badge
-                            count={work.workstatus_id === 1 ? "เปิดรับสมัคร" : "ปิดรับสมัคร"}
-                            style={{
-                              position: "absolute",
-                              top: 12,
-                              left: 12,
-                              backgroundColor: work.workstatus_id === 1 ? "#52c41a" : "#ff4d4f",
-                            }}
-                          />
+
+                          {/* ไอคอนดาวสำหรับงานที่จองแล้ว */}
+                          {bookedWorkIds.has(work.ID ?? 0) && (
+                            <StarFilled
+                              style={{
+                                position: "absolute",
+                                top: 12,
+                                left: 12,
+                                color: "#ffd700",
+                                fontSize: 34,
+                                zIndex: 10,
+                              }}
+                            />
+                          )}
+
+                          {/* Badge แสดง "เข้าร่วมงานนี้" อยู่ใต้ประเภทงาน */}
+                          {bookedWorkIds.has(work.ID ?? 0) && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 50, // เลื่อนลงใต้ประเภทงาน
+                                right: 12,
+                                backgroundColor: "#1890ff",
+                                color: "white",
+                                fontWeight: "bold",
+                                fontSize: 12,
+                                padding: "2px 8px",
+                                borderRadius: 12,
+                                zIndex: 5,
+                              }}
+                            >
+                              เข้าร่วมงานนี้
+                            </div>
+                          )}
                         </div>
 
                         <div style={{ padding: "20px" }}>
-                          <Title
-                            level={5}
-                            ellipsis
-                            style={{ margin: "0 0 8px", color: "#112D4E", fontSize: "18px" }}
-                          >
+                          <Title level={5} ellipsis style={{ margin: "0 0 8px", color: "#112D4E", fontSize: "18px" }}>
                             {work.title}
                           </Title>
-
-                          <Paragraph
-                            ellipsis={{ rows: 2 }}
-                            style={{ margin: "0 0 16px", color: "#666", lineHeight: 1.6 }}
-                          >
+                          <Paragraph ellipsis={{ rows: 2 }} style={{ margin: "0 0 16px", color: "#666", lineHeight: 1.6 }}>
                             {work.description}
                           </Paragraph>
-
 
                           <Space direction="vertical" size="small" style={{ width: "100%" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -324,12 +383,7 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                               type="primary"
                               size="large"
                               block
-                              style={{
-                                marginTop: 2,
-                                backgroundColor: "#5bace2ff",
-                                fontWeight: "bold",
-                                height: 48,
-                              }}
+                              style={{ marginTop: 2, backgroundColor: "#5bace2ff", fontWeight: "bold", height: 48 }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/work/info/${work.ID}`);
@@ -345,6 +399,7 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                   ))}
                 </Row>
 
+                {/* Pagination */}
                 <div style={{ textAlign: "center", marginTop: 40 }}>
                   <Pagination
                     current={currentPage}
@@ -352,11 +407,11 @@ const sortedWorks = filteredWorks.sort((a, b) => (b.ID ?? 0) - (a.ID ?? 0));
                     total={filteredWorks.length}
                     onChange={(page) => {
                       setCurrentPage(page);
-                      window.scrollTo({ top: 0, behavior: "smooth" }); // ให้เลื่อนขึ้นข้างบนเวลาเปลี่ยนหน้า
+                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     showSizeChanger={false}
-                    showQuickJumper={false} // ❌ เอา Go to Page ออก
-                    style={{ display: "inline-block" }} // ✅ ทำให้สามารถจัดตรงกลางได้
+                    showQuickJumper={false}
+                    style={{ display: "inline-block" }}
                   />
                 </div>
               </>

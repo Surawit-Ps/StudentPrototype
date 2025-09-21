@@ -35,24 +35,11 @@ func CreateCheckIn(c *gin.Context) {
 		return
 	}
 
-	// ✅ เพิ่มตรงนี้: สร้าง WorkHistory ทันที
-	workHistory := entity.WorkHistory{
-		UserID: input.UserID,
-		WorkID: input.WorkID,
-	}
-
-	if err := db.Create(&workHistory).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create work history"})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "Check-in and work history created successfully",
 		"checkIn":     checkIn,
-		"workHistory": workHistory,
 	})
 }
-
 
 func UpdateCheckIn(c *gin.Context) {
 	id := c.Param("id")

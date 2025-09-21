@@ -47,7 +47,7 @@ func main() {
 		router.GET("/user/:id", controller.GetUser)
 		router.PATCH("/users", controller.UpdateUser)
 		router.DELETE("/users/:id", controller.DeleteUser)
-		// Gender Routes
+		// Gender RoutesuserID
 
 		router.POST("/work", controller.CreateWork)
 		router.GET("/work", controller.GetAllWork)

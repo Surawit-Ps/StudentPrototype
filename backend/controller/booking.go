@@ -11,7 +11,9 @@ func GetBookingByUserID(c *gin.Context) {
 	userID := c.Param("userID")
 	var bookings []entity.Booking
 	db := config.DB()
-	result := db.Where("user_id = ?", userID).Find(&bookings)
+
+	// กรองเฉพาะ booking ที่ยังไม่ถูกลบ
+	result := db.Where("user_id = ? AND deleted_at IS NULL", userID).Find(&bookings)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
@@ -24,13 +26,16 @@ func GetBookingByWorkID(c *gin.Context) {
 	workID := c.Param("workID")
 	var bookings []entity.Booking		
 	db := config.DB()
-	result := db.Where("work_id = ?", workID).Find(&bookings)
+
+	// กรองเฉพาะ booking ที่ยังไม่ถูกลบ
+	result := db.Where("work_id = ? AND deleted_at IS NULL", workID).Find(&bookings)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, bookings)
 }
+
 
 func UpdateBooking(c *gin.Context) {
 	id := c.Param("id")

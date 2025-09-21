@@ -6,6 +6,7 @@ import {
   GetUserById,
   CreateWorkHistory,
   GetWorkById,
+  DeleteAllBookingByWorkID,
 } from "../../services/https";
 import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
@@ -96,6 +97,11 @@ const CompleteWork: React.FC = () => {
 
         await CreateWorkHistory(data);
       }
+      // 👉 เรียกใช้ DeleteAllBookingByWorkID หลังจากบันทึก WorkHistory เสร็จ
+    if (workId) {
+      await DeleteAllBookingByWorkID(Number(workId));
+      console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
+    }
       message.success("บันทึก Work History สำเร็จ");
       navigate("/myworks");
     } catch (err) {
