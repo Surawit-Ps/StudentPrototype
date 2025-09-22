@@ -14,4 +14,5 @@ export interface WorkInterface {
     workstatus_id?: number;
     worktype_id?: number;
     poster_id?: number;
+    createdAt?: string;
 }

@@ -53,6 +53,9 @@ const WorkEdit = () => {
   const [workDataState, setWorkDataState] = useState<WorkInterface | null>(null);
   const [user, setUser] = useState<UsersInterface | null>(null);
 
+  // ✅ state ใหม่เพื่อควบคุมการแก้ไขฟิลด์
+  const [canEditSensitiveFields, setCanEditSensitiveFields] = useState(true);
+
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
     if (userId) {
@@ -63,6 +66,7 @@ const WorkEdit = () => {
       });
     }
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!id) {
@@ -77,7 +81,6 @@ const WorkEdit = () => {
       if (workData) {
         setWorkDataState(workData);
 
-        console.log("🧩 Setting form values...");
         form.setFieldsValue({
           title: workData.title,
           description: workData.description,
@@ -94,7 +97,6 @@ const WorkEdit = () => {
 
         if (workData.latitude !== undefined && workData.longitude !== undefined) {
           setPosition([workData.latitude, workData.longitude]);
-          console.log("📍 Set position to:", [workData.latitude, workData.longitude]);
         }
 
         if (workData.photo) {
@@ -108,18 +110,29 @@ const WorkEdit = () => {
             },
           ];
           setFileList(fileListData);
-          console.log("🖼️ Set photo fileList:", fileListData);
           form.setFieldsValue({ photo: fileListData });
         }
+
+        // ✅ เช็กว่าแก้ไขฟิลด์สำคัญได้ไหม
+        if (workData.createdAt) {
+          const createdTime = new Date(workData.createdAt).getTime();
+          const oneDayAfter = createdTime + 24 * 60 * 60 * 1000;
+          const now = new Date().getTime();
+
+          if (user?.Role === "admin") {
+            setCanEditSensitiveFields(true);
+          } else {
+            setCanEditSensitiveFields(now <= oneDayAfter);
+          }
+        }
       } else {
-        console.log("❗ Work not found for ID:", id);
         messageApi.error("ไม่พบข้อมูลงาน");
         navigate("/work");
       }
     };
 
     fetchData();
-  }, [id]);
+  }, [id, user]);
 
   const onChange = ({ fileList: newFileList }: { fileList: any[] }) => {
     setFileList(newFileList);
@@ -157,9 +170,6 @@ const WorkEdit = () => {
       longitude: position[1],
     };
 
-
-    console.log("📤 Submitting data:", data);
-
     const res = await UpdateWork(data.ID!, data);
 
     if (res) {
@@ -172,18 +182,45 @@ const WorkEdit = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
-      {user?.Role === "employer" &&<Navbar />}
+      {user?.Role === "employer" && <Navbar />}
       {user?.Role === "admin" && (
-        <div style={{ width: 250, height: "100vh", position: "fixed", top: 0, left: 0, backgroundColor: "#1E3A8A", zIndex: 1000 }}>
+        <div
+          style={{
+            width: 250,
+            height: "100vh",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            backgroundColor: "#1E3A8A",
+            zIndex: 1000,
+          }}
+        >
           <AdminSidebar />
         </div>
       )}
       <Layout style={{ marginLeft: user?.Role === "admin" ? 250 : 0 }}>
         <Content style={{ padding: "32px", backgroundColor: "#dbe2ef" }}>
           {contextHolder}
-          <Card style={{ width: "100%", padding: 24, borderRadius: 12, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", backgroundColor: "#ffffff" }}>
-            <h1 style={{ margin: 0, fontSize: "32px", fontWeight: 800, color: "#112D4E", textAlign: "center" }}>แก้ไขงาน</h1>
-            {/* <div style={{ width: "100%", height: 4, backgroundColor: "#434c86", marginTop: 21, borderRadius: 2, marginBottom: 24 }} /> */}
+          <Card
+            style={{
+              width: "100%",
+              padding: 24,
+              borderRadius: 12,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              backgroundColor: "#ffffff",
+            }}
+          >
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "32px",
+                fontWeight: 800,
+                color: "#112D4E",
+                textAlign: "center",
+              }}
+            >
+              แก้ไขงาน
+            </h1>
             <Form form={form} layout="vertical" onFinish={onFinish}>
               <Row gutter={24}>
                 <Col xs={24} md={14}>
@@ -227,18 +264,25 @@ const WorkEdit = () => {
                         <Input />
                       </Form.Item>
                     </Col>
+
+                    {/* ✅ ประเภทงาน */}
                     <Col span={12}>
                       <Form.Item
                         name="WorkTypeID"
                         label={`ประเภทงาน (${workDataState?.worktype_id === 1 ? "มีค่าตอบแทน" : "จิตอาสา"})`}
                         rules={[{ required: true }]}
                       >
-                        <Select onChange={(value) => setWorkTypeID(value)}>
+                        <Select
+                          onChange={(value) => setWorkTypeID(value)}
+                          disabled={!canEditSensitiveFields}
+                        >
                           <Option value={1}>มีค่าตอบแทน</Option>
                           <Option value={2}>จิตอาสา</Option>
                         </Select>
                       </Form.Item>
                     </Col>
+
+                    {/* ✅ ค่าตอบแทน */}
                     {workTypeID === 1 && (
                       <Col span={12}>
                         <Form.Item
@@ -246,10 +290,15 @@ const WorkEdit = () => {
                           label={`ค่าตอบแทน (บาท) (${workDataState?.paid || 0})`}
                           rules={[{ required: true }]}
                         >
-                          <InputNumber style={{ width: "100%" }} />
+                          <InputNumber
+                            style={{ width: "100%" }}
+                            disabled={!canEditSensitiveFields}
+                          />
                         </Form.Item>
                       </Col>
                     )}
+
+                    {/* ✅ ชั่วโมงจิตอาสา */}
                     {workTypeID === 2 && (
                       <Col span={12}>
                         <Form.Item
@@ -257,19 +306,36 @@ const WorkEdit = () => {
                           label={`จำนวนชั่วโมงจิตอาสา (${workDataState?.volunteer || 0})`}
                           rules={[{ required: true }]}
                         >
-                          <InputNumber style={{ width: "100%" }} />
+                          <InputNumber
+                            style={{ width: "100%" }}
+                            disabled={!canEditSensitiveFields}
+                          />
                         </Form.Item>
                       </Col>
                     )}
+
+                    {/* ✅ วันและเวลาทำงาน */}
                     <Col span={24}>
                       <Form.Item
                         name="worktime"
-                        label={`วันและเวลาทำงาน (${workDataState?.worktime ? dayjs(workDataState.worktime).format("YYYY-MM-DD HH:mm") : ""})`}
+                        label={`วันและเวลาทำงาน (${
+                          workDataState?.worktime
+                            ? dayjs(workDataState.worktime).format("YYYY-MM-DD HH:mm")
+                            : ""
+                        })`}
                         rules={[{ required: true }]}
                       >
-                        <DatePicker showTime style={{ width: "100%" }} disabledDate={(current) => current && current < dayjs().startOf("day")} />
+                        <DatePicker
+                          showTime
+                          style={{ width: "100%" }}
+                          disabledDate={(current) =>
+                            current && current < dayjs().startOf("day")
+                          }
+                          disabled={!canEditSensitiveFields}
+                        />
                       </Form.Item>
                     </Col>
+
                     <Col span={20}>
                       <Form.Item
                         name="description"
@@ -309,6 +375,7 @@ const WorkEdit = () => {
                   </Row>
                 </Col>
 
+                {/* 📍 Map picker */}
                 <Col xs={24} md={10}>
                   <div style={{ marginBottom: 8, fontWeight: 600 }}>เลือกพิกัดจากแผนที่</div>
                   {position && (
@@ -332,6 +399,7 @@ const WorkEdit = () => {
                   </Row>
                 </Col>
 
+                {/* ปุ่มบันทึก */}
                 <Col span={24} style={{ display: "flex", justifyContent: "flex-end", marginTop: 32, gap: 10 }}>
                   <Button onClick={() => navigate(-1)}>ยกเลิก</Button>
                   <Button type="primary" htmlType="submit" icon={<PlusOutlined />} style={{ backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}>
@@ -343,9 +411,8 @@ const WorkEdit = () => {
           </Card>
         </Content>
       </Layout>
-      {user?.Role === "employer" &&<EnhancedFooter />}
+      {user?.Role === "employer" && <EnhancedFooter />}
     </Layout>
-    
   );
 };
 

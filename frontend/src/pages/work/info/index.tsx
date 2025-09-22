@@ -47,6 +47,7 @@ const WorkInfo = () => {
     const [user, setUser] = useState<UsersInterface | null>(null);
     const [distance, setDistance] = useState<number | null>(null);
     const [canCheckIn, setCanCheckIn] = useState(false);
+    const [canCancelBooking, setCanCancelBooking] = useState(true);
 
     useEffect(() => {
         const fetchUserAndWork = async () => {
@@ -75,6 +76,16 @@ const WorkInfo = () => {
         fetchUserAndWork();
     }, [id]);
 
+useEffect(() => {
+    if (!work?.worktime) return;
+    const workDate = new Date(work.worktime).getTime();
+    const oneDayBefore = workDate - 24 * 60 * 60 * 1000; // ลบไป 1 วัน
+    const now = new Date().getTime();
+
+    setCanCancelBooking(now < oneDayBefore);
+}, [work]);
+
+
     // ตรวจสอบตำแหน่งทุก 3 วินาที
     // ตรวจสอบตำแหน่ง + เวลาทุก 1 วินาที
 useEffect(() => {
@@ -100,7 +111,7 @@ useEffect(() => {
                 const isWithinTime = now >= checkInStart && now <= checkInEnd;
 
                 // อนุญาตให้เช็คอินได้เมื่ออยู่ในระยะ และเวลาอยู่ในช่วงที่กำหนด
-                if (dist <= 60 && isWithinTime) {  // เช่น กำหนดให้อยู่ใน 100 เมตร
+                if (dist <= 100 && isWithinTime) {  // เช่น กำหนดให้อยู่ใน 100 เมตร
                     setCanCheckIn(true);
                 } else {
                     setCanCheckIn(false);
@@ -280,12 +291,23 @@ useEffect(() => {
                                             <p style={{ fontSize: '12px', textAlign: 'center', color: '#6B7280' }}>
                                                 {distance !== null ? `คุณอยู่ห่างจากงาน ${Math.round(distance)} เมตร` : 'กำลังตรวจสอบตำแหน่ง...'}
                                             </p>
-                                            <button
-                                                onClick={handleCancelBooking}
-                                                style={{ fontSize: '16px', width: '100%', padding: '16px', backgroundColor: '#EF4444', color: 'white', fontWeight: 'bold', border: 'none', borderRadius: '16px' }}
-                                            >
-                                                <XCircle size={16} /> ยกเลิกการลงทะเบียน
-                                            </button>
+                                            {canCancelBooking && (
+                                                <button
+                                                    onClick={handleCancelBooking}
+                                                    style={{ 
+                                                    fontSize: '16px', 
+                                                    width: '100%', 
+                                                    padding: '16px', 
+                                                    backgroundColor: '#EF4444', 
+                                                    color: 'white', 
+                                                    fontWeight: 'bold', 
+                                                    border: 'none', 
+                                                    borderRadius: '16px' 
+                                                    }}
+                                                >
+                                                    <XCircle size={16} /> ยกเลิกการลงทะเบียน
+                                                </button>
+                                                )}
                                         </div>
                                     ) : hasBooked && hasCheckedIn ? (
                                         <div style={{ textAlign: 'center', color: '#10B981', fontWeight: 'bold' }}>
@@ -294,7 +316,7 @@ useEffect(() => {
                                     ) : (
                                         <button 
                                             onClick={handleRegister} 
-                                            disabled={work.workstatus_id !== 1 && hasOtherBooking && (work.workuse ?? 0) < (work.workcount ?? 0)}
+                                            disabled={!(work.workstatus_id === 1 && !hasOtherBooking && (work.workuse ?? 0) < (work.workcount ?? 0))}
                                             style={{
                                                 fontSize: '16px',
                                                 width: '100%',
@@ -303,7 +325,9 @@ useEffect(() => {
                                                 color: 'white',
                                                 fontWeight: 'bold',
                                                 border: 'none',
-                                                borderRadius: '16px'
+                                                borderRadius: '16px',
+                                                cursor: (work.workstatus_id === 1 && !hasOtherBooking && ((work.workuse ?? 0) < (work.workcount ?? 0))) ? 'pointer' : 'not-allowed'
+                                                
                                             }}
                                         >
                                             <CheckCircleOutlined /> ลงทะเบียนเข้าร่วม 
