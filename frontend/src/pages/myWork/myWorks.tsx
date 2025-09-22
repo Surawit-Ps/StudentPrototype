@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { WorkInterface } from "../../interfaces/IWork";
-import { GetWorkByPosterID, DeleteWorkByID } from "../../services/https/index";
+import { GetWorkByPosterID } from "../../services/https/index";
 import {
   Card,
   Col,
@@ -13,8 +13,7 @@ import {
   Space,
   Divider,
   Badge,
-  Modal,
-  message,
+  Progress,
 } from "antd";
 import {
   CalendarOutlined,
@@ -23,21 +22,21 @@ import {
   DollarOutlined,
   HeartOutlined,
   EyeOutlined,
-  DeleteOutlined,
   EditOutlined,
   CheckCircleOutlined,
   FileDoneOutlined,
 } from "@ant-design/icons";
 import Navbar from "../../components/Navbar/Navbar";
 import { useNavigate } from "react-router-dom";
-import EnhancedFooter from '../../components/Footer/EnhancedFooter';
+import EnhancedFooter from "../../components/Footer/EnhancedFooter";
+import banner from '../../assets/banner.png'
+
 const { Title, Text, Paragraph } = Typography;
 
 const MyPostedWorks: React.FC = () => {
   const [works, setWorks] = useState<WorkInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  // const [messageApi, contextHolder] = message.useMessage();
 
   const userData = localStorage.getItem("user_id");
   const userId = userData ? Number(userData) : undefined;
@@ -60,27 +59,6 @@ const MyPostedWorks: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [userId]);
-
-  // const handleDelete = async (id?: number, title?: string) => {
-  //   if (!id) return;
-  //   Modal.confirm({
-  //     title: "คุณแน่ใจหรือไม่?",
-  //     content: `คุณต้องการลบงาน "${title || "นี้"}" ใช่หรือไม่?`,
-  //     okText: "ลบ",
-  //     okType: "danger",
-  //     cancelText: "ยกเลิก",
-  //     centered: true,
-  //     onOk: async () => {
-  //       const res = await DeleteWorkByID(id);
-  //       if (res) {
-  //         messageApi.success("ลบงานสำเร็จ");
-  //         fetchData(); // โหลดใหม่หลังลบ
-  //       } else {
-  //         messageApi.error("ไม่สามารถลบงานได้");
-  //       }
-  //     },
-  //   });
-  // };
 
   const getWorkStatus = (work: WorkInterface) => {
     const remaining = (work.workcount ?? 0) - (work.workuse ?? 0);
@@ -110,7 +88,7 @@ const MyPostedWorks: React.FC = () => {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          background: "#F9F7F7",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -118,7 +96,7 @@ const MyPostedWorks: React.FC = () => {
       >
         <div style={{ textAlign: "center" }}>
           <Spin size="large" />
-          <Title level={3} style={{ color: "white", marginTop: 20 }}>
+          <Title level={3} style={{ color: "#112D4E", marginTop: 20 }}>
             กำลังโหลดข้อมูล...
           </Title>
         </div>
@@ -127,69 +105,63 @@ const MyPostedWorks: React.FC = () => {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #090cc58f 0%, #1655df2d 100%)",
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "#F9F7F7" }}>
       <Navbar />
 
-      <div style={{ padding: "60px 40px 40px", textAlign: "center" }}>
+      {/* ✅ Banner Section */}
+      <div
+        style={{
+          background: `linear-gradient(135deg, rgba(63,114,175,0.5) 0%, rgba(17,45,78,0.5) 100%), url(${banner}) center/cover no-repeat`,
+          color: "white",
+          padding: "10px 20px 20px 20px",
+          textAlign: "center",
+        }}
+      >
         <Title
-          level={1}
+          level={2}
           style={{
             color: "white",
-            fontSize: "3rem",
+            fontSize: "50px",
             fontWeight: "bold",
-            marginBottom: "10px",
-            textShadow: "0 4px 8px rgba(0,0,0,0.3)",
+            marginBottom: "4px",
           }}
         >
           งานที่ฉันโพสต์ไว้
         </Title>
-        <Text style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.2rem" }}>
-          จัดการและติดตามงานที่คุณได้โพสต์ไว้
+
+        <Text style={{ color: "#F9F7F7", fontSize: "18px", display: "block", marginBottom: "12px" }}>
+          จัดการและติดตามงานของฉันทั้งหมด {works.length} งาน
         </Text>
+
+
         {works.length > 0 && (
-          <div style={{ marginTop: "20px" }}>
-            <Button
-              type="primary"
-              size="large"
-              style={{
-                marginBottom: "20px",
-                background: "linear-gradient(45deg, #FF6B6B, #7a4ecdff)",
-                border: "none",
-                borderRadius: "25px",
-                padding: "10px 30px",
-                height: "auto",
-              }}
-              onClick={() => navigate("/work/create")}
-            >
-              สร้างงานใหม่
-            </Button>
-          </div>
-        )}
-        <div style={{ marginTop: "20px" }}>
-          <Tag
-            color="blue"
+          <Button
+            type="primary"
+            size="middle"
             style={{
-              fontSize: "16px",
-              padding: "8px 16px",
-              borderRadius: "20px",
+              marginTop: "10px",
+              background: "#e9eceeff",
+              border: "none",
+              borderRadius: "25px", // เพิ่มให้โค้งมนขึ้น
+              padding: "12px 36px", // เพิ่มขนาดปุ่ม
+              height: "auto",
+              fontSize: "16px", // เพิ่มขนาดตัวอักษร
+              color: "#112D4E",
+              fontWeight: "bold",
             }}
+            onClick={() => navigate("/work/create2")}
           >
-            ทั้งหมด {works.length} งาน
-          </Tag>
-        </div>
+            สร้างงานใหม่
+          </Button>
+        )}
       </div>
+
+      {/* ✅ End Banner Section */}
 
       <div
         style={{
           padding: "0 40px 60px",
-          background: "rgba(255,255,255,0.05)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "30px 30px 0 0",
+          background: "#DBE2EF",
           minHeight: "60vh",
         }}
       >
@@ -198,13 +170,13 @@ const MyPostedWorks: React.FC = () => {
             style={{
               textAlign: "center",
               padding: "80px 20px",
-              color: "white",
+              color: "#112D4E",
             }}
           >
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "18px" }}>
+                <Text style={{ color: "#112D4E", fontSize: "18px" }}>
                   คุณยังไม่ได้โพสต์งานใด ๆ
                 </Text>
               }
@@ -214,13 +186,13 @@ const MyPostedWorks: React.FC = () => {
               size="large"
               style={{
                 marginTop: "20px",
-                background: "linear-gradient(45deg, #FF6B6B, #4ECDC4)",
+                background: "#3F72AF",
                 border: "none",
                 borderRadius: "25px",
                 padding: "10px 30px",
                 height: "auto",
               }}
-              onClick={() => navigate("/work/create")}
+              onClick={() => navigate("/work/create2")}
             >
               เริ่มโพสต์งานแรก
             </Button>
@@ -229,18 +201,22 @@ const MyPostedWorks: React.FC = () => {
           <Row gutter={[24, 24]} style={{ paddingTop: "40px" }}>
             {works.map((work) => {
               const status = getWorkStatus(work);
+              const progress =
+                work.workcount && work.workcount > 0
+                  ? ((work.workuse ?? 0) / work.workcount) * 100
+                  : 0;
+
               return (
                 <Col xs={24} sm={12} lg={8} xl={6} key={work.ID}>
                   <Card
                     hoverable
                     style={{
-                      borderRadius: "20px",
-                      overflow: "hidden",
-                      border: "none",
-                      boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-                      background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
-                      transition: "all 0.3s ease",
+                      borderRadius: "16px",
+                      border: "1px solid #DBE2EF",
+                      background: "#fff",
+                      boxShadow: "0 6px 15px rgba(0,0,0,0.08)",
                       height: "100%",
+                      transition: "all 0.3s ease",
                     }}
                     cover={
                       <div style={{ position: "relative" }}>
@@ -251,6 +227,8 @@ const MyPostedWorks: React.FC = () => {
                             height: "200px",
                             objectFit: "cover",
                             width: "100%",
+                            borderTopLeftRadius: "16px",
+                            borderTopRightRadius: "16px",
                           }}
                         />
                         <Badge
@@ -260,18 +238,8 @@ const MyPostedWorks: React.FC = () => {
                             top: "10px",
                             right: "10px",
                             backgroundColor: status.color,
-                            borderRadius: "15px",
+                            borderRadius: "12px",
                             fontSize: "12px",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "0",
-                            left: "0",
-                            right: "0",
-                            background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
-                            padding: "20px 0 10px",
                           }}
                         />
                       </div>
@@ -281,15 +249,15 @@ const MyPostedWorks: React.FC = () => {
                         type="text"
                         icon={<EyeOutlined />}
                         onClick={() => navigate(`/work/info/${work.ID}`)}
-                        style={{ color: "#667eea" }}
+                        style={{ color: "#3F72AF" }}
                       >
                         ดู
                       </Button>,
                       <Button
                         type="text"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/work/edit/${work.ID}`)}
-                        style={{ color: "#667eea" }}
+                        onClick={() => navigate(`/work/edit2/${work.ID}`)}
+                        style={{ color: "#3F72AF" }}
                       >
                         แก้ไข
                       </Button>,
@@ -309,14 +277,6 @@ const MyPostedWorks: React.FC = () => {
                       >
                         สรุปงาน
                       </Button>,
-                      // <Button
-                      //   type="text"
-                      //   danger
-                      //   icon={<DeleteOutlined />}
-                      //   onClick={() => handleDelete(work.ID, work.title)}
-                      // >
-                      //   ลบ
-                      // </Button>,
                     ]}
                   >
                     <div style={{ padding: "0 8px" }}>
@@ -324,26 +284,31 @@ const MyPostedWorks: React.FC = () => {
                         level={4}
                         style={{
                           marginBottom: "8px",
-                          background: "linear-gradient(45deg, #667eea, #764ba2)",
-                          backgroundClip: "text",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
+                          color: "#112D4E",
                           fontSize: "18px",
                         }}
                       >
                         {work.title}
                       </Title>
 
-                      <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%" }}
+                      >
                         <Space>
-                          <EnvironmentOutlined style={{ color: "#FF6B6B" }} />
+                          <EnvironmentOutlined style={{ color: "#3F72AF" }} />
                           <Text type="secondary" style={{ fontSize: "14px" }}>
                             {work.place}
                           </Text>
                         </Space>
 
                         <Paragraph
-                          style={{ margin: "8px 0", fontSize: "13px", lineHeight: "1.4" }}
+                          style={{
+                            margin: "8px 0",
+                            fontSize: "13px",
+                            lineHeight: "1.4",
+                          }}
                           ellipsis={{ rows: 1 }}
                         >
                           {work.description || "ไม่มีรายละเอียด"}
@@ -351,35 +316,49 @@ const MyPostedWorks: React.FC = () => {
 
                         <Divider style={{ margin: "12px 0" }} />
 
-                        <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                        <Space
+                          direction="vertical"
+                          size="small"
+                          style={{ width: "100%" }}
+                        >
                           <Space>
-                            <CalendarOutlined style={{ color: "#4ECDC4" }} />
+                            <CalendarOutlined style={{ color: "#3F72AF" }} />
                             <Text style={{ fontSize: "13px" }}>
                               {formatWorkTime(work.worktime)}
                             </Text>
                           </Space>
 
                           <Space>
-                            <TeamOutlined style={{ color: "#45B7D1" }} />
+                            <TeamOutlined style={{ color: "#3F72AF" }} />
                             <Text style={{ fontSize: "13px" }}>
-                              รับ {work.workcount ?? 0} | ใช้แล้ว {work.workuse ?? 0}
+                              รับ {work.workcount ?? 0} | ใช้แล้ว{" "}
+                              {work.workuse ?? 0}
                             </Text>
                           </Space>
+
+                          <Progress
+                            percent={Math.round(progress)}
+                            size="small"
+                            strokeColor="#3F72AF"
+                          />
 
                           <Space>
                             {work.paid ? (
                               <>
-                                <DollarOutlined style={{ color: "#96CEB4" }} />
+                                <DollarOutlined style={{ color: "#27AE60" }} />
                                 <Text
                                   strong
-                                  style={{ color: "#27AE60", fontSize: "14px" }}
+                                  style={{
+                                    color: "#27AE60",
+                                    fontSize: "14px",
+                                  }}
                                 >
                                   {work.paid.toLocaleString()} บาท
                                 </Text>
                               </>
                             ) : (
                               <>
-                                <HeartOutlined style={{ color: "#FF6B6B" }} />
+                                <HeartOutlined style={{ color: "#E74C3C" }} />
                                 <Text
                                   style={{
                                     color: "#E74C3C",
@@ -404,7 +383,6 @@ const MyPostedWorks: React.FC = () => {
       </div>
       <EnhancedFooter />
     </div>
-
   );
 };
 

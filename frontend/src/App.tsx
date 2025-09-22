@@ -6,7 +6,9 @@ import "leaflet/dist/leaflet.css";
 import Home from "./pages/home";
 import Work from "./pages/work";
 import WorkCreate from "./pages/work/create";
+import WorkCreate2 from "./pages/work/create2";
 import WorkEdit from "./pages/work/edit";
+import WorkEdit2 from "./pages/work/edit2";
 import WorkInfo from "./pages/work/info";
 import WorkView from "./pages/work/view";
 import HistoryWork from "./pages/work/historywork";
@@ -48,6 +50,8 @@ const App: React.FC = () => {
             <Route path="/work" element={<Work />} />
             <Route path="/work/create" element={<WorkCreate />} />
             <Route path="/work/edit/:id" element={<WorkEdit />} />
+            <Route path="/work/create2" element={<WorkCreate2 />} />
+            <Route path="/work/edit2/:id" element={<WorkEdit2 />} />
             <Route path="/work/info/:id" element={<WorkInfo />} />
             <Route path="/work/view" element={<WorkView />} />
             <Route path="/work/historywork/:userId" element={<HistoryWork />} />

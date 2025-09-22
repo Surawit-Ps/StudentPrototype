@@ -4,10 +4,10 @@ import { SignIn, SignUp, GetGenders } from '../../services/https/index';
 import { UsersInterface } from '../../interfaces/IUser';
 import { GendersInterface } from '../../interfaces/IGender';
 import { useNavigate } from 'react-router-dom';
-import { Upload ,message} from 'antd';
+import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import type { UploadFile } from 'antd';
-
+import logo from "../../assets/logojob.png";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -118,16 +118,22 @@ const LoginPage = () => {
       <div style={styles.cardWrapper}>
         <div style={styles.headerContainer as React.CSSProperties}>
           <div style={styles.logoRow}>
-            <h1 style={styles.title}>Studentjobhub</h1>
-          </div>
-          <p style={styles.subtitle}>
-            {isLogin
-              ? 'เข้าสู่ระบบเพื่อค้นหางานที่เหมาะสมกับคุณ'
-              : 'สมัครสมาชิกเพื่อเริ่มต้นการหางาน'}
-          </p>
+  <img src={logo} alt="Logo" style={styles.logoImage} />
+
+</div>
+
+
         </div>
 
-        <div style={styles.card}>
+        <div
+  style={{
+    backgroundColor: 'rgba(228, 236, 238, 0.58)', // โปร่งใส 85%
+    // backdropFilter: 'blur(10px)', // ทำให้พื้นหลังด้านหลังเบลอ
+    borderRadius: 16,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    padding: 24,
+  }}
+>
           <div style={styles.toggleContainer}>
             <button
               onClick={() => setIsLogin(true)}
@@ -152,13 +158,13 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit}>
             {!isLogin && (
               <>
-                <div style={{ 
-  marginBottom: 16, 
-  display: 'flex', 
-  justifyContent: 'center',  // กึ่งกลางแนวนอน
-  alignItems: 'center',      // กึ่งกลางแนวตั้ง
-  flexDirection: 'column',   // ให้ label อยู่ด้านบน upload
-}}>
+                <div style={{
+                  marginBottom: 16,
+                  display: 'flex',
+                  justifyContent: 'center',  // กึ่งกลางแนวนอน
+                  alignItems: 'center',      // กึ่งกลางแนวตั้ง
+                  flexDirection: 'column',   // ให้ label อยู่ด้านบน upload
+                }}>
                   <label>รูปโปรไฟล์</label>
                   <ImgCrop rotationSlider>
                     <Upload
@@ -300,22 +306,27 @@ const LoginPage = () => {
 };
 
 const styles = {
-  pageContainer: {
-    minHeight: '100vh',
-    background: 'linear-gradient(to bottom right, #f3e8ff, #e0f2ff)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-backgroundImage: 'url("/images/login-bg.jpg")',     backgroundSize: 'cover',         // ให้เต็มหน้าจอ
-    backgroundPosition: 'center',    // จัดตรงกลาง
-    backgroundRepeat: 'no-repeat',   // ไม่ซ้ำ
-    
-  },
-  cardWrapper: {
-    width: '100%',
-    maxWidth: 400,
-  },
+pageContainer: {
+  minHeight: '100vh',
+  display: 'flex',
+  justifyContent: 'flex-start', // เริ่มจากด้านบน
+  alignItems: 'center',         // กึ่งกลางแนวนอน
+  paddingTop: 0,         // ระยะจากบน
+  paddingLeft: 16,
+  paddingRight: 16,
+  background: 'linear-gradient(to bottom right, #f3e8ff, #e0f2ff)',
+  backgroundImage: 'url("https://images4.alphacoders.com/139/thumb-1920-1397449.png")',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+},
+
+cardWrapper: {
+  width: '100%',
+  maxWidth: 400,
+  margin: '0 auto', // ✅ ทำให้กึ่งกลางแนวนอน
+},
+
   headerContainer: {
     textAlign: 'center',
     marginBottom: 32,
@@ -338,6 +349,11 @@ backgroundImage: 'url("/images/login-bg.jpg")',     backgroundSize: 'cover',    
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+  },
+    logoImage: {           // ✅ เพิ่มอันนี้
+    width: 1000,
+    height: 200,
+    marginBottom: 1,
   },
   title: {
     fontSize: 24,

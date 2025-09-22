@@ -10,6 +10,7 @@ import {
 import { BookingInterface } from "../../interfaces/IBooking";
 import { UsersInterface } from "../../interfaces/IUser";
 import { ReviewInterface } from "../../interfaces/IReview";
+import EnhancedFooter from "../../components/Footer/EnhancedFooter";
 import Navbar from "../../components/Navbar/Navbar";
 import {
   List,
@@ -335,6 +336,13 @@ const BookingWork: React.FC = () => {
           }}
         >
           <Button
+            size="large"
+            onClick={() => navigate(-1)}
+            style={{ minWidth: 220, backgroundColor: "#112D4E", color: "#F9F7F7" }}
+          >
+            ย้อนกลับ
+          </Button>
+          <Button
             type="primary"
             size="large"
             loading={saving}
@@ -344,13 +352,7 @@ const BookingWork: React.FC = () => {
             บันทึกสถานะเช็คชื่อทั้งหมด
           </Button>
 
-          <Button
-            size="large"
-            onClick={() => navigate(-1)}
-            style={{ minWidth: 220, backgroundColor: "#112D4E", color: "#F9F7F7" }}
-          >
-            ย้อนกลับ
-          </Button>
+          
         </div>
 
         {/* Review Modal */}
@@ -406,6 +408,7 @@ const BookingWork: React.FC = () => {
           </div>
         </Modal>
       </div>
+        <EnhancedFooter />
     </div>
   );
 };

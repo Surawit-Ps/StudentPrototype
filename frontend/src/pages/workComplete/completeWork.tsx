@@ -12,12 +12,12 @@ import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
 import { UsersInterface } from "../../interfaces/IUser";
 import { WorkInterface } from "../../interfaces/IWork";
-import { Table, Button, Typography, Spin, message } from "antd";
+import { Card, Button, Typography, Spin, message, Row, Col } from "antd";
 import Navbar from "../../components/Navbar/Navbar";
+import EnhancedFooter from "../../components/Footer/EnhancedFooter";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
-// interface สำหรับส่งข้อมูล WorkHistory ไป API (ใช้ snake_case)
 interface WorkHistoryPayload {
   user_id: number | undefined;
   work_id: number;
@@ -37,33 +37,24 @@ const CompleteWork: React.FC = () => {
       if (!workId) return;
 
       try {
-        // ดึงข้อมูลงาน
         const workData = await GetWorkById(Number(workId));
         setWork(workData);
 
-        // ดึง booking & checkin
         const bookings: BookingInterface[] = await GetBookingByWorkId(Number(workId));
         const checkins: CheckInInterface[] = await GetCheckIns();
 
-        // หา booking ที่ checked-in
         const checkedInBookings = bookings.filter((b) => b.status === "checked-in");
 
-        // กรองเฉพาะที่มี check-in record
         const checkedInUserIds = checkedInBookings
           .filter((b) =>
-            checkins.some(
-              (c) => c.user_id === b.user_id && c.work_id === b.work_id
-            )
+            checkins.some((c) => c.user_id === b.user_id && c.work_id === b.work_id)
           )
           .map((b) => b.user_id);
 
-        // ดึงข้อมูลผู้ใช้
         const userList: UsersInterface[] = [];
         for (const uid of checkedInUserIds) {
           const userData = await GetUserById(uid);
-          if (userData) {
-            userList.push(userData);
-          }
+          if (userData) userList.push(userData);
         }
         setUsers(userList);
       } catch (err) {
@@ -91,17 +82,15 @@ const CompleteWork: React.FC = () => {
           paid_amount: typeof work.paid === "number" ? work.paid : 0,
           volunteer_hour: typeof work.volunteer === "number" ? work.volunteer : 0,
         };
-
-        // แสดงข้อมูลใน console ก่อนบันทึก
         console.log("กำลังส่ง WorkHistory:", data);
-
         await CreateWorkHistory(data);
       }
-      // 👉 เรียกใช้ DeleteAllBookingByWorkID หลังจากบันทึก WorkHistory เสร็จ
-    if (workId) {
-      await DeleteAllBookingByWorkID(Number(workId));
-      console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
-    }
+
+      if (workId) {
+        await DeleteAllBookingByWorkID(Number(workId));
+        console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
+      }
+
       message.success("บันทึก Work History สำเร็จ");
       navigate("/myworks");
     } catch (err) {
@@ -121,38 +110,87 @@ const CompleteWork: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div style={{ padding: "20px" }}>
-        <Title level={2}>สรุปผู้ทำงาน</Title>
-        {work && (
-          <div style={{ marginBottom: "15px" }}>
-            <p>
-              <strong>ชื่องาน:</strong> {work.title}
-            </p>
-            <p>
-              <strong>ค่าจ้าง:</strong> {work.paid ?? 0}
-            </p>
-            <p>
-              <strong>ชั่วโมงอาสา:</strong> {work.volunteer ?? 0}
-            </p>
-          </div>
-        )}
-        <Table
-          dataSource={users}
-          rowKey="ID"
-          columns={[
-            { title: "ชื่อ", dataIndex: "FirstName", key: "FirstName" },
-            { title: "นามสกุล", dataIndex: "LastName", key: "LastName" },
-            { title: "อีเมล", dataIndex: "Email", key: "Email" },
-          ]}
-        />
-        <Button
-          type="primary"
-          style={{ marginTop: "20px" }}
-          onClick={handleCreateWorkHistory}
-        >
-          บันทึกเป็น Work History
-        </Button>
-      </div>
+      <div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "flex-start", // ชิดด้านบน
+    minHeight: "100vh",
+    padding: "20px",
+    backgroundColor: "#F9F7F7",
+  }}
+>
+  <div style={{ maxWidth: "800px", width: "100%" }}>
+    <Title level={2} style={{ textAlign: "center", color: "#112D4E", marginBottom: "20px" }}>
+      สรุปผู้ทำงาน
+    </Title>
+
+    {work && (
+      <Card
+        style={{
+          marginBottom: "25px",
+          borderRadius: "12px",
+          backgroundColor: "#DBE2EF",
+          textAlign: "center",
+        }}
+      >
+        <Title level={4} style={{ color: "#112D4E" }}>
+          {work.title}
+        </Title>
+        <Text strong>ค่าจ้าง: </Text>
+        <Text>{work.paid ?? 0} บาท</Text>
+        <br />
+        <Text strong>ชั่วโมงอาสา: </Text>
+        <Text>{work.volunteer ?? 0} ชั่วโมง</Text>
+      </Card>
+    )}
+
+    <Row gutter={[16, 16]} justify="center">
+      {users.length === 0 && (
+        <Col span={24} style={{ textAlign: "center", color: "#112D4E" }}>
+          <Text>ไม่มีผู้เข้าร่วมงาน</Text>
+        </Col>
+      )}
+      {users.map((user) => (
+        <Col xs={24} sm={12} md={8} key={user.ID}>
+          <Card
+            hoverable
+            style={{
+              borderRadius: "12px",
+              backgroundColor: "#3F72AF",
+              color: "#F9F7F7",
+              textAlign: "center",
+            }}
+            bodyStyle={{ color: "#F9F7F7" }}
+          >
+            <Title level={5} style={{ color: "#F9F7F7" }}>
+              {user.FirstName} {user.LastName}
+            </Title>
+            <Text style={{ color: "#F9F7F7" }}>{user.Email}</Text>
+          </Card>
+        </Col>
+      ))}
+    </Row>
+
+    <div style={{ textAlign: "center", marginTop: "30px" }}>
+      <Button
+        type="primary"
+        style={{
+          backgroundColor: "#112D4E",
+          borderColor: "#112D4E",
+          color: "#DBE2EF",
+          padding: "0 30px",
+          fontSize: "16px",
+        }}
+        onClick={handleCreateWorkHistory}
+      >
+        บันทึกเป็น Work History
+      </Button>
+    </div>
+  </div>
+</div>
+      <EnhancedFooter />
     </>
   );
 };

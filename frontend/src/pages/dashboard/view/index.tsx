@@ -80,7 +80,7 @@ const paginated = sortedDashboards.slice((currentPage - 1) * pageSize, currentPa
         </div>
 
         {/* Content */}
-        <div style={{ width: '100%', padding: '48px 24px' }}>
+        <div style={{ width: '100%', padding: '48px 24px',background: "#DBE2EF", }}>
           {loading ? (
             <div style={{ textAlign: 'center', padding: 50 }}>กำลังโหลดข้อมูล...</div>
           ) : (
@@ -96,7 +96,7 @@ const paginated = sortedDashboards.slice((currentPage - 1) * pageSize, currentPa
                     key={item.ID ?? Math.random()}
                     style={{
                       display: 'flex',
-                      background: 'linear-gradient(145deg, #2e5e8bc0, #75ade644)',
+                      background: 'linear-gradient(145deg, #35618dc0, #2782dd44)',
                       borderRadius: '24px',
                       overflow: 'hidden',
                       boxShadow: '0 8px 32px rgba(17, 78, 78, 0.1)',
