@@ -176,6 +176,12 @@ const LoginPage = () => {
                       }}
                       listType="picture-card"
                       maxCount={1}
+                      style={{
+    backgroundColor: "rgba(0,0,0,0.5)", // พื้นหลังเข้มโปร่งใส
+    border: "2px solid #444",           // ขอบเข้ม
+    borderRadius: "8px",                // มุมโค้ง
+    color: "#fff",                      // ตัวอักษรสีขาว
+  }}
                     >
                       {fileList.length < 1 && <div>อัปโหลด</div>}
                     </Upload>
@@ -315,8 +321,8 @@ pageContainer: {
   paddingLeft: 16,
   paddingRight: 16,
   background: 'linear-gradient(to bottom right, #f3e8ff, #e0f2ff)',
-  backgroundImage: 'url("https://images4.alphacoders.com/139/thumb-1920-1397449.png")',
-  backgroundSize: 'cover',
+  backgroundImage: 'url("https://i.makeagif.com/media/5-04-2017/XWrNmj.gif")',
+  backgroundSize: '120% 120%',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
 },

@@ -6,9 +6,7 @@ import "leaflet/dist/leaflet.css";
 import Home from "./pages/home";
 import Work from "./pages/work";
 import WorkCreate from "./pages/work/create";
-import WorkCreate2 from "./pages/work/create2";
 import WorkEdit from "./pages/work/edit";
-import WorkEdit2 from "./pages/work/edit2";
 import WorkInfo from "./pages/work/info";
 import WorkView from "./pages/work/view";
 import HistoryWork from "./pages/work/historywork";
@@ -28,7 +26,7 @@ import MyPostedWorks from "./pages/myWork/myWorks";
 import BookingWork from "./pages/myWork/ิbookingWork";
 
 import Login from "./pages/login/login";
-import EnhancedFooter from "./components/Footer/EnhancedFooter";
+// import EnhancedFooter from "./components/Footer/EnhancedFooter";
 import CompleteWork from "./pages/workComplete/completeWork";
 import LoginPage from "./pages/login/login";
 const { Content } = Layout;
@@ -50,8 +48,6 @@ const App: React.FC = () => {
             <Route path="/work" element={<Work />} />
             <Route path="/work/create" element={<WorkCreate />} />
             <Route path="/work/edit/:id" element={<WorkEdit />} />
-            <Route path="/work/create2" element={<WorkCreate2 />} />
-            <Route path="/work/edit2/:id" element={<WorkEdit2 />} />
             <Route path="/work/info/:id" element={<WorkInfo />} />
             <Route path="/work/view" element={<WorkView />} />
             <Route path="/work/historywork/:userId" element={<HistoryWork />} />

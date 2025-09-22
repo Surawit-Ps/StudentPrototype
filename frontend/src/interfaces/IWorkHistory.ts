@@ -1,6 +1,7 @@
 export interface IWorkHistory {
   ID?: number;
   user_id: number;
+  work_id: number;
   paid_amount: number | null;
   volunteer_hour: number | null;
   Work?: {

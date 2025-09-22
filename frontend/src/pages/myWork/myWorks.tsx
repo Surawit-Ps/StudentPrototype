@@ -149,7 +149,7 @@ const MyPostedWorks: React.FC = () => {
               color: "#112D4E",
               fontWeight: "bold",
             }}
-            onClick={() => navigate("/work/create2")}
+            onClick={() => navigate("/work/create")}
           >
             สร้างงานใหม่
           </Button>
@@ -192,7 +192,7 @@ const MyPostedWorks: React.FC = () => {
                 padding: "10px 30px",
                 height: "auto",
               }}
-              onClick={() => navigate("/work/create2")}
+              onClick={() => navigate("/work/create")}
             >
               เริ่มโพสต์งานแรก
             </Button>
@@ -256,7 +256,7 @@ const MyPostedWorks: React.FC = () => {
                       <Button
                         type="text"
                         icon={<EditOutlined />}
-                        onClick={() => navigate(`/work/edit2/${work.ID}`)}
+                        onClick={() => navigate(`/work/edit/${work.ID}`)}
                         style={{ color: "#3F72AF" }}
                       >
                         แก้ไข

@@ -73,56 +73,56 @@ func SetupDatabase() {
 		db.FirstOrCreate(&b, entity.Booking{UserID: b.UserID, WorkID: b.WorkID})
 	}
 
-	// สร้างข้อมูล WorkHistory ตัวอย่าง
+	// // สร้างข้อมูล WorkHistory ตัวอย่าง
 
-	workHistories := []entity.WorkHistory{
-		{
-			UserID:        3,
-			WorkID:        1,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(3),
-		},
-		{
-			UserID:        3,
-			WorkID:        2,
-			PaidAmount:    IntPtr(300),
-			VolunteerHour: nil,
-		},
-		{
-			UserID:        3,
-			WorkID:        3,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(5),
-		},
-		{
-			UserID:        4,
-			WorkID:        3,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(5),
-		},
-		{
-			UserID:        4,
-			WorkID:        4,
-			PaidAmount:    nil,
-			VolunteerHour: IntPtr(2),
-		},
-		{
-			UserID:        4,
-			WorkID:        5,
-			PaidAmount:    IntPtr(500),
-			VolunteerHour: nil,
-		},
-		{
-			UserID:        4,
-			WorkID:        10,
-			PaidAmount:    IntPtr(600),
-			VolunteerHour: nil,
-		},
-	}
+	// workHistories := []entity.WorkHistory{
+	// 	{
+	// 		UserID:        3,
+	// 		WorkID:        1,
+	// 		PaidAmount:    nil,
+	// 		VolunteerHour: IntPtr(3),
+	// 	},
+	// 	{
+	// 		UserID:        3,
+	// 		WorkID:        2,
+	// 		PaidAmount:    IntPtr(300),
+	// 		VolunteerHour: nil,
+	// 	},
+	// 	{
+	// 		UserID:        3,
+	// 		WorkID:        3,
+	// 		PaidAmount:    nil,
+	// 		VolunteerHour: IntPtr(5),
+	// 	},
+	// 	{
+	// 		UserID:        4,
+	// 		WorkID:        3,
+	// 		PaidAmount:    nil,
+	// 		VolunteerHour: IntPtr(5),
+	// 	},
+	// 	{
+	// 		UserID:        4,
+	// 		WorkID:        4,
+	// 		PaidAmount:    nil,
+	// 		VolunteerHour: IntPtr(2),
+	// 	},
+	// 	{
+	// 		UserID:        4,
+	// 		WorkID:        5,
+	// 		PaidAmount:    IntPtr(500),
+	// 		VolunteerHour: nil,
+	// 	},
+	// 	{
+	// 		UserID:        4,
+	// 		WorkID:        10,
+	// 		PaidAmount:    IntPtr(600),
+	// 		VolunteerHour: nil,
+	// 	},
+	// }
 
-	for _, wh := range workHistories {
-		db.FirstOrCreate(&wh, entity.WorkHistory{UserID: wh.UserID, WorkID: wh.WorkID})
-	}
+	// for _, wh := range workHistories {
+	// 	db.FirstOrCreate(&wh, entity.WorkHistory{UserID: wh.UserID, WorkID: wh.WorkID})
+	// }
 
 	//WorkStatus
 	WorStatusActive := entity.WorkStatus{WorkStatus: "Active"}
@@ -142,8 +142,8 @@ func SetupDatabase() {
 			Place:        "ลานหน้าคณะวิทยาศาสตร์",
 			Latitude:     13.736717,
 			Longitude:    100.523186,
-			WorkUse:      1,
-			WorkCount:    8,
+			WorkUse:      0,
+			WorkCount:    10,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://addnews.up.ac.th/main/UploadImages/32783/1dyprkak.jpg",
 			WorkStatusID: 1,         // Active
@@ -157,7 +157,7 @@ func SetupDatabase() {
 			Place:        "ห้องประชุมใหญ่ อาคารอเนกประสงค์",
 			Latitude:     13.730000,
 			Longitude:    100.510000,
-			WorkUse:      1,
+			WorkUse:      0,
 			WorkCount:    5,
 			WorkTime:     time.Date(2025, 11, 10, 10, 0, 0, 0, time.UTC),
 			Photo:        "https://www.mhesi.go.th/images/2565/Pornnapa/01/310165/6/2.jpg",
@@ -172,8 +172,8 @@ func SetupDatabase() {
 			Place:        "สวนลุมพินี",
 			Latitude:     13.730401,
 			Longitude:    100.541016,
-			WorkUse:      1,
-			WorkCount:    12,
+			WorkUse:      0,
+			WorkCount:    5,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://science.mahidol.ac.th/th/activity/photo/may62-11/08.jpg",
 			WorkStatusID: 1,
@@ -187,8 +187,8 @@ func SetupDatabase() {
 			Place:        "หน้าสถานีรถไฟฟ้าอโศก",
 			Latitude:     13.737527,
 			Longitude:    100.560318,
-			WorkUse:      1,
-			WorkCount:    6,
+			WorkUse:      0,
+			WorkCount:    4,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://สื่อการสอนฟรี.com/wp-content/uploads/2023/07/315430390_6326639150686452_8891593174735426634_n-768x1024.jpg",
 			WorkStatusID: 1,
@@ -202,11 +202,11 @@ func SetupDatabase() {
 			Place:        "คาเฟ่ 1989, BTS อารีย์",
 			Latitude:     13.779732,
 			Longitude:    100.544119,
-			WorkUse:      3,
+			WorkUse:      0,
 			WorkCount:    3,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://www.designil.com/wp-content/uploads/2023/08/Fast-Food-Attendant-scaled.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(500),
 			PosterID:     1,
@@ -217,11 +217,11 @@ func SetupDatabase() {
 			Place:        "มหาวิทยาลัยศิลปากร",
 			Latitude:     13.821244,
 			Longitude:    100.513158,
-			WorkUse:      2,
-			WorkCount:    2,
+			WorkUse:      0,
+			WorkCount:    4,
 			WorkTime:     time.Date(2025, 11, 10, 7, 0, 0, 0, time.UTC),
 			Photo:        "https://www.khaosod.co.th/wpapp/uploads/2024/12/camera1226-1.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   1,
 			Paid:         IntPtr(800),
 			PosterID:     1,
@@ -232,11 +232,11 @@ func SetupDatabase() {
 			Place:        "ศูนย์พักพิงสัตว์บางใหญ่",
 			Latitude:     13.880000,
 			Longitude:    100.400000,
-			WorkUse:      4,
+			WorkUse:      0,
 			WorkCount:    4,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://www.sut.ac.th/2012/images/upload/editor/images/201811/03.jpg",
-			WorkStatusID: 2,
+			WorkStatusID: 1,
 			WorkTypeID:   2,
 			Volunteer:    IntPtr(6),
 			PosterID:     1,
@@ -247,7 +247,7 @@ func SetupDatabase() {
 			Place:        "โกดังพระราม 2",
 			Latitude:     13.651859,
 			Longitude:    100.457328,
-			WorkUse:      2,
+			WorkUse:      0,
 			WorkCount:    10,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://media.graphassets.com/LhEdoVQEWmDl0NvvBnkQ",
@@ -262,7 +262,7 @@ func SetupDatabase() {
 			Place:        "หาดบางแสน",
 			Latitude:     13.280000,
 			Longitude:    100.920000,
-			WorkUse:      12,
+			WorkUse:      0,
 			WorkCount:    20,
 			WorkTime:     time.Date(2025, 11, 10, 8, 0, 0, 0, time.UTC),
 			Photo:        "https://thaipublica.org/wp-content/uploads/2024/11/KKP-%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B8%AD%E0%B8%B2%E0%B8%AA%E0%B8%B2-%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B9%81%E0%B8%AA%E0%B8%99-2.jpg",
@@ -277,7 +277,7 @@ func SetupDatabase() {
 			Place:        "หอสมุดคนตาบอดแห่งชาติ",
 			Latitude:     13.769880,
 			Longitude:    100.565183,
-			WorkUse:      1,
+			WorkUse:      0,
 			WorkCount:    6,
 			WorkTime:     time.Date(2025, 11, 10, 10, 0, 0, 0, time.UTC),
 			Photo:        "https://static.trueplookpanya.com/tppy/member/m_537500_540000/538757/cms/images/DoGood2/www.cbm.org:World-Braille-Day-2014-292196.php_resized.jpg",
@@ -292,7 +292,7 @@ func SetupDatabase() {
 			Place:        "สวนสาธารณะหนองจอก",
 			Latitude:     14.901579,
 			Longitude:    102.012559,
-			WorkUse:      1,
+			WorkUse:      0,
 			WorkCount:    15,
 			WorkTime:     time.Date(2025, 11, 10, 9, 0, 0, 0, time.UTC),
 			Photo:        "https://www.sut.ac.th/images/upload/editor/images/202407/17/04.jpg",
@@ -307,7 +307,7 @@ func SetupDatabase() {
 			Place:        "โรงแรมอโนมา แกรนด์",
 			Latitude:     14.901579,
 			Longitude:    102.012559,
-			WorkUse:      1,
+			WorkUse:      0,
 			WorkCount:    3,
 			WorkTime:     time.Date(2025, 11, 10, 7, 30, 0, 0, time.UTC),
 			Photo:        "https://www.econ.tu.ac.th/public/upload/news/2025/06%20June%202025/S__12886065_0%20-%20Paweena%20Jamroen.jpg",
@@ -401,14 +401,14 @@ func SetupDatabase() {
 	Admin := &entity.User{
 		FirstName: "Software",
 		LastName:  "Analyst",
-		Email:     "sa@gmail.com",
+		Email:     "sut@gmail.com",
 		Password:  hashedPassword,
 		BirthDay:  birthAdmin,
 		Profile:   "https://i.pinimg.com/736x/76/b2/ab/76b2abcc22f272d3cd03d4e63f2b75b5.jpg",
 		GenderID:  2,
 		Role:      "admin",
 	}
-	db.FirstOrCreate(Admin, &entity.User{Email: "sa@gmail.com"})
+	db.FirstOrCreate(Admin, &entity.User{Email: "sut@gmail.com"})
 
 	hashedPassword4, _ := HashPassword("123456")
 	birthAdmin2, _ := time.Parse("2006-01-02", "1988-11-05")

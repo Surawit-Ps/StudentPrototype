@@ -28,8 +28,9 @@ import { GetWorkHistory } from "../../../services/https/index";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import { thSarabunNewBase64 } from "../historywork/thaibase64";
-import logo from "../historywork/logojob.png";
+import EnhancedFooter from "../../../components/Footer/EnhancedFooter";
 import sutlogo from "../historywork/sutlogo.png";
+import banner from '../../../assets/banner.png';
 
 
 const { Title, Text, Paragraph } = Typography;
@@ -201,7 +202,14 @@ const WorkHistoryPage: React.FC = () => {
         >
             <Navbar />
 
-            <div style={{ padding: "60px 40px 40px", textAlign: "center" }}>
+            <div
+        style={{
+          background: `linear-gradient(135deg, rgba(63,114,175,0.5) 0%, rgba(17,45,78,0.5) 100%), url(${banner}) center/cover no-repeat`,
+          color: "white",
+          padding: "10px 20px 20px 20px",
+          textAlign: "center",
+        }}
+      >
                 <Title
                     level={1}
                     style={{
@@ -248,12 +256,10 @@ const WorkHistoryPage: React.FC = () => {
 
             <div
                 style={{
-                    padding: "0 40px 60px",
-                    background: "rgba(255,255,255,0.05)",
-                    backdropFilter: "blur(10px)",
-                    borderRadius: "30px 30px 0 0",
-                    minHeight: "60vh",
-                }}
+          padding: "0 40px 60px",
+          background: "#DBE2EF",
+          minHeight: "60vh",
+        }}
             >
                 {filtered.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "80px 20px", color: "white" }}>
@@ -398,6 +404,7 @@ const WorkHistoryPage: React.FC = () => {
                     </Row>
                 )}
             </div>
+            <EnhancedFooter />
         </div>
     );
 };

@@ -25,6 +25,8 @@ import { LeafletMouseEvent } from "leaflet";
 import AdminSidebar from "../../../components/Sider/AdminSidebar";
 import { UsersInterface } from "../../../interfaces/IUser";
 import { GetUserById } from "../../../services/https";
+import Navbar from "../../../components/Navbar/Navbar";
+import EnhancedFooter from "../../../components/Footer/EnhancedFooter";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -108,6 +110,7 @@ const WorkCreate = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+      {user?.Role === "employer" && <Navbar />}
       {user?.Role === "admin" && (
         <div
           style={{
@@ -305,6 +308,7 @@ const WorkCreate = () => {
             </Form>
           </Card>
         </Content>
+        {user?.Role === "employer" &&<EnhancedFooter />}
       </Layout>
     </Layout>
   );

@@ -15,6 +15,7 @@ import { WorkInterface } from "../../interfaces/IWork";
 import { Card, Button, Typography, Spin, message, Row, Col } from "antd";
 import Navbar from "../../components/Navbar/Navbar";
 import EnhancedFooter from "../../components/Footer/EnhancedFooter";
+import { IWorkHistory } from "../../interfaces/IWorkHistory";
 
 const { Title, Text } = Typography;
 
@@ -69,35 +70,37 @@ const CompleteWork: React.FC = () => {
   }, [workId]);
 
   const handleCreateWorkHistory = async () => {
-    if (!work) {
-      message.error("ไม่พบข้อมูลงาน");
-      return;
+  if (!work) {
+    message.error("ไม่พบข้อมูลงาน");
+    return;
+  }
+
+  try {
+    for (const user of users) {
+      const data: IWorkHistory = {
+        user_id: Number(user),
+        work_id: Number(workId),
+        paid_amount: typeof work.paid === "number" ? work.paid : null,
+        volunteer_hour: typeof work.volunteer === "number" ? work.volunteer : null,
+      };
+
+      console.log("กำลังส่ง WorkHistory:", data);
+      await CreateWorkHistory(data);
     }
 
-    try {
-      for (const user of users) {
-        const data: WorkHistoryPayload = {
-          user_id: user.ID,
-          work_id: Number(workId),
-          paid_amount: typeof work.paid === "number" ? work.paid : 0,
-          volunteer_hour: typeof work.volunteer === "number" ? work.volunteer : 0,
-        };
-        console.log("กำลังส่ง WorkHistory:", data);
-        await CreateWorkHistory(data);
-      }
-
-      if (workId) {
-        await DeleteAllBookingByWorkID(Number(workId));
-        console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
-      }
-
-      message.success("บันทึก Work History สำเร็จ");
-      navigate("/myworks");
-    } catch (err) {
-      console.error(err);
-      message.error("บันทึก Work History ล้มเหลว");
+    if (workId) {
+      await DeleteAllBookingByWorkID(Number(workId));
+      console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
     }
-  };
+
+    message.success("บันทึก Work History สำเร็จ");
+    navigate("/myworks");
+  } catch (err) {
+    console.error(err);
+    message.error("บันทึก Work History ล้มเหลว");
+  }
+};
+
 
   if (loading) {
     return (
@@ -185,7 +188,7 @@ const CompleteWork: React.FC = () => {
         }}
         onClick={handleCreateWorkHistory}
       >
-        บันทึกเป็น Work History
+        จบงาน
       </Button>
     </div>
   </div>
