@@ -18,7 +18,7 @@ const items: CustomMenuItem[] = [
   { key: "/work", label: "งานทั้งหมด", icon: <FileTextOutlined />, className: "menu-work" },
   { key: "/dashboard", label: "แดชบอร์ด", icon: <DashboardOutlined />, className: "menu-dashboard" },
   { key: "/account", label: "ผู้ใช้งานทั้งหมด", icon: <UserOutlined />, className: "menu-work" },
-  { key: "/", label: "ออก", icon: <LogoutOutlined  />, className: "menu-logout" },
+  { key: "/home", label: "ออก", icon: <LogoutOutlined  />, className: "menu-logout" },
 ];
 
 const AdminSidebar: React.FC = () => {

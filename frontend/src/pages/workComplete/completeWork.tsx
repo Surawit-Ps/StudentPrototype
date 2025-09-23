@@ -12,19 +12,16 @@ import { BookingInterface } from "../../interfaces/IBooking";
 import { CheckInInterface } from "../../interfaces/ICheckIn";
 import { UsersInterface } from "../../interfaces/IUser";
 import { WorkInterface } from "../../interfaces/IWork";
-import { Card, Button, Typography, Spin, message, Row, Col } from "antd";
+import { Card, Button, Typography, Spin, message, List, Divider, Descriptions } from "antd";
 import Navbar from "../../components/Navbar/Navbar";
 import EnhancedFooter from "../../components/Footer/EnhancedFooter";
 import { IWorkHistory } from "../../interfaces/IWorkHistory";
 
-const { Title, Text } = Typography;
+// Day.js สำหรับจัดการวันที่แบบไทย
+import dayjs from "dayjs";
+import "dayjs/locale/th";
 
-interface WorkHistoryPayload {
-  user_id: number | undefined;
-  work_id: number;
-  paid_amount: number;
-  volunteer_hour: number;
-}
+const { Title } = Typography;
 
 const CompleteWork: React.FC = () => {
   const { workId } = useParams();
@@ -70,37 +67,35 @@ const CompleteWork: React.FC = () => {
   }, [workId]);
 
   const handleCreateWorkHistory = async () => {
-  if (!work) {
-    message.error("ไม่พบข้อมูลงาน");
-    return;
-  }
-
-  try {
-    for (const user of users) {
-      const data: IWorkHistory = {
-        user_id: Number(user),
-        work_id: Number(workId),
-        paid_amount: typeof work.paid === "number" ? work.paid : null,
-        volunteer_hour: typeof work.volunteer === "number" ? work.volunteer : null,
-      };
-
-      console.log("กำลังส่ง WorkHistory:", data);
-      await CreateWorkHistory(data);
+    if (!work) {
+      message.error("ไม่พบข้อมูลงาน");
+      return;
     }
 
-    if (workId) {
-      await DeleteAllBookingByWorkID(Number(workId));
-      console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
+    try {
+      for (const user of users) {
+        const data: IWorkHistory = {
+          user_id: user?.ID ?? 0,  // <-- ใส่ comma ที่นี่
+          work_id: Number(workId),
+          paid_amount: work.paid ?? null,
+          volunteer_hour: work.volunteer ?? null,
+        };
+        console.log("กำลังส่งจบงาน:", data);
+        await CreateWorkHistory(data);
+      }
+
+      if (workId) {
+        await DeleteAllBookingByWorkID(Number(workId));
+        console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
+      }
+
+      message.success("จบงานเสร็จสิ้น");
+      navigate("/myworks");
+    } catch (err) {
+      console.error(err);
+      message.error("จบงานล้มเหลว");
     }
-
-    message.success("บันทึก Work History สำเร็จ");
-    navigate("/myworks");
-  } catch (err) {
-    console.error(err);
-    message.error("บันทึก Work History ล้มเหลว");
-  }
-};
-
+  };
 
   if (loading) {
     return (
@@ -114,85 +109,106 @@ const CompleteWork: React.FC = () => {
     <>
       <Navbar />
       <div
-  style={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-start", // ชิดด้านบน
-    minHeight: "100vh",
-    padding: "20px",
-    backgroundColor: "#F9F7F7",
-  }}
->
-  <div style={{ maxWidth: "800px", width: "100%" }}>
-    <Title level={2} style={{ textAlign: "center", color: "#112D4E", marginBottom: "20px" }}>
-      สรุปผู้ทำงาน
-    </Title>
-
-    {work && (
-      <Card
         style={{
-          marginBottom: "25px",
-          borderRadius: "12px",
-          backgroundColor: "#DBE2EF",
-          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          minHeight: "100vh",
+          padding: "20px",
+          backgroundColor: "#F9F7F7",
         }}
       >
-        <Title level={4} style={{ color: "#112D4E" }}>
-          {work.title}
-        </Title>
-        <Text strong>ค่าจ้าง: </Text>
-        <Text>{work.paid ?? 0} บาท</Text>
-        <br />
-        <Text strong>ชั่วโมงอาสา: </Text>
-        <Text>{work.volunteer ?? 0} ชั่วโมง</Text>
-      </Card>
-    )}
+        <div style={{ maxWidth: "900px", width: "100%" }}>
+          <Title level={2} style={{ textAlign: "center", color: "#112D4E", marginBottom: "20px" }}>
+            📋 สรุปงาน
+          </Title>
 
-    <Row gutter={[16, 16]} justify="center">
-      {users.length === 0 && (
-        <Col span={24} style={{ textAlign: "center", color: "#112D4E" }}>
-          <Text>ไม่มีผู้เข้าร่วมงาน</Text>
-        </Col>
-      )}
-      {users.map((user) => (
-        <Col xs={24} sm={12} md={8} key={user.ID}>
-          <Card
-            hoverable
-            style={{
-              borderRadius: "12px",
-              backgroundColor: "#3F72AF",
-              color: "#F9F7F7",
-              textAlign: "center",
-            }}
-            bodyStyle={{ color: "#F9F7F7" }}
-          >
-            <Title level={5} style={{ color: "#F9F7F7" }}>
-              {user.FirstName} {user.LastName}
-            </Title>
-            <Text style={{ color: "#F9F7F7" }}>{user.Email}</Text>
-          </Card>
-        </Col>
-      ))}
-    </Row>
+          {work && (
+            <Card
+              style={{
+                marginBottom: "25px",
+                borderRadius: "12px",
+                backgroundColor: "#ffffff",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+              }}
+            >
+              <Title level={4} style={{ color: "#112D4E", marginBottom: "15px" }}>
+                {work.title}
+              </Title>
 
-    <div style={{ textAlign: "center", marginTop: "30px" }}>
-      <Button
-        type="primary"
-        style={{
-          backgroundColor: "#112D4E",
-          borderColor: "#112D4E",
-          color: "#DBE2EF",
-          padding: "0 30px",
-          fontSize: "16px",
-        }}
-        onClick={handleCreateWorkHistory}
-      >
-        จบงาน
-      </Button>
-    </div>
-  </div>
-</div>
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="รายละเอียด">
+                  {work.description || "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="สถานที่">{work.place || "-"}</Descriptions.Item>
+                <Descriptions.Item label="วันเวลา">
+                  {work.worktime
+                    ? `${dayjs(work.worktime)
+                      .locale("th")
+                      .format("D MMMM")} ${dayjs(work.worktime).year() + 543} เวลา ${dayjs(
+                        work.worktime
+                      ).format("HH:mm")} น.`
+                    : "-"}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="ค่าจ้าง">
+                  {work.paid != null ? `${work.paid} บาท` : "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="ชั่วโมงอาสา">
+                  {work.volunteer != null ? `${work.volunteer} ชั่วโมง` : "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="จำนวนที่รับ">{work.workcount ?? 0} คน</Descriptions.Item>
+                <Descriptions.Item label="ผู้เข้าร่วมจริง">{users.length} คน</Descriptions.Item>
+              </Descriptions>
+            </Card>
+          )}
+
+          <Divider style={{ borderColor: "#112D4E" }}>รายชื่อผู้เข้าร่วม</Divider>
+
+          {users.length === 0 ? (
+            <p style={{ textAlign: "center", color: "#112D4E" }}>ไม่มีผู้เข้าร่วมงาน</p>
+          ) : (
+            <List
+              itemLayout="horizontal"
+              dataSource={users}
+              renderItem={(user, index) => (
+                <List.Item
+                  style={{
+                    background: index % 2 === 0 ? "#f0f4ff" : "#e6ecff",
+                    borderRadius: "8px",
+                    marginBottom: "8px",
+                    padding: "12px 20px",
+                  }}
+                >
+                  <span style={{ color: "#112D4E", fontWeight: 600 }}>
+                    {user.FirstName} {user.LastName}
+                  </span>
+                  <span style={{ color: "#555", marginLeft: "10px" }}>
+                    ({user.Email})
+                  </span>
+                </List.Item>
+              )}
+            />
+
+          )}
+
+          <div style={{ textAlign: "center", marginTop: "30px" }}>
+            <Button
+              type="primary"
+              style={{
+                backgroundColor: "#112D4E",
+                borderColor: "#112D4E",
+                color: "#fff",
+                padding: "0 30px",
+                fontSize: "16px",
+              }}
+              onClick={handleCreateWorkHistory}
+            >
+              ✅ จบงาน
+            </Button>
+          </div>
+        </div>
+      </div>
       <EnhancedFooter />
     </>
   );

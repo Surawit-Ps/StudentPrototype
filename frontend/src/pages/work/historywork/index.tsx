@@ -36,7 +36,7 @@ import banner from '../../../assets/banner.png';
 const { Title, Text, Paragraph } = Typography;
 
 const WorkHistoryPage: React.FC = () => {
-    const [histories, setHistories] = useState<WorkHistoryInterface[]>([]);
+    const [, setHistories] = useState<WorkHistoryInterface[]>([]);
     const [filtered, setFiltered] = useState<WorkHistoryInterface[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTitle, setSearchTitle] = useState("");
@@ -69,8 +69,6 @@ const WorkHistoryPage: React.FC = () => {
                 const dateB = new Date(b.Work?.worktime || "").getTime();
                 return dateB - dateA;
             });
-
-
 
             setFiltered(filteredData);
             setLoading(false);
@@ -203,13 +201,13 @@ const WorkHistoryPage: React.FC = () => {
             <Navbar />
 
             <div
-        style={{
-          background: `linear-gradient(135deg, rgba(63,114,175,0.5) 0%, rgba(17,45,78,0.5) 100%), url(${banner}) center/cover no-repeat`,
-          color: "white",
-          padding: "10px 20px 20px 20px",
-          textAlign: "center",
-        }}
-      >
+                style={{
+                    background: `linear-gradient(135deg, rgba(63,114,175,0.5) 0%, rgba(17,45,78,0.5) 100%), url(${banner}) center/cover no-repeat`,
+                    color: "white",
+                    padding: "10px 20px 20px 20px",
+                    textAlign: "center",
+                }}
+            >
                 <Title
                     level={1}
                     style={{
@@ -256,17 +254,17 @@ const WorkHistoryPage: React.FC = () => {
 
             <div
                 style={{
-          padding: "0 40px 60px",
-          background: "#DBE2EF",
-          minHeight: "60vh",
-        }}
+                    padding: "0 40px 60px",
+                    background: "#DBE2EF",
+                    minHeight: "60vh",
+                }}
             >
                 {filtered.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "80px 20px", color: "white" }}>
                         <Empty
                             image={Empty.PRESENTED_IMAGE_SIMPLE}
                             description={
-                                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "18px" }}>
+                                <Text style={{ color: "rgba(0,0,0,0.65)", fontSize: "18px" }}>
                                     ไม่มีประวัติงาน
                                 </Text>
                             }

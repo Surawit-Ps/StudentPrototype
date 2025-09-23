@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Space,
   Button,
@@ -8,7 +8,6 @@ import {
   Form,
   Input,
   Card,
-  message,
   Select,
   DatePicker,
   Upload,
@@ -97,9 +96,8 @@ function CustomerCreate() {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      padding: "32px" // เพิ่มระยะห่างขอบจอ
+      padding: "32px"
     }}>
-      {/* {contextHolder} */}
       <Card>
         <h2> เพิ่มข้อมูลผู้ใช้งาน</h2>
         <Divider />
@@ -119,13 +117,13 @@ function CustomerCreate() {
                       onChange={onChange}
                       onPreview={onPreview}
                       beforeUpload={(file) => {
-                        setFileList([file]); // จำกัด 1 รูป
+                        setFileList([file]);
                         return false;
                       }}
                       maxCount={1}
                       multiple={false}
                       listType="picture-card"
-                      showUploadList={false} // ✅ ซ่อน list อัตโนมัติของ Upload
+                      showUploadList={false}
                     >
                       {fileList.length === 0 ? (
                         <div>

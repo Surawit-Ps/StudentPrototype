@@ -3,7 +3,7 @@ import {
   Button, Col, Row, Card, Table, Typography, Divider, message, Layout, Modal
 } from "antd";
 import {
-  PlusOutlined, EditOutlined, DeleteOutlined
+  PlusOutlined, DeleteOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { UsersInterface } from "../../interfaces/IUser";
@@ -112,11 +112,6 @@ const UserTablePage = () => {
       align: "center" as const,
       render: (_: any, record: UsersInterface) => (
         <div className={styles.actions}>
-          {/* <Button
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/account/edit/${record.ID}`)}
-            className={styles.editButton}
-          /> */}
           <Button
             icon={<DeleteOutlined />}
             danger
@@ -152,7 +147,7 @@ const UserTablePage = () => {
                   onClick={() => navigate("/account/create")}
                   className={styles.createButton}
                 >
-                  สร้างบัญชี
+                  สร้างบัญชีแอดมิน
                 </Button>
               </Col>
             </Row>

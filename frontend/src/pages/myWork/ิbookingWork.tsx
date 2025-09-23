@@ -196,220 +196,222 @@ const BookingWork: React.FC = () => {
   }
 
   return (
-    <div style={{ background: "#F9F7F7", minHeight: "100vh" }}>
-      <Navbar />
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 16px" }}>
+    <>
+      <div style={{ background: "#F9F7F7", minHeight: "100vh" }}>
+        <Navbar />
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 16px" }}>
 
-        {/* Header */}
-        <div style={{ marginBottom: 32, textAlign: "center" }}>
-          <Title level={2} style={{ color: "#112D4E" }}>
-            <TeamOutlined /> รายชื่อผู้ลงทะเบียน
-          </Title>
-          <Text style={{ color: "#3F72AF", fontSize: 16 }}>
-            จัดการการเช็คชื่อผู้เข้าร่วมงาน
-          </Text>
-        </div>
+          {/* Header */}
+          <div style={{ marginBottom: 32, textAlign: "center" }}>
+            <Title level={2} style={{ color: "#112D4E" }}>
+              <TeamOutlined /> รายชื่อผู้ลงทะเบียน
+            </Title>
+            <Text style={{ color: "#3F72AF", fontSize: 16 }}>
+              จัดการการเช็คชื่อผู้เข้าร่วมงาน
+            </Text>
+          </div>
 
-        {/* Search & Filter */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12}>
-            <Search
-              placeholder="ค้นหาชื่อหรืออีเมล"
-              onChange={(e) => setSearchText(e.target.value)}
-              enterButton={<SearchOutlined />}
-              allowClear
-              size="large"
-            />
-          </Col>
-          <Col xs={24} sm={12}>
-            <Select
-              style={{ width: "100%" }}
-              value={filterStatus}
-              onChange={setFilterStatus}
-              suffixIcon={<FilterOutlined />}
-              size="large"
-            >
-              <Option value="all">ทั้งหมด</Option>
-              <Option value="checked">เช็คชื่อแล้ว</Option>
-              <Option value="not-checked">ยังไม่เช็คชื่อ</Option>
-            </Select>
-          </Col>
-        </Row>
-
-        {/* User List */}
-        <List
-          dataSource={filteredUsers}
-          itemLayout="horizontal"
-          split={false}
-          renderItem={(user) => (
-            <List.Item
-              style={{
-                background: "#DBE2EF",
-                borderRadius: 12,
-                marginBottom: 12,
-                padding: "16px 24px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-              actions={[
-                user.checkedIn ? (
-                  <Tooltip title="ยกเลิกเช็คชื่อ" key="undo-checkin">
-                    <Button
-                      type="text"
-                      danger
-                      onClick={() => handleUndoCheckIn(user.ID!)}
-                    >
-                      ยกเลิก
-                    </Button>
-                  </Tooltip>
-                ) : (
-                  <Button
-                    type="primary"
-                    style={{ backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
-                    onClick={() => handleCheckIn(user.ID!)}
-                  >
-                    เช็คชื่อ
-                  </Button>
-                ),
-                <Button
-                  type={user.checkedIn || user.hasReviewed ? "default" : "primary"}
-                  onClick={() => openReviewModal(user)}
-                  disabled={user.checkedIn || user.hasReviewed}
-                  style={{
-                    backgroundColor:
-                      user.checkedIn || user.hasReviewed ? undefined : "#112D4E",
-                    color:
-                      user.checkedIn || user.hasReviewed ? undefined : "#F9F7F7",
-                  }}
-                >
-                  {user.checkedIn ? "รีวิวเรียบร้อย" : user.hasReviewed ? "รีวิวแล้ว" : "รีวิว"}
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                avatar={
-                  <Badge dot color={user.checkedIn ? "green" : "gray"}>
-                    <Avatar
-                      src={user.Profile}
-                      icon={!user.Profile && <UserOutlined />}
-                      size={48}
-                    />
-                  </Badge>
-                }
-                title={
-                  <span>
-                    <Link
-                      to={`/account/showprofile/${user.ID}`}
-                      style={{
-                        color: "#112D4E",
-                        fontWeight: 600,
-                        fontSize: 16,
-                      }}
-                    >
-                      {user.FirstName} {user.LastName}
-                    </Link>
-                    {user.checkedIn && (
-                      <Tag
-                        color="success"
-                        icon={<CheckCircleOutlined />}
-                        style={{ marginLeft: 12 }}
-                      >
-                        เช็คชื่อเรียบร้อย
-                      </Tag>
-                    )}
-                  </span>
-                }
-                description={<Text style={{ color: "#112D4E" }}>{user.Email}</Text>}
+          {/* Search & Filter */}
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+            <Col xs={24} sm={12}>
+              <Search
+                placeholder="ค้นหาชื่อหรืออีเมล"
+                onChange={(e) => setSearchText(e.target.value)}
+                enterButton={<SearchOutlined />}
+                allowClear
+                size="large"
               />
-            </List.Item>
-          )}
-        />
+            </Col>
+            <Col xs={24} sm={12}>
+              <Select
+                style={{ width: "100%" }}
+                value={filterStatus}
+                onChange={setFilterStatus}
+                suffixIcon={<FilterOutlined />}
+                size="large"
+              >
+                <Option value="all">ทั้งหมด</Option>
+                <Option value="checked">เช็คชื่อแล้ว</Option>
+                <Option value="not-checked">ยังไม่เช็คชื่อ</Option>
+              </Select>
+            </Col>
+          </Row>
 
-        {/* Action Buttons */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 16,
-            marginTop: 32,
-          }}
-        >
-          <Button
-            size="large"
-            onClick={() => navigate(-1)}
-            style={{ minWidth: 220, backgroundColor: "#112D4E", color: "#F9F7F7" }}
+          {/* User List */}
+          <List
+            dataSource={filteredUsers}
+            itemLayout="horizontal"
+            split={false}
+            renderItem={(user) => (
+              <List.Item
+                style={{
+                  background: "#DBE2EF",
+                  borderRadius: 12,
+                  marginBottom: 12,
+                  padding: "16px 24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+                actions={[
+                  user.checkedIn ? (
+                    <Tooltip title="ยกเลิกเช็คชื่อ" key="undo-checkin">
+                      <Button
+                        type="text"
+                        danger
+                        onClick={() => handleUndoCheckIn(user.ID!)}
+                      >
+                        ยกเลิก
+                      </Button>
+                    </Tooltip>
+                  ) : (
+                    <Button
+                      type="primary"
+                      style={{ backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
+                      onClick={() => handleCheckIn(user.ID!)}
+                    >
+                      เช็คชื่อ
+                    </Button>
+                  ),
+                  <Button
+                    type={user.checkedIn || user.hasReviewed ? "default" : "primary"}
+                    onClick={() => openReviewModal(user)}
+                    disabled={user.checkedIn || user.hasReviewed}
+                    style={{
+                      backgroundColor:
+                        user.checkedIn || user.hasReviewed ? undefined : "#112D4E",
+                      color:
+                        user.checkedIn || user.hasReviewed ? undefined : "#F9F7F7",
+                    }}
+                  >
+                    {user.checkedIn ? "รีวิวเรียบร้อย" : user.hasReviewed ? "รีวิวแล้ว" : "รีวิว"}
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={
+                    <Badge dot color={user.checkedIn ? "green" : "gray"}>
+                      <Avatar
+                        src={user.Profile}
+                        icon={!user.Profile && <UserOutlined />}
+                        size={48}
+                      />
+                    </Badge>
+                  }
+                  title={
+                    <span>
+                      <Link
+                        to={`/account/showprofile/${user.ID}`}
+                        style={{
+                          color: "#112D4E",
+                          fontWeight: 600,
+                          fontSize: 16,
+                        }}
+                      >
+                        {user.FirstName} {user.LastName}
+                      </Link>
+                      {user.checkedIn && (
+                        <Tag
+                          color="success"
+                          icon={<CheckCircleOutlined />}
+                          style={{ marginLeft: 12 }}
+                        >
+                          เช็คชื่อเรียบร้อย
+                        </Tag>
+                      )}
+                    </span>
+                  }
+                  description={<Text style={{ color: "#112D4E" }}>{user.Email}</Text>}
+                />
+              </List.Item>
+            )}
+          />
+
+          {/* Action Buttons */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 16,
+              marginTop: 32,
+            }}
           >
-            ย้อนกลับ
-          </Button>
-          <Button
-            type="primary"
-            size="large"
-            loading={saving}
-            onClick={handleSaveAll}
-            style={{ minWidth: 220, backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
-          >
-            บันทึกสถานะเช็คชื่อทั้งหมด
-          </Button>
+            <Button
+              size="large"
+              onClick={() => navigate(-1)}
+              style={{ minWidth: 220, backgroundColor: "#112D4E", color: "#F9F7F7" }}
+            >
+              ย้อนกลับ
+            </Button>
+            <Button
+              type="primary"
+              size="large"
+              loading={saving}
+              onClick={handleSaveAll}
+              style={{ minWidth: 220, backgroundColor: "#3F72AF", borderColor: "#3F72AF" }}
+            >
+              บันทึกสถานะเช็คชื่อทั้งหมด
+            </Button>
 
-          
-        </div>
 
-        {/* Review Modal */}
-        <Modal
-          title={
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {currentReviewUser?.Profile ? (
-                <Avatar src={currentReviewUser.Profile} size={40} />
-              ) : (
-                <Avatar icon={<UserOutlined />} size={40} />
-              )}
-              <div>
-                <div style={{ fontWeight: 600, color: "#112D4E" }}>
-                  รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
-                </div>
-                <div style={{ fontSize: 12, color: "#3F72AF" }}>
-                  ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
+          </div>
+
+          {/* Review Modal */}
+          <Modal
+            title={
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {currentReviewUser?.Profile ? (
+                  <Avatar src={currentReviewUser.Profile} size={40} />
+                ) : (
+                  <Avatar icon={<UserOutlined />} size={40} />
+                )}
+                <div>
+                  <div style={{ fontWeight: 600, color: "#112D4E" }}>
+                    รีวิวของ {currentReviewUser?.FirstName} {currentReviewUser?.LastName}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#3F72AF" }}>
+                    ให้คะแนนและเขียนความคิดเห็นเกี่ยวกับการเข้าร่วมงาน
+                  </div>
                 </div>
               </div>
+            }
+            visible={isReviewModalVisible}
+            onOk={handleSaveReview}
+            onCancel={() => setIsReviewModalVisible(false)}
+            okText="บันทึก"
+            cancelText="ยกเลิก"
+            width={500}
+            okButtonProps={{
+              disabled: reviewRating === 0 || reviewComment.trim() === "",
+            }}
+          >
+            <div style={{ marginBottom: 16 }}>
+              <Text strong style={{ color: "#112D4E" }}>
+                ให้คะแนน:{" "}
+              </Text>
+              <Rate
+                value={reviewRating}
+                onChange={setReviewRating}
+                tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
+              />
             </div>
-          }
-          visible={isReviewModalVisible}
-          onOk={handleSaveReview}
-          onCancel={() => setIsReviewModalVisible(false)}
-          okText="บันทึก"
-          cancelText="ยกเลิก"
-          width={500}
-          okButtonProps={{
-            disabled: reviewRating === 0 || reviewComment.trim() === "",
-          }}
-        >
-          <div style={{ marginBottom: 16 }}>
-            <Text strong style={{ color: "#112D4E" }}>
-              ให้คะแนน:{" "}
-            </Text>
-            <Rate
-              value={reviewRating}
-              onChange={setReviewRating}
-              tooltips={["แย่มาก", "พอใช้", "ดี", "ดีมาก", "เยี่ยม"]}
-            />
-          </div>
-          <div>
-            <Text strong style={{ color: "#112D4E" }}>
-              ความคิดเห็น:{" "}
-            </Text>
-            <Input.TextArea
-              value={reviewComment}
-              onChange={(e) => setReviewComment(e.target.value)}
-              placeholder="เขียนความคิดเห็นของคุณที่นี่..."
-              autoSize={{ minRows: 4, maxRows: 6 }}
-              style={{ marginTop: 8 }}
-            />
-          </div>
-        </Modal>
+            <div>
+              <Text strong style={{ color: "#112D4E" }}>
+                ความคิดเห็น:{" "}
+              </Text>
+              <Input.TextArea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="เขียนความคิดเห็นของคุณที่นี่..."
+                autoSize={{ minRows: 4, maxRows: 6 }}
+                style={{ marginTop: 8 }}
+              />
+            </div>
+          </Modal>
+        </div>
       </div>
-        <EnhancedFooter />
-    </div>
+      <EnhancedFooter />
+    </>
   );
 };
 

@@ -321,7 +321,7 @@ pageContainer: {
   paddingLeft: 16,
   paddingRight: 16,
   background: 'linear-gradient(to bottom right, #f3e8ff, #e0f2ff)',
-  backgroundImage: 'url("https://i.makeagif.com/media/5-04-2017/XWrNmj.gif")',
+  backgroundImage: 'url("https://www.shutterstock.com/image-photo/blurred-background-dynamic-vibe-modern-600nw-2427774907.jpg")',
   backgroundSize: '120% 120%',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
@@ -357,8 +357,8 @@ cardWrapper: {
     marginRight: 12,
   },
     logoImage: {           // ✅ เพิ่มอันนี้
-    width: 1000,
-    height: 200,
+    width: 800,
+    height: 100,
     marginBottom: 1,
   },
   title: {
