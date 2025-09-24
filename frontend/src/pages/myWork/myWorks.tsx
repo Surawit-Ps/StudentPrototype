@@ -157,7 +157,6 @@ const MyPostedWorks: React.FC = () => {
       </div>
 
       {/* ✅ End Banner Section */}
-
       <div
         style={{
           padding: "0 40px 60px",

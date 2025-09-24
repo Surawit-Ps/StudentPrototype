@@ -11,23 +11,18 @@ import (
 func GetAllWork(c *gin.Context) {
 	var work []entity.Work
 	db := config.DB()
-
 	result := db.Preload("WorkStatus").Preload("WorkType").Find(&work)
-
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, work)
 }
 
 func GetWork(c *gin.Context) {
 	ID := c.Param("id")
 	var work entity.Work
-
 	db := config.DB()
-
 	result := db.Preload("WorkStatus").Preload("WorkType").First(&work, ID)
 
 	if result.Error != nil {
@@ -40,14 +35,11 @@ func GetWork(c *gin.Context) {
 
 func CreateWork(c *gin.Context) {
 	var work entity.Work
-
-	// รับข้อมูล JSON ที่ส่งมาจาก client
 	if err := c.ShouldBindJSON(&work); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request, unable to map payload"})
 		return
 	}
 
-	// บันทึกโปรโมชั่นใหม่ลงในฐานข้อมูล
 	db := config.DB()
 	if result := db.Create(&work); result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create work"})
@@ -96,7 +88,6 @@ func DeleteWork(c *gin.Context) {
 	id := c.Param("id")
 	db := config.DB()
 
-	// ลบโปรโมชั่นจากฐานข้อมูล
 	if tx := db.Exec("DELETE FROM works WHERE id = ?", id); tx.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Work not found"})
 		return
@@ -110,7 +101,7 @@ type RegisterPayload struct {
 }
 
 func RegisterWork(c *gin.Context) {
-	id := c.Param("id") // รับ work id จาก URL
+	id := c.Param("id")
 	db := config.DB()
 
 	var work entity.Work
@@ -125,7 +116,6 @@ func RegisterWork(c *gin.Context) {
 		return
 	}
 
-	// ✅ ตรวจสอบว่าผู้ใช้เคยลงทะเบียนแล้วหรือยัง
 	var user entity.User
 	if err := db.First(&user, payload.UserID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})

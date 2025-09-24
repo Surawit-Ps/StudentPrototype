@@ -104,9 +104,9 @@ const WorkTablePage = () => {
       width: 60,
       align: "center" as const,
       render: (_: any, __: any, index: number) => {
-  const { current, pageSize } = tablePagination; // ต้องเก็บ pagination state
-  return index + 1 + (current - 1) * pageSize;
-}
+        const { current, pageSize } = tablePagination; // ต้องเก็บ pagination state
+        return index + 1 + (current - 1) * pageSize;
+      }
     },
     {
       title: "รูปภาพ",
@@ -185,8 +185,8 @@ const WorkTablePage = () => {
         record.paid
           ? `${record.paid} บาท`
           : record.volunteer
-          ? `${record.volunteer} ชั่วโมง`
-          : "-",
+            ? `${record.volunteer} ชั่วโมง`
+            : "-",
     },
     {
       title: "การจัดการ",
@@ -288,21 +288,18 @@ const WorkTablePage = () => {
                 </Button>
               </Col>
             </Row>
-
             <Divider />
-
             <Table
-  bordered
-  columns={columns}
-  dataSource={filteredWorks.map((item) => ({ ...item, key: item.ID?.toString() }))}
-  pagination={{
-    current: tablePagination.current,
-    pageSize: tablePagination.pageSize,
-    onChange: (page, pageSize) => setTablePagination({ current: page, pageSize }),
-  }}
-  scroll={{ x: "max-content" }}
-/>
-
+              bordered
+              columns={columns}
+              dataSource={filteredWorks.map((item) => ({ ...item, key: item.ID?.toString() }))}
+              pagination={{
+                current: tablePagination.current,
+                pageSize: tablePagination.pageSize,
+                onChange: (page, pageSize) => setTablePagination({ current: page, pageSize }),
+              }}
+              scroll={{ x: "max-content" }}
+            />
           </Card>
         </Content>
       </Layout>
