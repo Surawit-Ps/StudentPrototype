@@ -29,6 +29,7 @@ import Login from "./pages/login/login";
 // import EnhancedFooter from "./components/Footer/EnhancedFooter";
 import CompleteWork from "./pages/workComplete/completeWork";
 import LoginPage from "./pages/login/login";
+import CreateCheckInPage from "./pages/work/checkIn";
 
 const { Content } = Layout;
 
@@ -68,6 +69,7 @@ const App: React.FC = () => {
             <Route path="/myworks/booking/:workId" element={<BookingWork />} />
             <Route path="/work/complete/:workId" element={<CompleteWork />} />
             <Route path="/home" element={<Home/>}/>
+            <Route path="/work/checkin/:workId" element={<CreateCheckInPage />} />
             
           </Routes>
         </Content>

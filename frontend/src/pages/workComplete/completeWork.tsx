@@ -2,22 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   GetBookingByWorkId,
-  GetCheckIns,
   GetUserById,
   CreateWorkHistory,
   GetWorkById,
-  DeleteAllBookingByWorkID,
+  DeleteAllCheckInByWorkID,
+  UpdateWork,
 } from "../../services/https";
 import { BookingInterface } from "../../interfaces/IBooking";
-import { CheckInInterface } from "../../interfaces/ICheckIn";
 import { UsersInterface } from "../../interfaces/IUser";
 import { WorkInterface } from "../../interfaces/IWork";
 import { Card, Button, Typography, Spin, message, List, Divider, Descriptions } from "antd";
 import Navbar from "../../components/Navbar/Navbar";
 import EnhancedFooter from "../../components/Footer/EnhancedFooter";
 import { IWorkHistory } from "../../interfaces/IWorkHistory";
-
-// Day.js สำหรับจัดการวันที่แบบไทย
 import dayjs from "dayjs";
 import "dayjs/locale/th";
 
@@ -39,15 +36,9 @@ const CompleteWork: React.FC = () => {
         setWork(workData);
 
         const bookings: BookingInterface[] = await GetBookingByWorkId(Number(workId));
-        const checkins: CheckInInterface[] = await GetCheckIns();
-
         const checkedInBookings = bookings.filter((b) => b.status === "checked-in");
 
-        const checkedInUserIds = checkedInBookings
-          .filter((b) =>
-            checkins.some((c) => c.user_id === b.user_id && c.work_id === b.work_id)
-          )
-          .map((b) => b.user_id);
+        const checkedInUserIds = checkedInBookings.map((b) => b.user_id);
 
         const userList: UsersInterface[] = [];
         for (const uid of checkedInUserIds) {
@@ -66,30 +57,37 @@ const CompleteWork: React.FC = () => {
     fetchData();
   }, [workId]);
 
-  const handleCreateWorkHistory = async () => {
+  const handleCompleteWork = async () => {
     if (!work) {
       message.error("ไม่พบข้อมูลงาน");
       return;
     }
 
     try {
+      // สร้าง WorkHistory สำหรับผู้เข้าร่วมทั้งหมด
       for (const user of users) {
         const data: IWorkHistory = {
-          user_id: user?.ID ?? 0,  // <-- ใส่ comma ที่นี่
+          user_id: user.ID ?? 0,
           work_id: Number(workId),
           paid_amount: work.paid ?? null,
           volunteer_hour: work.volunteer ?? null,
         };
-        console.log("กำลังส่งจบงาน:", data);
         await CreateWorkHistory(data);
       }
 
+      // ลบ CheckIn ทั้งหมดของงานนี้
       if (workId) {
-        await DeleteAllBookingByWorkID(Number(workId));
-        console.log("ลบ Booking ของงานนี้เรียบร้อยแล้ว");
+        await DeleteAllCheckInByWorkID(Number(workId));
       }
 
-      message.success("จบงานเสร็จสิ้น");
+      // อัปเดต work_use เป็น 0
+      await UpdateWork(Number(workId), {
+        ...(work as WorkInterface),
+        ID: work.ID,
+        workuse: 0
+      });
+
+      message.success("จบงานสำเร็จ");
       navigate("/myworks");
     } catch (err) {
       console.error(err);
@@ -137,26 +135,17 @@ const CompleteWork: React.FC = () => {
               </Title>
 
               <Descriptions column={1} bordered size="middle">
-                <Descriptions.Item label="รายละเอียด">
-                  {work.description || "-"}
-                </Descriptions.Item>
+                <Descriptions.Item label="รายละเอียด">{work.description || "-"}</Descriptions.Item>
                 <Descriptions.Item label="สถานที่">{work.place || "-"}</Descriptions.Item>
                 <Descriptions.Item label="วันเวลา">
                   {work.worktime
-                    ? `${dayjs(work.worktime)
-                      .locale("th")
-                      .format("D MMMM")} ${dayjs(work.worktime).year() + 543} เวลา ${dayjs(
-                        work.worktime
-                      ).format("HH:mm")} น.`
+                    ? `${dayjs(work.worktime).locale("th").format("D MMMM")} ${
+                        dayjs(work.worktime).year() + 543
+                      } เวลา ${dayjs(work.worktime).format("HH:mm")} น.`
                     : "-"}
                 </Descriptions.Item>
-
-                <Descriptions.Item label="ค่าจ้าง">
-                  {work.paid != null ? `${work.paid} บาท` : "-"}
-                </Descriptions.Item>
-                <Descriptions.Item label="ชั่วโมงอาสา">
-                  {work.volunteer != null ? `${work.volunteer} ชั่วโมง` : "-"}
-                </Descriptions.Item>
+                <Descriptions.Item label="ค่าจ้าง">{work.paid ?? "-"} บาท</Descriptions.Item>
+                <Descriptions.Item label="ชั่วโมงอาสา">{work.volunteer ?? "-"} ชั่วโมง</Descriptions.Item>
                 <Descriptions.Item label="จำนวนที่รับ">{work.workcount ?? 0} คน</Descriptions.Item>
                 <Descriptions.Item label="ผู้เข้าร่วมจริง">{users.length} คน</Descriptions.Item>
               </Descriptions>
@@ -189,10 +178,22 @@ const CompleteWork: React.FC = () => {
                 </List.Item>
               )}
             />
-
           )}
 
           <div style={{ textAlign: "center", marginTop: "30px" }}>
+            <Button
+              type="default"
+              style={{
+                marginRight: "10px",
+                borderColor: "#112D4E",
+                color: "#112D4E",
+                padding: "0 30px",
+                fontSize: "16px",
+              }}
+              onClick={() => navigate(`/work/checkin/${workId}`)}
+            >
+              📝 เช็คอิน
+            </Button>
             <Button
               type="primary"
               style={{
@@ -202,7 +203,7 @@ const CompleteWork: React.FC = () => {
                 padding: "0 30px",
                 fontSize: "16px",
               }}
-              onClick={handleCreateWorkHistory}
+              onClick={handleCompleteWork}
             >
               ✅ จบงาน
             </Button>

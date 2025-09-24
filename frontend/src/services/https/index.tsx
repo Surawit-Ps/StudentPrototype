@@ -240,7 +240,12 @@ async function UpdateCheckIn(data: CheckInInterface) {
   return res.ok ? res.json() : false;
 }
 async function DeleteCheckInByID(id: Number | undefined) {
-  const res = await fetch(`${apiUrl}/checkins/${id}`, authRequestOptions("DELETE"));
+  const res = await fetch(`${apiUrl}/checkin/${id}`, authRequestOptions("DELETE"));
+  return res.ok;
+}
+
+async function DeleteAllCheckInByWorkID(workId: number) {
+  const res = await fetch(`${apiUrl}/checkins/work/${workId}`, authRequestOptions("DELETE"));
   return res.ok;
 }
 
@@ -360,6 +365,7 @@ export {
   DeleteCheckInByID,
   GetCheckInByWorkId,
   GetCheckInByUserId,
+  DeleteAllCheckInByWorkID,
   // work history
   GetWorkHistoryByUserId,
   GetWorkHistoryByWorkId,

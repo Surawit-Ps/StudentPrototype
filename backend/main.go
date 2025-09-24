@@ -78,6 +78,8 @@ func main() {
 		router.PATCH("/checkin/:id", controller.UpdateCheckIn)
 		router.DELETE("/checkin/:id", controller.DeleteCheckIn)
 		router.GET("/checkins", controller.GetAllCheckIn)
+		router.DELETE("/checkins/work/:workID", controller.DeleteAllCheckInByWorkID)
+
 		// WorkHistory Routes
 		router.GET("/workhistory/user/:userID", controller.GetWorkHistoryByUserID)
 		router.GET("/workhistory/work/:workID", controller.GetWorkHistoryByWorkID)

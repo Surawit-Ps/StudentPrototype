@@ -82,3 +82,18 @@ func GetAllCheckIn (c *gin.Context) {
 	}	
 	c.JSON(http.StatusOK, checkIns)
 }
+
+func DeleteAllCheckInByWorkID(c *gin.Context) {
+	workID := c.Param("workID")
+	db := config.DB()
+	result := db.Where("work_id = ?", workID).Delete(&entity.CheckIn{})	
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to delete check-ins"})
+		return
+	}	
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No check-ins found for the specified work ID"})
+		return
+	}	
+	c.JSON(http.StatusOK, gin.H{"message": "All check-ins for the specified work ID deleted successfully"})
+}
