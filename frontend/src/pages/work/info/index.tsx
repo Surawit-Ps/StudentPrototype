@@ -111,7 +111,7 @@ useEffect(() => {
                 const isWithinTime = now >= checkInStart && now <= checkInEnd;
 
                 // อนุญาตให้เช็คอินได้เมื่ออยู่ในระยะ และเวลาอยู่ในช่วงที่กำหนด
-                if (true && true) {  // เช่น กำหนดให้อยู่ใน 100 เมตร
+                if (dist <= 100 && isWithinTime) {  // เช่น กำหนดให้อยู่ใน 100 เมตร
                     setCanCheckIn(true);
                 } else {
                     setCanCheckIn(false);
